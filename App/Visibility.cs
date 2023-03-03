@@ -1,4 +1,4 @@
-﻿namespace Console
+﻿namespace App
 {
 	internal enum Visibility
 	{

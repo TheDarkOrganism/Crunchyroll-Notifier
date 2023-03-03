@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Console
+namespace App
 {
 	internal sealed class Program
 	{
@@ -125,7 +125,7 @@ namespace Console
 
 					foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
 					{
-						if (DateTime.TryParse(nav.SelectSingleNode($".//crunchyroll:{config.Visibility.ToString()?.ToLower()}PubDate", manager)?.Value, out DateTime result) && result >= copy)
+						if (DateTime.TryParse(nav.SelectSingleNode($".//crunchyroll:{config.Visibility.ToString()?.ToLower()}PubDate", manager)?.Value, out DateTime result) && result > copy)
 						{
 							string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? Regex.Match(title, @"\(([A-Za-z\-]+) Dub\)").Groups.Values.ElementAtOrDefault(1)?.Value : default;
 
