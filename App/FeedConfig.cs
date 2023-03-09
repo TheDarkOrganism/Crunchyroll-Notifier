@@ -2,6 +2,8 @@
 {
 	internal sealed class FeedConfig
 	{
+		#region Properties
+
 		public double Interval { get; init; }
 
 		public int MaxNotifications { get; init; }
@@ -14,6 +16,8 @@
 
 		public IEnumerable<string> Names { get; init; }
 
+		#endregion
+
 		public FeedConfig()
 		{
 			Interval = 10;
@@ -21,6 +25,8 @@
 			Dubs = Enumerable.Empty<string>();
 			Names = Enumerable.Empty<string>();
 		}
+
+		#region Methods
 
 		public bool ShouldSerializeDubs()
 		{
@@ -31,5 +37,7 @@
 		{
 			return Names.Any();
 		}
+
+		#endregion
 	}
 }

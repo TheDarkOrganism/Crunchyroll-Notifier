@@ -1,9 +1,6 @@
 {
 	"Interval": 30,
-	"Visibility": "Premium",
+	"Visibility": "Default",
 	"MaxNotifications": 10,
-	"ShowFirstRun": true,
-	"Dubs": [
-		"English"
-	]
+	"ShowFirstRun": true
 }

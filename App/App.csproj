@@ -7,22 +7,28 @@
 		<Nullable>enable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>Crunchyroll Notifier</AssemblyName>
+		<AssemblyVersion>1.1.0</AssemblyVersion>
+		<Version>$(AssemblyVersion)</Version>
+		<Authors>Richard Whicker</Authors>
+		<Company>Cfboy1995</Company>
+		<Copyright>2023</Copyright>
 		<SupportedOSPlatformVersion>10.0.20348.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>Crunchyroll-Notifier.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Using Include="System.Diagnostics" />
 		<Using Remove="System.Net.Http" />
-		<Using Include="CommunityToolkit.WinUI.Notifications" />
+		<Using Include="System.Text.RegularExpressions" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Crunchyroll-Notifier.ico" />
+		<Content Include="Crunchyroll-Notifier.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
 	</ItemGroup>
 

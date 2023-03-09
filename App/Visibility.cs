@@ -2,7 +2,7 @@
 {
 	internal enum Visibility
 	{
-		All,
+		Default,
 		Free,
 		Premium
 	}

@@ -17,8 +17,8 @@
 			"type": "string",
 			"description": "The visibility of a episode on the website.",
 			"enum": [
-				"All",
-				"all",
+				"Default",
+				"default",
 				"Free",
 				"Premium",
 				"free",
