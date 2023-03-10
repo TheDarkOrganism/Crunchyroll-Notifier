@@ -66,11 +66,11 @@ namespace App
 
 		#region Public
 
-		public static async Task<(bool, FeedConfig)> LoadAsync(CancellationToken token)
+		public static async Task<(LoadStatus, FeedConfig)> LoadAsync(CancellationToken token)
 		{
 			if (!File.Exists(_feedConfig))
 			{
-				return (default, _fallback.Value);
+				return (LoadStatus.NotFound, _fallback.Value);
 			}
 
 			try
@@ -79,12 +79,12 @@ namespace App
 
 				if (json.IsValid(JSchema.Parse(await File.ReadAllTextAsync("FeedConfigSchema.json", token))) && json.ToObject<FeedConfig>() is FeedConfig config)
 				{
-					return (true, config);
+					return (LoadStatus.Loaded, config);
 				}
 			}
 			catch { }
 
-			return (default, _fallback.Value);
+			return (LoadStatus.Invalid, _fallback.Value);
 		}
 
 		public static async Task<bool> SaveAsync(FeedConfig config, CancellationToken token)

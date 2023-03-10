@@ -30,7 +30,7 @@ async void Run()
 		timer = new(TimeSpan.FromSeconds(c.Interval));
 	};
 
-	(bool, FeedConfig) load = await ConfigManager.LoadAsync(token);
+	(LoadStatus, FeedConfig) load = await ConfigManager.LoadAsync(token);
 
 	config = load.Item2;
 
@@ -45,15 +45,21 @@ async void Run()
 		builder.Show();
 	}
 
-	if (!load.Item1)
+	#region Handle config file errors
+
+	LoadStatus status = load.Item1;
+
+	if (status != LoadStatus.Loaded)
 	{
 		Notification(builder => builder
-		.AddText("Config Not Valid")
+		.AddText($"Config was {(status is LoadStatus.NotFound ? "Not Found" : status)}")
 		.AddText("Using Default Config")
 		.AddButton(new ToastButton()
 		.SetContent("View Defualt Config")
 		.AddArgument("open", "default config")));
 	}
+
+	#endregion
 
 	#region Load Last Check
 
