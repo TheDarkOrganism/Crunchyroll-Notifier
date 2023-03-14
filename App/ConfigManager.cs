@@ -40,7 +40,7 @@ namespace App
 
 		#region Private
 
-		private static async Task<bool> HandleSaveAsync(FeedConfig config, string filename, CancellationToken token)
+		private static async ValueTask<bool> HandleSaveAsync(FeedConfig config, string filename, CancellationToken token)
 		{
 			try
 			{
@@ -66,7 +66,7 @@ namespace App
 
 		#region Public
 
-		public static async Task<(LoadStatus, FeedConfig)> LoadAsync(CancellationToken token)
+		public static async ValueTask<(LoadStatus, FeedConfig)> LoadAsync(CancellationToken token)
 		{
 			if (!File.Exists(_feedConfig))
 			{
@@ -87,7 +87,7 @@ namespace App
 			return (LoadStatus.Invalid, _fallback.Value);
 		}
 
-		public static async Task<bool> SaveAsync(FeedConfig config, CancellationToken token)
+		public static async ValueTask<bool> SaveAsync(FeedConfig config, CancellationToken token)
 		{
 			if (await HandleSaveAsync(config, _feedConfig, token))
 			{
@@ -101,7 +101,7 @@ namespace App
 			}
 		}
 
-		public static async Task OpenConfigAsync(CancellationToken token)
+		public static async ValueTask OpenConfigAsync(CancellationToken token)
 		{
 			if (File.Exists(_feedConfig) || await SaveAsync(_fallback.Value, token))
 			{
@@ -109,7 +109,7 @@ namespace App
 			}
 		}
 
-		public static async Task OpenDefaultConfigAsync(CancellationToken token)
+		public static async ValueTask OpenDefaultConfigAsync(CancellationToken token)
 		{
 			const string example = "FeedConfigDefault.json";
 

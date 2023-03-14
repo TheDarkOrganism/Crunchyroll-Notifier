@@ -65,7 +65,7 @@ async void Run()
 
 	const string lastFile = "Last";
 
-	DateTime last = default;
+	DateTime last;
 
 	if (File.Exists(lastFile))
 	{
