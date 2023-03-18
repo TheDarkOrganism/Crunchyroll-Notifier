@@ -110,52 +110,56 @@ async void Run()
 
 		do
 		{
-			#region Load RSS Feed
-
-			XPathDocument document = new("http://feeds.feedburner.com/crunchyroll/rss/anime");
-
-			XPathNavigator navigator = document.CreateNavigator();
-
-			if (manager is null)
+			try
 			{
-				manager = new(navigator.NameTable);
+				#region Load RSS Feed
 
-				manager.AddNamespace("media", "http://search.yahoo.com/mrss/");
-				manager.AddNamespace("crunchyroll", "http://www.crunchyroll.com/rss");
-			}
+				XPathDocument document = new("http://feeds.feedburner.com/crunchyroll/rss/anime");
 
-			#endregion
+				XPathNavigator navigator = document.CreateNavigator();
 
-			DateTime copy = last;
-
-			#region Loop through parsed episode data
-
-			string pub = config.Visibility is Visibility.Default ? "pub" : $"crunchyroll:{config.Visibility.ToString().ToLower()}Pub";
-
-			foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
-			{
-				if (DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
+				if (manager is null)
 				{
-					string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? Regex.Match(title, @"\(([A-Za-z\-]+) Dub\)").Groups.Values.ElementAtOrDefault(1)?.Value : default;
+					manager = new(navigator.NameTable);
 
-					if (CheckValue(dub, config.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, config.Names) && nav.SelectSingleNode(".//link")?.Value is string url)
+					manager.AddNamespace("media", "http://search.yahoo.com/mrss/");
+					manager.AddNamespace("crunchyroll", "http://www.crunchyroll.com/rss");
+				}
+
+				#endregion
+
+				DateTime copy = last;
+
+				#region Loop through parsed episode data
+
+				string pub = config.Visibility is Visibility.Default ? "pub" : $"crunchyroll:{config.Visibility.ToString().ToLower()}Pub";
+
+				foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
+				{
+					if (DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
 					{
-						Notification(builder => builder
-						.AddText($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}")
-						.AddText($"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}")
-						.AddButton("Open", ToastActivationType.Protocol, url));
-					}
+						string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? Regex.Match(title, @"\(([A-Za-z\-]+) Dub\)").Groups.Values.ElementAtOrDefault(1)?.Value : default;
 
-					last = result;
+						if (CheckValue(dub, config.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, config.Names) && nav.SelectSingleNode(".//link")?.Value is string url)
+						{
+							Notification(builder => builder
+							.AddText($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}")
+							.AddText($"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}")
+							.AddButton("Open", ToastActivationType.Protocol, url));
+						}
+
+						last = result;
+					}
+				}
+
+				#endregion
+
+				if (copy != last)
+				{
+					await File.WriteAllTextAsync(lastFile, last.ToString(), token);
 				}
 			}
-
-			#endregion
-
-			if (copy != last)
-			{
-				await File.WriteAllTextAsync(lastFile, last.ToString(), token);
-			}
+			catch { }
 		} while (await timer.WaitForNextTickAsync(token));
 	}
 	catch (Exception ex)
