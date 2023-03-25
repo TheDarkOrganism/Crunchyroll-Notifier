@@ -68,7 +68,7 @@ provided by Cruchyroll.
 
 <br>
 
-It is the schema used to validate the FeedCofig.json
+It is the schema used to validate the FeedConfig.json
 file when the app is loaded.
 
 <br>
