@@ -6,7 +6,7 @@
 
 <br>
 
-**Crunchyroll Notifier** is a windows application written in .Net 6.<br>
+**Crunchyroll Notifier** is a windows application written in .Net 8.<br>
 It sends notifications to the user about new episodes on Cruchyroll.<br>
 This app uses the RSS feed found at [Recently Added Anime Videos](http://feeds.feedburner.com/crunchyroll/rss/anime)
 provided by Cruchyroll.
