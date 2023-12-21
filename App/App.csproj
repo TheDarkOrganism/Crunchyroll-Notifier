@@ -10,7 +10,7 @@
 		<AssemblyVersion>1.1.1</AssemblyVersion>
 		<Version>$(AssemblyVersion)</Version>
 		<Authors>Richard Whicker</Authors>
-		<Company>Cfboy1995</Company>
+		<Company>TheDarkOrganism</Company>
 		<Copyright>2023</Copyright>
 		<SupportedOSPlatformVersion>10.0.20348.0</SupportedOSPlatformVersion>
 		<ApplicationIcon>Crunchyroll-Notifier.ico</ApplicationIcon>
