@@ -23,13 +23,6 @@ async void Run()
 
 	PeriodicTimer timer;
 
-	ConfigManager.OnFeedConfigChanged += c =>
-	{
-		config = c;
-
-		timer = new(TimeSpan.FromSeconds(c.Interval));
-	};
-
 	(LoadStatus, FeedConfig) load = await ConfigManager.LoadAsync(token);
 
 	config = load.Item2;
@@ -105,6 +98,13 @@ async void Run()
 		}
 
 		timer = new(TimeSpan.FromSeconds(config.Interval));
+
+		ConfigManager.OnFeedConfigChanged += c =>
+		{
+			config = c;
+
+			timer.Period = TimeSpan.FromSeconds(c.Interval);
+		};
 
 		XmlNamespaceManager? manager = default;
 
