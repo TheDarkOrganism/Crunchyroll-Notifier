@@ -1,5 +1,4 @@
 ﻿using App;
-using CommunityToolkit.WinUI.Notifications;
 using System.Xml;
 using System.Xml.XPath;
 
@@ -11,6 +10,8 @@ if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length >
 CancellationTokenSource source = new();
 
 CancellationToken token = source.Token;
+
+NotificationHelper notification = new(token);
 
 #region Background Thread
 
@@ -29,27 +30,13 @@ async void Run()
 
 	#endregion
 
-	static void Notification(Action<ToastContentBuilder> action)
-	{
-		ToastContentBuilder builder = new();
-
-		action(builder);
-
-		builder.Show();
-	}
-
 	#region Handle config file errors
 
 	LoadStatus status = load.Item1;
 
 	if (status != LoadStatus.Loaded)
 	{
-		Notification(builder => builder
-		.AddText($"Config was {(status is LoadStatus.NotFound ? "Not Found" : status)}")
-		.AddText("Using Default Config")
-		.AddButton(new ToastButton()
-		.SetContent("View Defualt Config")
-		.AddArgument("open", "default config")));
+		notification.Notify($"Config was {(status is LoadStatus.NotFound ? "Not Found" : status)}", "Using Default Config", "View Defualt Config", NotificationHelper.openKey, NotificationHelper.defaultConfigValue);
 	}
 
 	#endregion
@@ -76,13 +63,7 @@ async void Run()
 
 		if (config.ShowFirstRun)
 		{
-			Notification(builder => builder
-				.AddText("App First Run")
-				.AddText("You can find the app in the system tray.")
-				.AddButton(new ToastButton()
-				.SetContent("Open Config")
-				.AddArgument("open", "config"))
-			);
+			notification.Notify("App First Run", "You can find the app in the system tray.", "Open Config", NotificationHelper.openKey, NotificationHelper.openKey);
 		}
 	}
 
@@ -142,10 +123,7 @@ async void Run()
 
 						if (CheckValue(dub, config.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, config.Names) && nav.SelectSingleNode(".//link")?.Value is string url)
 						{
-							Notification(builder => builder
-							.AddText($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}")
-							.AddText($"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}")
-							.AddButton("Open", ToastActivationType.Protocol, url));
+							notification.Notify($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}", $"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}", NotificationHelper.openKey, url);
 						}
 
 						last = result;
@@ -172,30 +150,6 @@ async void Run()
 
 	#endregion
 }
-
-#region Set up notification buttons
-
-ToastNotificationManagerCompat.OnActivated += async toastArgs =>
-{
-	ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
-
-	if (args.TryGetValue("open", out string? value))
-	{
-		switch (value)
-		{
-			case "config":
-				await ConfigManager.OpenConfigAsync(token);
-				break;
-			case "default config":
-				await ConfigManager.OpenDefaultConfigAsync(token);
-				break;
-			default:
-				break;
-		}
-	}
-};
-
-#endregion
 
 Run();
 
