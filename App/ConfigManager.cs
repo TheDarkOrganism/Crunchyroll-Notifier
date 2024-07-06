@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace App
 {
@@ -15,14 +13,12 @@ namespace App
 
 		private static readonly Lazy<FeedConfig> _fallback = new(() => new());
 
-		private static readonly JsonSerializerSettings _settings = new()
+		private static readonly JsonSerializerOptions _serializerOptions = new()
 		{
-			NullValueHandling = NullValueHandling.Ignore,
-			Formatting = Formatting.Indented,
-			Converters =
-			[
-				new StringEnumConverter()
-			]
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+			PropertyNameCaseInsensitive = true,
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			WriteIndented = true
 		};
 
 		#endregion
@@ -44,7 +40,7 @@ namespace App
 		{
 			try
 			{
-				await File.WriteAllTextAsync(filename, JsonConvert.SerializeObject(config, _settings), token);
+				await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(config, _serializerOptions), token);
 
 				return true;
 			}
@@ -75,9 +71,9 @@ namespace App
 
 			try
 			{
-				JToken json = JToken.Parse(await File.ReadAllTextAsync(_feedConfig, token));
+				FeedConfig? feedConfig = JsonSerializer.Deserialize<FeedConfig>(await File.ReadAllTextAsync("FeedConfig.json", token), _serializerOptions);
 
-				if (json.IsValid(JSchema.Parse(await File.ReadAllTextAsync("FeedConfigSchema.json", token))) && json.ToObject<FeedConfig>() is FeedConfig config)
+				if (JsonSerializer.Deserialize<FeedConfig>(await File.ReadAllTextAsync("FeedConfig.json", token), _serializerOptions) is FeedConfig config)
 				{
 					return (LoadStatus.Loaded, config);
 				}
