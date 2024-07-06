@@ -4,27 +4,19 @@
 	{
 		#region Properties
 
-		public double Interval { get; init; }
+		public double Interval { get; init; } = 10;
 
-		public int MaxNotifications { get; init; }
+		public int MaxNotifications { get; init; } = 10;
 
 		public bool ShowFirstRun { get; init; }
 
 		public Visibility Visibility { get; init; }
 
-		public IEnumerable<string> Dubs { get; init; }
+		public IEnumerable<string> Dubs { get; init; } = [];
 
-		public IEnumerable<string> Names { get; init; }
+		public IEnumerable<string> Names { get; init; } = [];
 
 		#endregion
-
-		public FeedConfig()
-		{
-			Interval = 10;
-			MaxNotifications = 10;
-			Dubs = Enumerable.Empty<string>();
-			Names = Enumerable.Empty<string>();
-		}
 
 		#region Methods
 

@@ -19,10 +19,10 @@ namespace App
 		{
 			NullValueHandling = NullValueHandling.Ignore,
 			Formatting = Formatting.Indented,
-			Converters = new[]
-			{
+			Converters =
+			[
 				new StringEnumConverter()
-			}
+			]
 		};
 
 		#endregion
