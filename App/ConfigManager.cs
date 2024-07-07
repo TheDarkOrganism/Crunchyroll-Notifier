@@ -1,4 +1,5 @@
 ﻿using App.Converters;
+using System.Text.Json.Serialization.Metadata;
 
 namespace App
 {
@@ -22,6 +23,40 @@ namespace App
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 			PropertyNameCaseInsensitive = true,
 			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+			{
+				Modifiers =
+				{
+					typeInfo =>
+					{
+						foreach (JsonPropertyInfo jsonPropertyInfo in typeInfo.Properties)
+						{
+							Action<object, object?>? setProperty = jsonPropertyInfo.Set;
+
+							if (setProperty is not null)
+							{
+								IEnumerable<ValidationAttribute>? attributes = jsonPropertyInfo.AttributeProvider?.GetCustomAttributes(typeof(ValidationAttribute), true).OfType<ValidationAttribute>();
+
+								if (attributes is not null)
+								{
+									jsonPropertyInfo.Set = (obj, value) =>
+									{
+										foreach(ValidationAttribute attribute in attributes)
+										{
+											if (!attribute.IsValid(value))
+											{
+												throw new InvalidDataException(attribute.FormatErrorMessage(jsonPropertyInfo.Name));
+											}
+										}
+
+										setProperty(obj, value);
+									};
+								}
+							}
+						}
+					}
+				}
+			},
 			WriteIndented = true
 		};
 
