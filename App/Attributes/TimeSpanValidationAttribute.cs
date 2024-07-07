@@ -4,7 +4,7 @@
 	{
 		public override bool IsValid(object? value)
 		{
-			return Minimum is double minimum && value is TimeSpan timeSpan && minimum >= timeSpan.TotalSeconds;
+			return Minimum is double minimum && value is TimeSpan timeSpan && timeSpan.TotalSeconds >= minimum;
 		}
 	}
 }
