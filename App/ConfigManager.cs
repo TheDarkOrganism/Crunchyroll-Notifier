@@ -22,7 +22,7 @@ namespace App
 			},
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 			PropertyNameCaseInsensitive = true,
-			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			PropertyNamingPolicy = new PascalCaseNamingPolicy(),
 			TypeInfoResolver = new DefaultJsonTypeInfoResolver()
 			{
 				Modifiers =
