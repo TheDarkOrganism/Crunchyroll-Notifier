@@ -110,7 +110,7 @@ namespace App
 
 			try
 			{
-				FeedConfig? feedConfig = JsonSerializer.Deserialize<FeedConfig>(await File.ReadAllTextAsync("FeedConfig.json", token), _serializerOptions);
+				FeedConfig? feedConfig = JsonSerializer.Deserialize<FeedConfig>(await File.ReadAllTextAsync(_feedConfig, token), _serializerOptions);
 
 				if (JsonSerializer.Deserialize<FeedConfig>(await File.ReadAllTextAsync("FeedConfig.json", token), _serializerOptions) is FeedConfig config)
 				{
