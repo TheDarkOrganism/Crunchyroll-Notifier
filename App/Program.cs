@@ -78,13 +78,13 @@ async void Run()
 			return !values.Any() || values.Any(v => v.Equals(value, StringComparison.OrdinalIgnoreCase));
 		}
 
-		timer = new(TimeSpan.FromSeconds(config.Interval));
+		timer = new(config.Interval);
 
 		ConfigManager.OnFeedConfigChanged += c =>
 		{
 			config = c;
 
-			timer.Period = TimeSpan.FromSeconds(c.Interval);
+			timer.Period = c.Interval;
 		};
 
 		XmlNamespaceManager? manager = default;

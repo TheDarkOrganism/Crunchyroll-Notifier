@@ -20,6 +20,8 @@
 		<Using Include="System.Diagnostics" />
 		<Using Remove="System.Net.Http" />
 		<Using Include="System.Text.RegularExpressions" />
+		<Using Include="System.Text.Json" />
+		<Using Include="System.Text.Json.Serialization" />
 	</ItemGroup>
 
 	<ItemGroup>

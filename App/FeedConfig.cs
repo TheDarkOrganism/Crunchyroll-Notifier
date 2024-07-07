@@ -4,7 +4,7 @@
 	{
 		#region Properties
 
-		public double Interval { get; init; } = 10;
+		public TimeSpan Interval { get; init; } = TimeSpan.FromSeconds(10);
 
 		public int MaxNotifications { get; init; } = 10;
 

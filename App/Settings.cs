@@ -82,7 +82,7 @@
 			{
 				if (await ConfigManager.SaveAsync(new()
 				{
-					Interval = interval,
+					Interval = TimeSpan.FromSeconds(interval),
 					MaxNotifications = MaxNotificationsInput.Value,
 					Visibility = visibility,
 					ShowFirstRun = ShowFirstRunInput.Checked,

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using App.Converters;
 
 namespace App
 {
@@ -15,6 +14,11 @@ namespace App
 
 		private static readonly JsonSerializerOptions _serializerOptions = new()
 		{
+			Converters =
+			{
+				new EnumConverter(),
+				new TimeSpanConverter()
+			},
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 			PropertyNameCaseInsensitive = true,
 			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
