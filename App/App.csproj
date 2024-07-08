@@ -19,7 +19,6 @@
 	<ItemGroup>
 		<Using Include="System.ComponentModel.DataAnnotations" />
 		<Using Include="System.Diagnostics" />
-		<Using Remove="System.Net.Http" />
 		<Using Include="System.Text.RegularExpressions" />
 		<Using Include="System.Text.Json" />
 		<Using Include="System.Text.Json.Serialization" />
@@ -41,9 +40,7 @@
 	</ItemGroup>
 
 	<ProjectExtensions>
-		<VisualStudio>
-			<UserProperties feedconfig_1json__JsonSchema="FeedConfigSchema.json" feedconfigschema_1json__JsonSchema="https://json-schema.org/draft-04/schema" />
-		</VisualStudio>
+		<VisualStudio><UserProperties /></VisualStudio>
 	</ProjectExtensions>
 
 </Project>

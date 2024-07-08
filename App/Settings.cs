@@ -19,6 +19,9 @@
 			IntervalInput.Text = config.Interval.ToString();
 			VisibilityInput.Items.AddRange(Enum.GetNames<Visibility>());
 			VisibilityInput.SelectedItem = config.Visibility.ToString();
+			FeedHostTypeInput.Items.AddRange(Enum.GetNames<FeedHostType>());
+			FeedHostTypeInput.SelectedItem = config.FeedHost.ToString();
+			MaxNotificationsInput.Maximum = FeedConfig.MaxNotificationsMax;
 			MaxNotificationsInput.Value = config.MaxNotifications;
 			ShowFirstRunInput.Checked = config.ShowFirstRun;
 			DubsValues.Items.AddRange(config.Dubs.ToArray());
@@ -78,13 +81,14 @@
 
 		private async void SaveButton_Click(object sender, EventArgs e)
 		{
-			if (double.TryParse(IntervalInput.Text, out double interval) && interval >= 10 && Enum.TryParse(VisibilityInput.SelectedItem.ToString(), out Visibility visibility))
+			if (double.TryParse(IntervalInput.Text, out double interval) && interval >= FeedConfig.IntervalMin && Enum.TryParse(VisibilityInput.SelectedItem?.ToString(), out Visibility visibility) && Enum.TryParse(FeedHostTypeInput.SelectedItem?.ToString(), out FeedHostType feedHostType))
 			{
 				if (await ConfigManager.SaveAsync(new()
 				{
 					Interval = TimeSpan.FromSeconds(interval),
 					MaxNotifications = MaxNotificationsInput.Value,
 					Visibility = visibility,
+					FeedHost = feedHostType,
 					ShowFirstRun = ShowFirstRunInput.Checked,
 					Dubs = DubsValues.Items.OfType<string>(),
 					Names = NamesValues.Items.OfType<string>()

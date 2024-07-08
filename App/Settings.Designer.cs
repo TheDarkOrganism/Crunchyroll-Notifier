@@ -34,6 +34,8 @@
 			IntervalInput = new TextBox();
 			VisibilityLabel = new Label();
 			VisibilityInput = new ComboBox();
+			FeedHostTypeLabel = new Label();
+			FeedHostTypeInput = new ComboBox();
 			MaxNotificationsLabel = new Label();
 			ShowFirstRunLabel = new Label();
 			ShowFirstRunInput = new CheckBox();
@@ -52,7 +54,7 @@
 			// 
 			// SaveButton
 			// 
-			SaveButton.Location = new Point(196, 489);
+			SaveButton.Location = new Point(196, 519);
 			SaveButton.Margin = new Padding(3, 4, 3, 4);
 			SaveButton.Name = "SaveButton";
 			SaveButton.Size = new Size(94, 29);
@@ -83,7 +85,7 @@
 			// VisibilityLabel
 			// 
 			VisibilityLabel.AutoSize = true;
-			VisibilityLabel.Location = new Point(7, 48);
+			VisibilityLabel.Location = new Point(7, 47);
 			VisibilityLabel.Name = "VisibilityLabel";
 			VisibilityLabel.Size = new Size(65, 20);
 			VisibilityLabel.TabIndex = 3;
@@ -92,76 +94,93 @@
 			// VisibilityInput
 			// 
 			VisibilityInput.FormattingEnabled = true;
-			VisibilityInput.Location = new Point(152, 45);
+			VisibilityInput.Location = new Point(152, 44);
 			VisibilityInput.Margin = new Padding(3, 4, 3, 4);
 			VisibilityInput.Name = "VisibilityInput";
 			VisibilityInput.Size = new Size(138, 28);
 			VisibilityInput.TabIndex = 4;
 			// 
+			// FeedHostTypeLabel
+			// 
+			FeedHostTypeLabel.AutoSize = true;
+			FeedHostTypeLabel.Location = new Point(7, 83);
+			FeedHostTypeLabel.Name = "FeedHostTypeLabel";
+			FeedHostTypeLabel.Size = new Size(76, 20);
+			FeedHostTypeLabel.TabIndex = 5;
+			FeedHostTypeLabel.Text = "Feed Host";
+			// 
+			// FeedHostTypeInput
+			// 
+			FeedHostTypeInput.FormattingEnabled = true;
+			FeedHostTypeInput.Location = new Point(152, 80);
+			FeedHostTypeInput.Margin = new Padding(3, 4, 3, 4);
+			FeedHostTypeInput.Name = "FeedHostTypeInput";
+			FeedHostTypeInput.Size = new Size(138, 28);
+			FeedHostTypeInput.TabIndex = 6;
+			// 
 			// MaxNotificationsLabel
 			// 
 			MaxNotificationsLabel.AutoSize = true;
-			MaxNotificationsLabel.Location = new Point(7, 83);
+			MaxNotificationsLabel.Location = new Point(7, 124);
 			MaxNotificationsLabel.Name = "MaxNotificationsLabel";
 			MaxNotificationsLabel.Size = new Size(126, 20);
-			MaxNotificationsLabel.TabIndex = 5;
+			MaxNotificationsLabel.TabIndex = 7;
 			MaxNotificationsLabel.Text = "Max Notifications";
 			// 
 			// ShowFirstRunLabel
 			// 
 			ShowFirstRunLabel.AutoSize = true;
-			ShowFirstRunLabel.Location = new Point(7, 124);
+			ShowFirstRunLabel.Location = new Point(7, 160);
 			ShowFirstRunLabel.Name = "ShowFirstRunLabel";
 			ShowFirstRunLabel.Size = new Size(105, 20);
-			ShowFirstRunLabel.TabIndex = 7;
+			ShowFirstRunLabel.TabIndex = 8;
 			ShowFirstRunLabel.Text = "Show First Run";
 			// 
 			// ShowFirstRunInput
 			// 
 			ShowFirstRunInput.AutoSize = true;
-			ShowFirstRunInput.Location = new Point(152, 127);
+			ShowFirstRunInput.Location = new Point(152, 163);
 			ShowFirstRunInput.Margin = new Padding(3, 4, 3, 4);
 			ShowFirstRunInput.Name = "ShowFirstRunInput";
 			ShowFirstRunInput.Size = new Size(18, 17);
-			ShowFirstRunInput.TabIndex = 8;
+			ShowFirstRunInput.TabIndex = 9;
 			ShowFirstRunInput.UseVisualStyleBackColor = true;
 			// 
 			// DubsValues
 			// 
 			DubsValues.FormattingEnabled = true;
 			DubsValues.HorizontalScrollbar = true;
-			DubsValues.ItemHeight = 20;
-			DubsValues.Location = new Point(7, 192);
+			DubsValues.Location = new Point(7, 222);
 			DubsValues.Margin = new Padding(3, 4, 3, 4);
 			DubsValues.Name = "DubsValues";
 			DubsValues.Size = new Size(283, 124);
-			DubsValues.TabIndex = 9;
+			DubsValues.TabIndex = 10;
 			// 
 			// DubsLabel
 			// 
 			DubsLabel.AutoSize = true;
-			DubsLabel.Location = new Point(7, 165);
+			DubsLabel.Location = new Point(7, 195);
 			DubsLabel.Name = "DubsLabel";
 			DubsLabel.Size = new Size(43, 20);
-			DubsLabel.TabIndex = 10;
+			DubsLabel.TabIndex = 11;
 			DubsLabel.Text = "Dubs";
 			// 
 			// DubsRemoveButton
 			// 
-			DubsRemoveButton.Location = new Point(193, 156);
+			DubsRemoveButton.Location = new Point(196, 186);
 			DubsRemoveButton.Name = "DubsRemoveButton";
 			DubsRemoveButton.Size = new Size(94, 29);
-			DubsRemoveButton.TabIndex = 11;
+			DubsRemoveButton.TabIndex = 12;
 			DubsRemoveButton.Text = "Remove";
 			DubsRemoveButton.UseVisualStyleBackColor = true;
 			DubsRemoveButton.Click += DubsRemoveButton_Click;
 			// 
 			// DubsAddButton
 			// 
-			DubsAddButton.Location = new Point(96, 156);
+			DubsAddButton.Location = new Point(96, 187);
 			DubsAddButton.Name = "DubsAddButton";
 			DubsAddButton.Size = new Size(94, 29);
-			DubsAddButton.TabIndex = 12;
+			DubsAddButton.TabIndex = 13;
 			DubsAddButton.Text = "Add";
 			DubsAddButton.UseVisualStyleBackColor = true;
 			DubsAddButton.Click += DubsAddButton_Click;
@@ -169,59 +188,57 @@
 			// NamesLabel
 			// 
 			NamesLabel.AutoSize = true;
-			NamesLabel.Location = new Point(7, 332);
+			NamesLabel.Location = new Point(7, 362);
 			NamesLabel.Name = "NamesLabel";
 			NamesLabel.Size = new Size(55, 20);
-			NamesLabel.TabIndex = 13;
+			NamesLabel.TabIndex = 14;
 			NamesLabel.Text = "Names";
 			// 
 			// NamesValues
 			// 
 			NamesValues.FormattingEnabled = true;
 			NamesValues.HorizontalScrollbar = true;
-			NamesValues.ItemHeight = 20;
-			NamesValues.Location = new Point(7, 358);
+			NamesValues.Location = new Point(7, 388);
 			NamesValues.Name = "NamesValues";
 			NamesValues.Size = new Size(283, 124);
-			NamesValues.TabIndex = 14;
+			NamesValues.TabIndex = 15;
 			// 
 			// NamesRemoveButton
 			// 
-			NamesRemoveButton.Location = new Point(196, 323);
+			NamesRemoveButton.Location = new Point(196, 353);
 			NamesRemoveButton.Name = "NamesRemoveButton";
 			NamesRemoveButton.Size = new Size(94, 29);
-			NamesRemoveButton.TabIndex = 15;
+			NamesRemoveButton.TabIndex = 16;
 			NamesRemoveButton.Text = "Remove";
 			NamesRemoveButton.UseVisualStyleBackColor = true;
 			NamesRemoveButton.Click += NamesRemoveButton_Click;
 			// 
 			// NamesAddButton
 			// 
-			NamesAddButton.Location = new Point(96, 323);
+			NamesAddButton.Location = new Point(96, 353);
 			NamesAddButton.Name = "NamesAddButton";
 			NamesAddButton.Size = new Size(94, 29);
-			NamesAddButton.TabIndex = 16;
+			NamesAddButton.TabIndex = 17;
 			NamesAddButton.Text = "Add";
 			NamesAddButton.UseVisualStyleBackColor = true;
 			NamesAddButton.Click += NamesAddButton_Click;
 			// 
 			// MaxNotificationsInput
 			// 
-			MaxNotificationsInput.Location = new Point(176, 83);
-			MaxNotificationsInput.Maximum = 100;
+			MaxNotificationsInput.Location = new Point(176, 124);
 			MaxNotificationsInput.Minimum = 1;
 			MaxNotificationsInput.Name = "MaxNotificationsInput";
 			MaxNotificationsInput.Size = new Size(114, 56);
-			MaxNotificationsInput.TabIndex = 17;
+			MaxNotificationsInput.TabIndex = 18;
 			MaxNotificationsInput.Value = 1;
 			MaxNotificationsInput.ValueChanged += MaxNotificationsInput_ValueChanged;
 			// 
 			// OpenConfigButton
 			// 
-			OpenConfigButton.Location = new Point(96, 489);
+			OpenConfigButton.Location = new Point(96, 519);
 			OpenConfigButton.Name = "OpenConfigButton";
 			OpenConfigButton.Size = new Size(94, 29);
-			OpenConfigButton.TabIndex = 18;
+			OpenConfigButton.TabIndex = 19;
 			OpenConfigButton.Text = "Config";
 			OpenConfigButton.UseVisualStyleBackColor = true;
 			OpenConfigButton.Click += OpenConfigButton_Click;
@@ -230,7 +247,7 @@
 			// 
 			AutoScaleDimensions = new SizeF(8F, 20F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(299, 521);
+			ClientSize = new Size(299, 549);
 			Controls.Add(OpenConfigButton);
 			Controls.Add(MaxNotificationsInput);
 			Controls.Add(NamesAddButton);
@@ -246,6 +263,8 @@
 			Controls.Add(MaxNotificationsLabel);
 			Controls.Add(VisibilityInput);
 			Controls.Add(VisibilityLabel);
+			Controls.Add(FeedHostTypeLabel);
+			Controls.Add(FeedHostTypeInput);
 			Controls.Add(IntervalInput);
 			Controls.Add(IntervalLabel);
 			Controls.Add(SaveButton);
@@ -268,6 +287,8 @@
 		private TextBox IntervalInput;
 		private Label VisibilityLabel;
 		private ComboBox VisibilityInput;
+		private Label FeedHostTypeLabel;
+		private ComboBox FeedHostTypeInput;
 		private Label MaxNotificationsLabel;
 		private Label ShowFirstRunLabel;
 		private CheckBox ShowFirstRunInput;

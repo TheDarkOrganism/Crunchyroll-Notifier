@@ -89,22 +89,43 @@ async void Run()
 
 		XmlNamespaceManager? manager = default;
 
+		const string mainFeed = "http://www.crunchyroll.com/rss";
+
+		using HttpClientHandler handler = new()
+		{
+			UseCookies = true
+		};
+
 		do
 		{
 			try
 			{
 				#region Load RSS Feed
 
-				XPathDocument document = new("http://feeds.feedburner.com/crunchyroll/rss/anime");
+				using HttpClient client = new(handler, false);
 
-				XPathNavigator navigator = document.CreateNavigator();
+				using XmlReader reader = XmlReader.Create((await client.SendAsync(new()
+				{
+					Method = HttpMethod.Get,
+					RequestUri = new(config.FeedHost switch
+					{
+						FeedHostType.Crunchyroll => mainFeed,
+						FeedHostType.FeedBurner => "http://feeds.feedburner.com/crunchyroll/rss/anime",
+						_ => throw new NotImplementedException()
+					}),
+					Headers =
+					{
+						{ "cookie", "session_id=fb5e80d995a90f27726e04f6fb23299f" },
+						{ "User-Agent", "chrome" }
+					}
+				}, token)).EnsureSuccessStatusCode().Content.ReadAsStream());
 
 				if (manager is null)
 				{
-					manager = new(navigator.NameTable);
+					manager = new(reader.NameTable);
 
 					manager.AddNamespace("media", "http://search.yahoo.com/mrss/");
-					manager.AddNamespace("crunchyroll", "http://www.crunchyroll.com/rss");
+					manager.AddNamespace("crunchyroll", mainFeed);
 				}
 
 				#endregion
@@ -113,11 +134,13 @@ async void Run()
 
 				#region Loop through parsed episode data
 
+				XPathNavigator navigator = new XPathDocument(reader).CreateNavigator();
+
 				string pub = config.Visibility is Visibility.Default ? "pub" : $"crunchyroll:{config.Visibility.ToString().ToLower()}Pub";
 
 				foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
 				{
-					if (DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
+					if (nav.SelectSingleNode(".//category", manager)?.Value == "Anime" && DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
 					{
 						string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? Regex.Match(title, @"\(([A-Za-z\-]+) Dub\)").Groups.Values.ElementAtOrDefault(1)?.Value : default;
 
