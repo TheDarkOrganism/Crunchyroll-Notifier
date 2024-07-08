@@ -76,7 +76,7 @@ namespace App
 		/// </param>
 		private void ShowNotification(string title, string message, Action<ToastContentBuilder> modifier)
 		{
-			ToastContentBuilder builder = new ToastContentBuilder().AddText(message).AddText(title);
+			ToastContentBuilder builder = new ToastContentBuilder().AddText(title).AddText(message);
 
 			modifier(builder);
 
