@@ -16,7 +16,7 @@
 
 			InitializeComponent();
 
-			IntervalInput.Text = config.Interval.ToString();
+			IntervalInput.Text = config.Interval.TotalSeconds.ToString();
 			VisibilityInput.Items.AddRange(Enum.GetNames<Visibility>());
 			VisibilityInput.SelectedItem = config.Visibility.ToString();
 			FeedHostTypeInput.Items.AddRange(Enum.GetNames<FeedHostType>());
