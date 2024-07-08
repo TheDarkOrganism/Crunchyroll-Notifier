@@ -20,7 +20,7 @@ namespace App
 				new EnumConverter(),
 				new TimeSpanConverter()
 			},
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			PropertyNameCaseInsensitive = true,
 			PropertyNamingPolicy = new PascalCaseNamingPolicy(),
 			TypeInfoResolver = new DefaultJsonTypeInfoResolver()
