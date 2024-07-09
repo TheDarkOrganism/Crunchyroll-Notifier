@@ -1,248 +1,256 @@
-﻿using App;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.XPath;
 
-if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length >= 2)
+namespace App
 {
-	Environment.Exit(0);
-}
-
-CancellationTokenSource source = new();
-
-CancellationToken token = source.Token;
-
-NotificationHelper notification = new(token);
-
-#region Background Thread
-
-async void Run()
-{
-
-	#region Load Config
-
-	FeedConfig config;
-
-	PeriodicTimer timer;
-
-	(LoadStatus, FeedConfig) load = await ConfigManager.LoadAsync(token);
-
-	config = load.Item2;
-
-	#endregion
-
-	#region Handle config file errors
-
-	LoadStatus status = load.Item1;
-
-	if (status != LoadStatus.Loaded)
+	internal sealed partial class Program
 	{
-		notification.Notify($"Config was {(status is LoadStatus.NotFound ? "Not Found" : status)}", "Using Default Config", "View Defualt Config", NotificationHelper.openKey, NotificationHelper.defaultConfigValue);
-	}
+		#region Fields
 
-	#endregion
+		private const string _lastFile = "Last";
 
-	#region Load Last Check
+		private const string _mainFeed = "http://www.crunchyroll.com/rss";
 
-	const string lastFile = "Last";
+		private const string _altFeed = "http://feeds.feedburner.com/crunchyroll/rss/anime";
 
-	DateTime last;
+		#endregion
 
-	if (File.Exists(lastFile))
-	{
-		last = DateTime.TryParse(await File.ReadAllTextAsync(lastFile, token), out DateTime result) ? result : DateTime.Now;
-	}
-	else
-	{
-		last = DateTime.Now;
-
-		try
+		private static void Main()
 		{
-			await File.WriteAllTextAsync(lastFile, last.ToString(), token);
+			if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length >= 2)
+			{
+				Environment.Exit(0);
+			}
+
+			CancellationTokenSource cancellationTokenSource = new();
+
+			CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+			Run(cancellationToken);
+
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+
+			#region Tray Icon
+
+			ContextMenuStrip strip = new();
+
+			ToolStripMenuItem settingsItem = new("Settings")
+			{
+				Name = "Settings"
+			};
+
+			Settings? settings = null;
+
+			settingsItem.Click += async (_, _) =>
+			{
+				if (settings is null)
+				{
+					settings = new((await ConfigManager.LoadAsync(cancellationToken)).Item2, cancellationToken);
+
+					settings.FormClosed += (_, _) => settings = null;
+
+					settings.Show();
+				}
+				else
+				{
+					settings.Focus();
+				}
+			};
+
+			strip.Items.Add(settingsItem);
+
+			ToolStripMenuItem configItem = new("Config")
+			{
+				Name = "Config"
+			};
+
+			configItem.Click += async (_, _) => await ConfigManager.OpenConfigAsync(cancellationToken);
+
+			strip.Items.Add(configItem);
+
+			ToolStripMenuItem exit = new("Exit")
+			{
+				Name = "Exit"
+			};
+
+			exit.Click += (_, _) =>
+			{
+				settings?.Close();
+
+				cancellationTokenSource.Cancel();
+			};
+
+			strip.Items.Add(exit);
+
+			using NotifyIcon icon = new()
+			{
+				ContextMenuStrip = strip,
+				Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath),
+				Text = Application.ProductName,
+				Visible = true
+			};
+
+			#endregion
+
+			Application.Run();
+
+			icon.Visible = false;
 		}
-		catch { }
 
-		if (config.ShowFirstRun)
-		{
-			notification.Notify("App First Run", "You can find the app in the system tray.", "Open Config", NotificationHelper.openKey, NotificationHelper.openKey);
-		}
-	}
+		#region Background Thread
 
-	#endregion
-
-	#region Run Main Loop
-
-	try
-	{
-		static bool CheckValue(string? value, IEnumerable<string> values)
+		private static bool CheckValue(string? value, IEnumerable<string> values)
 		{
 			return !values.Any() || values.Any(v => v.Equals(value, StringComparison.OrdinalIgnoreCase));
 		}
 
-		timer = new(config.Interval);
+		[GeneratedRegex("\\(([A-Za-z\\-]+) Dub\\)")]
+		private static partial Regex DubRegex();
 
-		ConfigManager.OnFeedConfigChanged += c =>
+		private static async void Run(CancellationToken cancellationToken)
 		{
-			config = c;
+			NotificationHelper notification = new(cancellationToken);
 
-			timer.Period = c.Interval;
-		};
+			#region Load Config
 
-		XmlNamespaceManager? manager = default;
+			(LoadStatus status, FeedConfig config) = await ConfigManager.LoadAsync(cancellationToken);
 
-		const string mainFeed = "http://www.crunchyroll.com/rss";
+			PeriodicTimer timer = new(config.Interval);
 
-		using HttpClientHandler handler = new()
-		{
-			UseCookies = true
-		};
-
-		do
-		{
-			try
+			ConfigManager.OnFeedConfigChanged += c =>
 			{
-				#region Load RSS Feed
+				config = c;
 
-				using HttpClient client = new(handler, false);
+				timer.Period = c.Interval;
+			};
 
-				using XmlReader reader = XmlReader.Create((await client.SendAsync(new()
+			#endregion
+
+			#region Handle config file errors
+
+			if (status != LoadStatus.Loaded)
+			{
+				notification.Notify($"Config was {(status is LoadStatus.NotFound ? "Not Found" : status)}", "Using Default Config", "View Defualt Config", NotificationHelper.openKey, NotificationHelper.defaultConfigValue);
+			}
+
+			#endregion
+
+			#region Load Last Check
+
+			DateTime last;
+
+			if (File.Exists(_lastFile))
+			{
+				last = DateTime.TryParse(await File.ReadAllTextAsync(_lastFile, cancellationToken), out DateTime result) ? result : DateTime.Now;
+			}
+			else
+			{
+				last = DateTime.Now;
+
+				try
 				{
-					Method = HttpMethod.Get,
-					RequestUri = new(config.FeedHost switch
-					{
-						FeedHostType.Crunchyroll => mainFeed,
-						FeedHostType.FeedBurner => "http://feeds.feedburner.com/crunchyroll/rss/anime",
-						_ => throw new NotImplementedException()
-					}),
-					Headers =
-					{
-						{ "cookie", "session_id=fb5e80d995a90f27726e04f6fb23299f" },
-						{ "User-Agent", "chrome" }
-					}
-				}, token)).EnsureSuccessStatusCode().Content.ReadAsStream());
-
-				if (manager is null)
-				{
-					manager = new(reader.NameTable);
-
-					manager.AddNamespace("media", "http://search.yahoo.com/mrss/");
-					manager.AddNamespace("crunchyroll", mainFeed);
+					await File.WriteAllTextAsync(_lastFile, last.ToString(), cancellationToken);
 				}
+				catch { }
 
-				#endregion
-
-				DateTime copy = last;
-
-				#region Loop through parsed episode data
-
-				XPathNavigator navigator = new XPathDocument(reader).CreateNavigator();
-
-				string pub = config.Visibility is Visibility.Default ? "pub" : $"crunchyroll:{config.Visibility.ToString().ToLower()}Pub";
-
-				foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
+				if (config.ShowFirstRun)
 				{
-					if (nav.SelectSingleNode(".//category", manager)?.Value == "Anime" && DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
-					{
-						string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? Regex.Match(title, @"\(([A-Za-z\-]+) Dub\)").Groups.Values.ElementAtOrDefault(1)?.Value : default;
-
-						if (CheckValue(dub, config.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, config.Names) && nav.SelectSingleNode(".//link")?.Value is string url)
-						{
-							notification.Notify($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}", $"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}", NotificationHelper.openKey, url);
-						}
-
-						last = result;
-					}
-				}
-
-				#endregion
-
-				if (copy != last)
-				{
-					await File.WriteAllTextAsync(lastFile, last.ToString(), token);
+					notification.Notify("App First Run", "You can find the app in the system tray.", "Open Config", NotificationHelper.openKey, NotificationHelper.openKey);
 				}
 			}
-			catch { }
-		} while (await timer.WaitForNextTickAsync(token));
-	}
-	catch (Exception ex)
-	{
-		if (ex is OperationCanceledException)
-		{
-			Application.Exit();
+
+			#endregion
+
+			#region Run Main Loop
+
+			try
+			{
+				XmlNamespaceManager? manager = null;
+
+				using HttpClientHandler handler = new()
+				{
+					UseCookies = true
+				};
+
+				do
+				{
+					try
+					{
+						#region Load RSS Feed
+
+						using HttpClient client = new(handler, false);
+
+						using XmlReader reader = XmlReader.Create((await client.SendAsync(new()
+						{
+							Method = HttpMethod.Get,
+							RequestUri = new(config.FeedHost switch
+							{
+								FeedHostType.Crunchyroll => _mainFeed,
+								FeedHostType.FeedBurner => _altFeed,
+								_ => throw new NotImplementedException()
+							}),
+							Headers =
+							{
+								{ "cookie", "session_id=fb5e80d995a90f27726e04f6fb23299f" },
+								{ "User-Agent", "chrome" }
+							}
+						}, cancellationToken)).EnsureSuccessStatusCode().Content.ReadAsStream(cancellationToken));
+
+						if (manager is null)
+						{
+							manager = new(reader.NameTable);
+
+							manager.AddNamespace("media", "http://search.yahoo.com/mrss/");
+							manager.AddNamespace("crunchyroll", _mainFeed);
+						}
+
+						#endregion
+
+						DateTime copy = last;
+
+						#region Loop through parsed episode data
+
+						XPathNavigator navigator = new XPathDocument(reader).CreateNavigator();
+
+						string pub = config.Visibility is Visibility.Default ? "pub" : $"crunchyroll:{config.Visibility.ToString().ToLower()}Pub";
+
+						foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {config.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
+						{
+							if (nav.SelectSingleNode(".//category", manager)?.Value == "Anime" && DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
+							{
+								string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? DubRegex().Match(title).Groups.Values.ElementAtOrDefault(1)?.Value : null;
+
+								if (CheckValue(dub, config.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, config.Names) && nav.SelectSingleNode(".//link")?.Value is string url)
+								{
+									notification.Notify($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}", $"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}", NotificationHelper.openKey, url);
+								}
+
+								last = result;
+							}
+						}
+
+						#endregion
+
+						if (copy != last)
+						{
+							await File.WriteAllTextAsync(_lastFile, last.ToString(), cancellationToken);
+						}
+					}
+					catch { }
+				} while (await timer.WaitForNextTickAsync(cancellationToken));
+			}
+			catch (Exception ex)
+			{
+				if (ex is OperationCanceledException)
+				{
+					Application.Exit();
+				}
+			}
+
+			#endregion
 		}
-	}
 
-	#endregion
+		#endregion
+	}
 }
-
-Run();
-
-#endregion
-
-Application.EnableVisualStyles();
-Application.SetCompatibleTextRenderingDefault(false);
-
-#region Tray Icon
-
-ContextMenuStrip strip = new();
-
-ToolStripMenuItem settingsItem = new("Settings")
-{
-	Name = "Settings"
-};
-
-Settings? settings = default;
-
-settingsItem.Click += async (_, _) =>
-{
-	if (settings is null)
-	{
-		settings = new((await ConfigManager.LoadAsync(token)).Item2, token);
-
-		settings.FormClosed += (_, _) => settings = default;
-
-		settings.Show();
-	}
-	else
-	{
-		settings.Focus();
-	}
-};
-
-strip.Items.Add(settingsItem);
-
-ToolStripMenuItem configItem = new("Config")
-{
-	Name = "Config"
-};
-
-configItem.Click += async (_, _) => await ConfigManager.OpenConfigAsync(token);
-
-strip.Items.Add(configItem);
-
-ToolStripMenuItem exit = new("Exit")
-{
-	Name = "Exit"
-};
-
-exit.Click += (_, _) =>
-{
-	settings?.Close();
-
-	source.Cancel();
-};
-
-strip.Items.Add(exit);
-
-using NotifyIcon icon = new()
-{
-	ContextMenuStrip = strip,
-	Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath),
-	Text = Application.ProductName,
-	Visible = true
-};
-
-#endregion
-
-Application.Run();
-
-icon.Visible = false;
