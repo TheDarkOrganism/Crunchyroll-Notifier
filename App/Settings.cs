@@ -6,8 +6,6 @@
 
 		private readonly CancellationToken _token;
 
-		private const string _dubPattern = @"^[a-zA-Z\-]+$";
-
 		#endregion
 
 		public Settings(FeedConfig config, CancellationToken token)
@@ -32,7 +30,7 @@
 
 		#region Prompt Handlers
 
-		private static void HandlePrompt(string name, string text, int maxLength, string? pattern, Action<string> callback)
+		private static void HandlePrompt(string name, string text, int maxLength, RegexSelector? pattern, Action<string> callback)
 		{
 			using Prompt prompt = new(name, text, maxLength, pattern);
 
@@ -42,7 +40,7 @@
 			}
 		}
 
-		private static void HandlePromptAdd(string name, int maxLength, ListBox list, string? pattern = default)
+		private static void HandlePromptAdd(string name, int maxLength, ListBox list, RegexSelector? pattern = null)
 		{
 			HandlePrompt(name, "add to", maxLength, pattern, value =>
 			{
@@ -53,7 +51,7 @@
 			});
 		}
 
-		private static void HandlePromptRemove(string name, int maxLength, ListBox list, string? pattern = default)
+		private static void HandlePromptRemove(string name, int maxLength, ListBox list, RegexSelector? pattern = null)
 		{
 			HandlePrompt(name, "remove from", maxLength, pattern, value =>
 			{
@@ -65,6 +63,9 @@
 		}
 
 		#endregion
+
+		[GeneratedRegex("^[a-z\\-]+$", RegexOptions.IgnoreCase)]
+		private static partial Regex DubRegex();
 
 		#region Events
 
@@ -111,12 +112,12 @@
 
 		private void DubsAddButton_Click(object sender, EventArgs e)
 		{
-			HandlePromptAdd(nameof(FeedConfig.Dubs), 40, DubsValues, _dubPattern);
+			HandlePromptAdd(nameof(FeedConfig.Dubs), 40, DubsValues, DubRegex);
 		}
 
 		private void DubsRemoveButton_Click(object sender, EventArgs e)
 		{
-			HandlePromptRemove(nameof(FeedConfig.Dubs), 40, DubsValues, _dubPattern);
+			HandlePromptRemove(nameof(FeedConfig.Dubs), 40, DubsValues, DubRegex);
 		}
 
 		private void NamesAddButton_Click(object sender, EventArgs e)

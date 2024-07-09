@@ -6,7 +6,7 @@
 
 		#region Private
 
-		private readonly string? _pattern;
+		private readonly RegexSelector? _pattern;
 
 		#endregion
 
@@ -18,7 +18,7 @@
 
 		#endregion
 
-		public Prompt(string name, string text, int maxLength, string? pattern)
+		public Prompt(string name, string text, int maxLength, RegexSelector? pattern)
 		{
 			_pattern = pattern;
 
@@ -39,7 +39,7 @@
 
 			if (value.Any())
 			{
-				if (_pattern is null || Regex.IsMatch(value, _pattern))
+				if (_pattern is null || _pattern().IsMatch(value))
 				{
 					Value = value;
 
