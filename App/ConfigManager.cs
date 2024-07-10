@@ -85,7 +85,7 @@ namespace App
 			}
 			catch
 			{
-				return default;
+				return false;
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace App
 			}
 			else
 			{
-				return default;
+				return false;
 			}
 		}
 

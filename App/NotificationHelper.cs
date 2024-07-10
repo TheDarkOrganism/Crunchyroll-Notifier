@@ -150,7 +150,7 @@ namespace App
 		/// </param>
 		public void Notify(string title, string message, string buttonText, string buttonKey, string buttonValue)
 		{
-			Notify(title, message, new ToastButton(buttonText, $"{buttonKey}={buttonValue}"));
+			Notify(title, message, new ToastButton(buttonText, string.Join('=', buttonKey, buttonValue)));
 		}
 
 		/// <summary>
