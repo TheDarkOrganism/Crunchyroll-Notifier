@@ -1,7 +1,7 @@
 {
-	"Interval": 30,
-	"Visibility": "Default",
-	"MaxNotifications": 10,
-	"ShowFirstRun": true,
-	"FeedHost": "Crunchyroll"
+  "Interval": 30,
+  "Visibility": "Default",
+  "MaxNotifications": 10,
+  "ShowFirstRun": true,
+  "FeedHost": "Crunchyroll"
 }
