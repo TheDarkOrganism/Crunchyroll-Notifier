@@ -1,4 +1,4 @@
 ﻿namespace App
 {
-	internal delegate Regex RegexSelector();
+	public delegate Regex RegexSelector();
 }
