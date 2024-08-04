@@ -10,17 +10,17 @@ namespace App
 		/// <summary>
 		/// The key for a button to open a file.
 		/// </summary>
-		public const string openKey = "open";
+		public const string openKey = "Open";
 
 		/// <summary>
 		/// The value used to open the config file.
 		/// </summary>
-		public const string configValue = "config";
+		public const string configValue = "Config";
 
 		/// <summary>
 		/// The value used to open the default config.
 		/// </summary>
-		public const string defaultConfigValue = "default config";
+		public const string defaultConfigValue = "Default Config";
 
 		private readonly CancellationToken _exitToken;
 
