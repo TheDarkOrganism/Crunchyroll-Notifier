@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.UI.Xaml;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -10,12 +11,17 @@ namespace WinUIApp
 	/// </summary>
 	public sealed partial class App : Application
 	{
+		private readonly IHost _host;
+
 		/// <summary>
 		/// Initializes the singleton application object.  This is the first line of authored code
 		/// executed, and as such is the logical equivalent of main() or WinMain().
 		/// </summary>
 		public App()
 		{
+			_host = Host.CreateDefaultBuilder()
+				.Build();
+
 			InitializeComponent();
 		}
 
@@ -23,6 +29,11 @@ namespace WinUIApp
 		/// Invoked when the application is launched.
 		/// </summary>
 		/// <param name="args">Details about the launch request and process.</param>
-		protected override void OnLaunched(LaunchActivatedEventArgs args) { }
+		protected override async void OnLaunched(LaunchActivatedEventArgs args)
+		{
+			AppDomain.CurrentDomain.ProcessExit += async (_, _) => await _host.StopAsync();
+
+			await _host.RunAsync();
+		}
 	}
 }
