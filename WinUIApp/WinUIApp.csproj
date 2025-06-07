@@ -22,6 +22,10 @@
 		<Copyright>2025</Copyright>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(WindowsPackageType)'!='None'">
+		<DefineConstants>PACKAGED_APP</DefineConstants>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="!$(Configuration.StartsWith('Debug'))">
 		<DebugType>none</DebugType>
 	</PropertyGroup>

@@ -2,6 +2,10 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
+using System.Reflection;
+#if PACKAGED_APP
+using Windows.ApplicationModel;
+#endif
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -48,6 +52,12 @@ namespace WinUIApp
 							};
 							break;
 						case TaskbarIcon trayIcon:
+#if PACKAGED_APP
+							trayIcon.ToolTipText = Package.Current.DisplayName;
+#else
+							trayIcon.ToolTipText = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? "App";
+#endif
+
 							trayIcon.ForceCreate();
 							break;
 						default:
