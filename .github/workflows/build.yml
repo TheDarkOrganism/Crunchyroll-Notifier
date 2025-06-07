@@ -1,0 +1,29 @@
+name: Build
+
+on:
+    repository_dispatch:
+    push:
+        branches:
+        - WinUIPort
+    
+env:
+    Dotnet_Version: "9.x"
+    Solution: "Crunchyroll Notifier"
+
+jobs:
+    build:
+        runs-on: windows-latest
+
+        steps:
+        - uses: actions/checkout@v3
+  
+        - name: Setup .Net
+          uses: actions/setup-dotnet@v3
+          with:
+                dotnet-version: ${{ env.Dotnet_Version }}
+
+        - name: Restore
+          run: dotnet restore "./${{ env.Solution }}.sln"
+
+        - name: Build
+          run: dotnet build "./${{ env.Solution }}.sln" --configuration Release --no-restore
