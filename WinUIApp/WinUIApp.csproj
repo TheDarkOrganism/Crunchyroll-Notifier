@@ -31,6 +31,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Using Include="System.Text.Json" />
+		<Using Include="System.Text.Json.Serialization" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="Assets\SplashScreen.scale-200.png" />
 		<Content Include="Assets\LockScreenLogo.scale-200.png" />
 		<Content Include="Assets\Square150x150Logo.scale-200.png" />
