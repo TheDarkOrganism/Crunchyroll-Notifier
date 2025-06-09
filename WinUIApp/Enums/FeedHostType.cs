@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Enums
 {
-	internal enum FeedHostType
+	public enum FeedHostType
 	{
 		Crunchyroll,
 		FeedBurner
