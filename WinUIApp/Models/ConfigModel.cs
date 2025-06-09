@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using WinUIApp.Attributes;
 using WinUIApp.Enums;
 
 namespace WinUIApp.Models
@@ -10,6 +11,7 @@ namespace WinUIApp.Models
 		[JsonRequired]
 		[JsonConverter(typeof(Converters.TimeSpanConverter))]
 		[JsonPropertyName("interval")]
+		[TimeSpanRange(0, 1)]
 		public TimeSpan Interval
 		{
 			get => _interval;
