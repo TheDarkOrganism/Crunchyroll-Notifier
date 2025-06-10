@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using WinUIApp.Attributes;
 using WinUIApp.Enums;
 
 namespace WinUIApp.Models
