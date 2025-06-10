@@ -1,9 +1,9 @@
 ﻿using H.NotifyIcon;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System.Reflection;
+using WinUIApp.Models;
+using WinUIApp.Options;
 #if PACKAGED_APP
 using Windows.ApplicationModel;
 #endif
@@ -31,6 +31,8 @@ namespace WinUIApp
 
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureAppConfiguration(static builder => builder.AddJsonFile(configFile).AddJsonFile(lastUpdateFile))
+				.ConfigureSavableJson<ConfigModel>(configFile)
+				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
 				.Build();
 
 			InitializeComponent();
