@@ -31,6 +31,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Dialogs\TextInputDialog.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Using Include="Microsoft.Extensions.Configuration" />
 		<Using Include="Microsoft.Extensions.FileProviders" />
 		<Using Include="Microsoft.Extensions.Hosting" />
@@ -39,6 +43,7 @@
 		<Using Include="System.Text.Json" />
 		<Using Include="System.Text.Json.Serialization" />
 		<Using Include="WinUIApp.Attributes" />
+		<Using Include="WinUIApp.Models" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -74,6 +79,9 @@
 		<None Update="Config.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<Page Update="Dialogs\TextInputDialog.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<None Update="LastUpdate.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

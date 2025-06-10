@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System.Reflection;
-using WinUIApp.Models;
 using WinUIApp.Options;
 #if PACKAGED_APP
 using Windows.ApplicationModel;
