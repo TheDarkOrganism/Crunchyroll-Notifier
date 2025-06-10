@@ -1,4 +1,5 @@
 ﻿using H.NotifyIcon;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
@@ -25,7 +26,11 @@ namespace WinUIApp
 		/// </summary>
 		public App()
 		{
+			const string configFile = "Config.json";
+			const string lastUpdateFile = "LastUpdate.json";
+
 			_host = Host.CreateDefaultBuilder()
+				.ConfigureAppConfiguration(static builder => builder.AddJsonFile(configFile).AddJsonFile(lastUpdateFile))
 				.Build();
 
 			InitializeComponent();
