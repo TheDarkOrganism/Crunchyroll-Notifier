@@ -31,20 +31,26 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Dialogs\TextInputDialog.xaml" />
+		<None Remove="Dialogs\TextInputDialog.xaml" />
+		<None Remove="Settings.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Using Include="Microsoft.Extensions.Configuration" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Microsoft.Extensions.FileProviders" />
 		<Using Include="Microsoft.Extensions.Hosting" />
 		<Using Include="Microsoft.Extensions.Options" />
+		<Using Include="Microsoft.UI.Xaml" />
+		<Using Include="Microsoft.UI.Xaml.Controls" />
 		<Using Include="System.ComponentModel.DataAnnotations" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="System.Text.Json" />
 		<Using Include="System.Text.Json.Serialization" />
 		<Using Include="WinUIApp.Attributes" />
+		<Using Include="WinUIApp.Enums" />
 		<Using Include="WinUIApp.Models" />
+		<Using Include="WinUIApp.Options" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -80,8 +86,11 @@
 		<None Update="Config.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<Page Update="Settings.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Update="Dialogs\TextInputDialog.xaml">
-		  <Generator>MSBuild:Compile</Generator>
+			<Generator>MSBuild:Compile</Generator>
 		</Page>
 		<None Update="LastUpdate.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

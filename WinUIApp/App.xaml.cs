@@ -1,8 +1,6 @@
 ﻿using H.NotifyIcon;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System.Reflection;
-using WinUIApp.Options;
 #if PACKAGED_APP
 using Windows.ApplicationModel;
 #endif
@@ -30,6 +28,7 @@ namespace WinUIApp
 
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureAppConfiguration(static builder => builder.AddJsonFile(configFile).AddJsonFile(lastUpdateFile))
+				.ConfigureServices(static services => services.AddScoped<Settings>())
 				.ConfigureSavableJson<ConfigModel>(configFile)
 				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
 				.Build();
@@ -52,7 +51,7 @@ namespace WinUIApp
 						case XamlUICommand command:
 							command.ExecuteRequested += key.ToString() switch
 							{
-								"Settings" => (_, _) => { },
+								"Settings" => (_, _) => _host.Services.GetRequiredService<Settings>().Activate(),
 								"Exit" => (_, _) => Exit(),
 								_ => throw new NotImplementedException()
 							};

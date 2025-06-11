@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using WinUIApp.Enums;
-
-namespace WinUIApp.Dialogs
+﻿namespace WinUIApp.Dialogs
 {
 	internal sealed partial class TextInputDialog : ContentDialog
 	{

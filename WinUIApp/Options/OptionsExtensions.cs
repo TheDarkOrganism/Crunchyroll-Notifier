@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace WinUIApp.Options
+﻿namespace WinUIApp.Options
 {
 	internal static class OptionsExtensions
 	{

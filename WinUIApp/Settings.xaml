@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+	x:Class="WinUIApp.Settings"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:WinUIApp"
+	xmlns:models="using:WinUIApp.Models"
+	xmlns:markup="using:WinUIApp.Markup"
+	xmlns:enums="using:WinUIApp.Enums"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	Title="Settings"
+	Closed="Window_Closed">
+	<ScrollViewer VerticalAlignment="Top">
+		
+		<ScrollViewer.Resources>
+			
+			<Style x:Key="GridStyle" TargetType="Grid">
+				<Setter Property="ColumnSpacing" Value="10" />
+				<Setter Property="RowSpacing" Value="20" />
+			</Style>
+			
+		</ScrollViewer.Resources>
+
+		<Grid x:Name="LayoutGrid" Style="{StaticResource GridStyle}" d:DataContext="{d:DesignInstance Type=models:ConfigModel}">
+			
+			<Grid.Resources>
+
+				<ResourceDictionary>
+
+					<!-- Styles -->
+
+					<Style x:Key="LabelStyle" TargetType="TextBlock">
+						<Setter Property="VerticalAlignment" Value="Center" />
+					</Style>
+
+					<Style x:Key="InputStyle" TargetType="Control">
+						<Setter Property="Grid.Column" Value="1" />
+						<Setter Property="HorizontalAlignment" Value="Stretch" />
+					</Style>
+
+					<Style x:Key="DropdownStyle" TargetType="ComboBox" BasedOn="{StaticResource InputStyle}">
+						<Setter Property="HorizontalAlignment" Value="Right" />
+						<Setter Property="MinWidth" Value="100" />
+					</Style>
+
+					<Style x:Key="InputContainerStyle" TargetType="Grid" BasedOn="{StaticResource GridStyle}">
+						<Setter Property="Grid.Column" Value="1" />
+						<Setter Property="HorizontalAlignment" Value="Right" />
+					</Style>
+
+					<Style x:Key="AddButtonStyle" TargetType="Button">
+						<Setter Property="Content" Value="Add" />
+					</Style>
+
+					<Style x:Key="RemoveButtonStyle" TargetType="Button">
+						<Setter Property="Content" Value="Remove" />
+						<Setter Property="Grid.Column" Value="1" />
+					</Style>
+
+					<Style x:Key="ValueListStyle" TargetType="ListView">
+						<Setter Property="Grid.ColumnSpan" Value="2" />
+						<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+					</Style>
+
+				</ResourceDictionary>
+
+			</Grid.Resources>
+
+			<!--#region Grid Definitions -->
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+				
+			<!--#endregion-->
+			
+			<!--#region Interval -->
+
+			<TextBlock Text="Interval" Style="{StaticResource LabelStyle}" />
+
+			<TimePicker ClockIdentifier="24HourClock" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
+
+			<!--#endregion-->
+
+			<!--#region Visibility -->
+
+			<TextBlock Text="Visibility" Grid.Row="1" Style="{StaticResource LabelStyle}" />
+
+			<ComboBox Grid.Row="1" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}}" SelectedItem="{Binding Visibility, Mode=TwoWay}" Style="{StaticResource DropdownStyle}" />
+
+			<!--#endregion-->
+			
+			<!--#region Feed Host -->
+
+			<TextBlock Text="Feed Host" Grid.Row="2" Style="{StaticResource LabelStyle}" />
+
+			<ComboBox Grid.Row="2" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" Style="{StaticResource DropdownStyle}" />
+			
+			<!--#endregion-->
+
+			<!--#region  Max Notifications -->
+
+			<TextBlock Text="Max Notifications" Grid.Row="3" Style="{StaticResource LabelStyle}" />
+
+			<NumberBox Grid.Row="3" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding MaxNotifications, Mode=TwoWay}" Style="{StaticResource InputStyle}" ValueChanged="NumberBox_ValueChanged" />
+
+			<!--#endregion-->
+			
+			<!--#region  Show First Run -->
+
+			<TextBlock Text="Show on first run" Grid.Row="4" Style="{StaticResource LabelStyle}" />
+
+			<CheckBox Grid.Row="4" IsChecked="{Binding ShowFirstRun, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
+
+			<!--#endregion-->
+			
+			<!--#region Dubs -->
+
+			<TextBlock Text="Dubs" Grid.Row="5" Style="{StaticResource LabelStyle}" />
+
+			<Grid Grid.Row="6" Style="{StaticResource InputContainerStyle}">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+
+				<Button Style="{StaticResource AddButtonStyle}" Click="DubsAddButton_Click" />
+				<Button Style="{StaticResource RemoveButtonStyle}" Click="DubsRemoveButton_Click" />
+			</Grid>
+
+			<ListView x:Name="DubsValues" Grid.Row="7" ItemsSource="{Binding Dubs, Mode=TwoWay}" Style="{StaticResource ValueListStyle}" />
+
+			<!--#endregion-->
+			
+			<!--#region Names -->
+
+			<TextBlock Text="Names" Grid.Row="8" Style="{StaticResource LabelStyle}" />
+
+			<Grid Grid.Row="9" Style="{StaticResource InputContainerStyle}">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+
+				<Button Style="{StaticResource AddButtonStyle}" Click="NamesAddButton_Click" />
+				<Button Style="{StaticResource RemoveButtonStyle}" Click="NamesRemoveButton_Click" />
+			</Grid>
+
+			<ListView x:Name="NamesValues" Grid.Row="10" ItemsSource="{Binding Names, Mode=TwoWay}" Style="{StaticResource ValueListStyle}" />
+
+			<!--#endregion-->
+		</Grid>
+	</ScrollViewer>
+</Window>
