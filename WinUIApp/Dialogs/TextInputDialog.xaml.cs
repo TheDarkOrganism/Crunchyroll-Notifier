@@ -9,9 +9,9 @@ namespace WinUIApp.Dialogs
 
 		public string Text => _textInputModel.Text;
 
-		public TextInputDialog(UserActionType userAction, string text, int maxLength)
+		public TextInputDialog(UserActionType userAction, string name, int maxLength)
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(text, nameof(text));
+			ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 			ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, 1, nameof(maxLength));
 
 			_textInputModel = new();
@@ -20,9 +20,16 @@ namespace WinUIApp.Dialogs
 
 			InitializeComponent();
 
-			Title = $"{userAction} Prompt";
+			Title = $"{name} Prompt";
 
-			MessageContent.Text = $"Enter a value to {text} {userAction}:";
+			string middle = userAction switch
+			{
+				UserActionType.add => "to",
+				UserActionType.remove => "from",
+				_ => throw new NotImplementedException()
+			};
+
+			MessageContent.Text = $"Enter a value to {userAction} {middle} {name}:";
 
 			TextValueInput.MaxLength = maxLength;
 		}
