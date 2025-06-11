@@ -11,6 +11,7 @@ namespace WinUIApp.Models
 
 		private readonly Dictionary<string, IReadOnlyCollection<string>> _errors = [];
 
+		[JsonIgnore]
 		public bool HasErrors => _errors.Count > 0;
 
 		private void OnErrorsChanged(string propertyName)
