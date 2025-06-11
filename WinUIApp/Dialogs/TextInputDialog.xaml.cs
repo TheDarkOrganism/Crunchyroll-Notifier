@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using WinUIApp.Enums;
 
 namespace WinUIApp.Dialogs
 {
@@ -8,9 +9,8 @@ namespace WinUIApp.Dialogs
 
 		public string Text => _textInputModel.Text;
 
-		public TextInputDialog(string name, string text, int maxLength)
+		public TextInputDialog(UserActionType userAction, string text, int maxLength)
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 			ArgumentException.ThrowIfNullOrWhiteSpace(text, nameof(text));
 			ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, 1, nameof(maxLength));
 
@@ -20,9 +20,9 @@ namespace WinUIApp.Dialogs
 
 			InitializeComponent();
 
-			Title = $"{name} Prompt";
+			Title = $"{userAction} Prompt";
 
-			MessageContent.Text = $"Enter a value to {text} {name}:";
+			MessageContent.Text = $"Enter a value to {text} {userAction}:";
 
 			TextValueInput.MaxLength = maxLength;
 		}
