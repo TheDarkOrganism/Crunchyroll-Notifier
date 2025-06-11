@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace WinUIApp.Options
+﻿namespace WinUIApp.Options
 {
 	internal sealed class SavableJsonOptions<TOptions> : ISavableJsonOptions<TOptions>
 		where TOptions : class
