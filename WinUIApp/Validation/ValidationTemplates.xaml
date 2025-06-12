@@ -1,0 +1,171 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Style x:Key="ValidatedInputStyle" TargetType="Control">
+		<Setter Property="BorderBrush" Value="Gray" />
+		<Setter Property="BorderThickness" Value="1" />
+	</Style>
+
+	<Style x:Key="ContentContainerStyle" TargetType="StackPanel">
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="Padding" Value="10 0" />
+	</Style>
+
+	<Style x:Key="ContentElementStyle" TargetType="ScrollViewer">
+		<Setter Property="HorizontalScrollBarVisibility" Value="Hidden" />
+		<Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+		<Setter Property="IsTabStop" Value="False" />
+	</Style>
+
+	<Style x:Key="ErrorContentStyle" TargetType="TextBlock">
+		<Setter Property="FontSize" Value="12" />
+		<Setter Property="Foreground" Value="Red" />
+		<Setter Property="VerticalAlignment" Value="Bottom" />
+		<Setter Property="Visibility" Value="Collapsed" />
+	</Style>
+
+	<ControlTemplate x:Key="TextBoxErrorTemplate" TargetType="TextBox">
+		<StackPanel Style="{StaticResource ContentContainerStyle}">
+			<TextBlock Style="{StaticResource HeaderTextBlockStyle}" Text="{TemplateBinding Header}" />
+
+			<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" />
+
+			<Grid>
+				<Border x:Name="ErrorBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+
+				<ScrollViewer x:Name="ContentElement" Style="{StaticResource ContentElementStyle}" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" Padding="{TemplateBinding Padding}" />
+			</Grid>
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup>
+					<VisualState x:Name="Valid" />
+
+					<VisualState x:Name="Invalid">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorContent" Storyboard.TargetProperty="Visibility">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+							</ObjectAnimationUsingKeyFrames>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorBorder" Storyboard.TargetProperty="BorderBrush">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Red" />
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+		</StackPanel>
+	</ControlTemplate>
+
+	<ControlTemplate x:Key="NumberBoxErrorTemplate" TargetType="NumberBox">
+		<StackPanel Style="{StaticResource ContentContainerStyle}">
+			<TextBlock Style="{StaticResource HeaderTextBlockStyle}" Text="{TemplateBinding Header}" />
+
+			<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" />
+
+			<Grid>
+				<Border x:Name="ErrorBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+
+				<TextBox x:Name="InputBox" Text="{TemplateBinding Text}" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" BorderThickness="0" />
+			</Grid>
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup>
+					<VisualState x:Name="Valid" />
+
+					<VisualState x:Name="Invalid">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorContent" Storyboard.TargetProperty="Visibility">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+							</ObjectAnimationUsingKeyFrames>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorBorder" Storyboard.TargetProperty="BorderBrush">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Red" />
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+		</StackPanel>
+	</ControlTemplate>
+
+	<ControlTemplate x:Key="ComboBoxErrorTemplate" TargetType="ComboBox">
+		<StackPanel Style="{StaticResource ContentContainerStyle}">
+			<TextBlock Style="{StaticResource HeaderTextBlockStyle}" Text="{TemplateBinding Header}" />
+
+			<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" />
+
+			<Border x:Name="ErrorBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+				<Grid>
+					<ContentPresenter x:Name="ContentPresenter" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}" />
+
+					<Button x:Name="DropDownButton" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="32" Content="▼" Background="Transparent" BorderThickness="0" IsTabStop="False" />
+				</Grid>
+			</Border>
+
+			<Popup x:Name="DropdownPopup" IsLightDismissEnabled="True" DesiredPlacement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" ShouldConstrainToRootBounds="False">
+				<Border BorderBrush="{ThemeResource ComboBoxPopupBorderThemeBrush}" Background="{ThemeResource ComboBoxForegroundThemeBrush}" BorderThickness="1" MaxHeight="200" MinWidth="{TemplateBinding ActualWidth}">
+					<ScrollViewer>
+						<ItemsPresenter />
+					</ScrollViewer>
+				</Border>
+			</Popup>
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup>
+					<VisualState x:Name="Valid" />
+
+					<VisualState x:Name="Invalid">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorContent" Storyboard.TargetProperty="Visibility">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+							</ObjectAnimationUsingKeyFrames>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorBorder" Storyboard.TargetProperty="BorderBrush">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Red" />
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+
+				<VisualStateGroup x:Name="PopupStates">
+					<VisualState x:Name="PopupClosed" />
+					<VisualState x:Name="PopupOpened">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="DropdownPopup" Storyboard.TargetProperty="IsOpen">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="True" />
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+		</StackPanel>
+	</ControlTemplate>
+
+	<ControlTemplate x:Key="ListViewBaseErrorTemplate" TargetType="ListViewBase">
+		<StackPanel Style="{StaticResource ContentContainerStyle}">
+			<TextBlock Style="{StaticResource HeaderTextBlockStyle}" Text="{TemplateBinding Header}" />
+
+			<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" />
+
+			<Border x:Name="ErrorBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+				<ItemsPresenter x:Name="ItemsPresenter" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" Padding="{TemplateBinding Padding}" />
+			</Border>
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup>
+					<VisualState x:Name="Valid" />
+
+					<VisualState x:Name="Invalid">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorContent" Storyboard.TargetProperty="Visibility">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Visible" />
+							</ObjectAnimationUsingKeyFrames>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="ErrorBorder" Storyboard.TargetProperty="BorderBrush">
+								<DiscreteObjectKeyFrame KeyTime="0" Value="Red" />
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+		</StackPanel>
+	</ControlTemplate>
+
+</ResourceDictionary>

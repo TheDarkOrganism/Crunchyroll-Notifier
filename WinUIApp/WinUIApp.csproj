@@ -33,6 +33,11 @@
 	<ItemGroup>
 		<None Remove="Dialogs\TextInputDialog.xaml" />
 		<None Remove="Settings.xaml" />
+		<None Remove="Validation\ValidationTemplates.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,6 +95,9 @@
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 		<Page Update="Dialogs\TextInputDialog.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Validation\ValidationTemplates.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 		<None Update="LastUpdate.json">
