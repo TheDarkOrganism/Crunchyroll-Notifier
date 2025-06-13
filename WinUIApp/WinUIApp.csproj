@@ -48,6 +48,7 @@
 		<Using Include="Microsoft.Extensions.Options" />
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
+		<Using Include="System.ComponentModel" />
 		<Using Include="System.ComponentModel.DataAnnotations" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="System.Text.Json" />
