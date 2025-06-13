@@ -114,5 +114,18 @@ namespace WinUIApp
 				sender.Value = Math.Clamp(value, min, max);
 			}
 		}
+
+		private void Control_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (sender is Control control)
+			{
+				control.LoadValidation<ConfigModel>();
+			}
+
+			if (sender is FrameworkElement element)
+			{
+				element.Loaded -= Control_Loaded;
+			}
+		}
 	}
 }

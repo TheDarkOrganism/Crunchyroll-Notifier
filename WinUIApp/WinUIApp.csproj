@@ -57,6 +57,7 @@
 		<Using Include="WinUIApp.Enums" />
 		<Using Include="WinUIApp.Models" />
 		<Using Include="WinUIApp.Options" />
+		<Using Include="WinUIApp.Validation" />
 	</ItemGroup>
 
 	<ItemGroup>

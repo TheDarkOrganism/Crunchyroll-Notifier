@@ -30,5 +30,12 @@
 
 			TextValueInput.MaxLength = maxLength;
 		}
+
+		private void TextValueInput_Loaded(object sender, RoutedEventArgs e)
+		{
+			TextValueInput.LoadValidation<TextInputModel>();
+
+			TextValueInput.Loaded -= TextValueInput_Loaded;
+		}
 	}
 }

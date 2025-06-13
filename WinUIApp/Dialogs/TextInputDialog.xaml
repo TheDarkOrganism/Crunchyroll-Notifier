@@ -10,8 +10,12 @@
 	SecondaryButtonText="Cancel"
 	d:DataContext="{d:DesignInstance Type=models:TextInputModel}">
 	<StackPanel>
+		<StackPanel.Resources>
+			<ResourceDictionary Source="/Validation/ValidationTemplates.xaml" />
+		</StackPanel.Resources>
+		
 		<TextBlock x:Name="MessageContent" FontFamily="{x:Bind FontFamily}" FontSize="{x:Bind FontSize}" />
 
-		<TextBox x:Name="TextValueInput" Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+		<TextBox x:Name="TextValueInput" Style="{StaticResource ValidatedInputStyle}" Template="{StaticResource TextBoxErrorTemplate}" Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Loaded="TextValueInput_Loaded" />
 	</StackPanel>
 </ContentDialog>
