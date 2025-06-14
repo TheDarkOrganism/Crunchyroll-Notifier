@@ -37,10 +37,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  
-	</ItemGroup>
-
-	<ItemGroup>
 		<Using Include="Microsoft.Extensions.Configuration" />
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Microsoft.Extensions.FileProviders" />
@@ -48,6 +44,7 @@
 		<Using Include="Microsoft.Extensions.Options" />
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
+		<Using Include="Microsoft.Windows.AppNotifications" />
 		<Using Include="System.ComponentModel" />
 		<Using Include="System.ComponentModel.DataAnnotations" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
