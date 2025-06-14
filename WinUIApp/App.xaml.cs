@@ -28,7 +28,7 @@ namespace WinUIApp
 
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureAppConfiguration(static builder => builder.AddJsonFile(configFile).AddJsonFile(lastUpdateFile))
-				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddScoped<Settings>())
+				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddScoped<Settings>().AddHttpClient())
 				.ConfigureSavableJson<ConfigModel>(configFile)
 				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
 				.Build();
