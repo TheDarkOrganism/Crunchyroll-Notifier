@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace WinUIApp.Models
+﻿namespace WinUIApp.Models
 {
 	public sealed partial class ConfigModel : ValidationModelBase
 	{
