@@ -32,6 +32,8 @@ namespace WinUIApp
 				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
 				.ConfigureSavableJson<ConfigModel>(configFile)
 				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
+				.AddResourceRecovery(configFile)
+				.AddResourceRecovery(lastUpdateFile)
 				.Build();
 
 			InitializeComponent();

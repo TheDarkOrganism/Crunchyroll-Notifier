@@ -91,6 +91,7 @@
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
 	</ItemGroup>
 	<ItemGroup>
+		<EmbeddedResource Include="Config.json" />
 		<None Update="Config.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -103,6 +104,7 @@
 		<Page Update="Validation\ValidationTemplates.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
+		<EmbeddedResource Include="LastUpdate.json" />
 		<None Update="LastUpdate.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
