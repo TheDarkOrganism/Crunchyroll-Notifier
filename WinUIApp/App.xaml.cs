@@ -1,6 +1,6 @@
 ﻿using H.NotifyIcon;
 using Microsoft.UI.Xaml.Input;
-using System.Reflection;
+using WinUIApp.Providers;
 using WinUIApp.Services;
 #if PACKAGED_APP
 using Windows.ApplicationModel;
@@ -28,7 +28,7 @@ namespace WinUIApp
 			const string lastUpdateFile = "LastUpdate.json";
 
 			_host = Host.CreateDefaultBuilder()
-				.ConfigureAppConfiguration(static builder => builder.AddJsonFile(configFile).AddJsonFile(lastUpdateFile))
+				.ConfigureAppConfiguration(static (context, builder) => builder.AddJsonFileWithValidation<ConfigModel>(configFile, context.HostingEnvironment.ContentRootFileProvider).AddJsonFile(lastUpdateFile))
 				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
 				.ConfigureSavableJson<ConfigModel>(configFile)
 				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
