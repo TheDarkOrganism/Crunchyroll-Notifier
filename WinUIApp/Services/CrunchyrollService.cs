@@ -66,7 +66,7 @@ namespace WinUIApp.Services
 
 						#endregion
 
-						DateTime copy = lastOptions.Value.LastUpdate;
+						DateTime copy = lastUpdateModel.LastUpdate;
 
 						#region #region Loop through parsed episode data
 
