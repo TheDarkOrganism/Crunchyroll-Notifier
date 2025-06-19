@@ -1,4 +1,6 @@
-﻿namespace WinUIApp.Models
+﻿using System.Collections.Specialized;
+
+namespace WinUIApp.Models
 {
 	public sealed partial class ConfigModel : ValidationModelBase
 	{
@@ -116,6 +118,11 @@
 			}
 		}
 
+		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+		{
+			OnModified();
+		}
+
 		public ConfigModel()
 		{
 			ValidateProperty(Interval);
@@ -125,6 +132,9 @@
 
 			RemoveEmptyValues(Dubs);
 			RemoveEmptyValues(Names);
+
+			Dubs.CollectionChanged += OnCollectionChanged;
+			Names.CollectionChanged += OnCollectionChanged;
 		}
 	}
 }
