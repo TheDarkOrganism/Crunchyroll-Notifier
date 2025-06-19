@@ -13,13 +13,16 @@
 			get => _interval;
 			set
 			{
-				_interval = value;
+				if (_interval != value)
+				{
+					_interval = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 
-		private int _maxNotifications = 10;
+		private int _maxNotifications = 30;
 
 		[JsonRequired]
 		[JsonPropertyName("maxNotifications")]
@@ -29,9 +32,12 @@
 			get => _maxNotifications;
 			set
 			{
-				_maxNotifications = value;
+				if (_maxNotifications != value)
+				{
+					_maxNotifications = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 
@@ -44,9 +50,12 @@
 			get => _showFirstRun;
 			set
 			{
-				_showFirstRun = value;
+				if (_showFirstRun != value)
+				{
+					_showFirstRun = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 
@@ -61,9 +70,12 @@
 			get => _visibility;
 			set
 			{
-				_visibility = value;
+				if (_visibility != value)
+				{
+					_visibility = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 
@@ -78,9 +90,12 @@
 			get => _feedHostType;
 			set
 			{
-				_feedHostType = value;
+				if (_feedHostType != value)
+				{
+					_feedHostType = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 

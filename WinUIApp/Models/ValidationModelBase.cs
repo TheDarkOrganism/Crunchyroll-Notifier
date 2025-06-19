@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace WinUIApp.Models
 {
-	public abstract class ValidationModelBase : INotifyDataErrorInfo, INotifyPropertyChanged
+	public abstract class ValidationModelBase : ModelBase, INotifyDataErrorInfo, INotifyPropertyChanged
 	{
 		public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
@@ -47,6 +47,8 @@ namespace WinUIApp.Models
 
 			if (!string.IsNullOrWhiteSpace(propertyName))
 			{
+				OnModified();
+
 				ValidateProperty(value, propertyName);
 			}
 		}

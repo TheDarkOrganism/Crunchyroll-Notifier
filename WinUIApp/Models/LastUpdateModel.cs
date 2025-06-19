@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	internal sealed class LastUpdateModel
+	internal sealed class LastUpdateModel : ModelBase
 	{
 		private DateTime _lastUpdate = DateTime.Now;
 
@@ -10,9 +10,11 @@
 			get => _lastUpdate;
 			set
 			{
-				if (value != default)
+				if (value != default && _lastUpdate != value)
 				{
 					_lastUpdate = value;
+
+					OnModified();
 				}
 			}
 		}

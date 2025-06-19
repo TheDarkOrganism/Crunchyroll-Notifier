@@ -10,9 +10,12 @@
 			get => _text;
 			set
 			{
-				_text = value;
+				if (_text != value)
+				{
+					_text = value;
 
-				OnPropertyChanged(value);
+					OnPropertyChanged(value);
+				}
 			}
 		}
 
