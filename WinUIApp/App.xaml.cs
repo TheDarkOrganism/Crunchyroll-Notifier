@@ -29,7 +29,7 @@ namespace WinUIApp
 
 			_host = Host.CreateDefaultBuilder()
 				.ConfigureAppConfiguration(static (context, builder) => builder.AddJsonFileWithValidation<ConfigModel>(configFile, context.HostingEnvironment.ContentRootFileProvider).AddJsonFile(lastUpdateFile))
-				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
+				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
 				.ConfigureSavableJson<ConfigModel>(configFile)
 				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
 				.AddResourceRecovery(configFile)
