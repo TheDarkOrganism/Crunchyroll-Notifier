@@ -1,7 +1,7 @@
 ﻿namespace WinUIApp.Options
 {
 	internal sealed class SavableJsonOptions<TOptions> : ISavableJsonOptions<TOptions>
-		where TOptions : class
+		where TOptions : ModelBase
 	{
 		private readonly string _file;
 		private readonly string _section;
@@ -50,13 +50,15 @@
 
 		public void Save()
 		{
-			if (TryGetFileStream(out FileStream? fileStream))
+			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 			{
 				try
 				{
 					using Utf8JsonWriter utf8JsonWriter = new(fileStream);
 
 					Write(utf8JsonWriter);
+
+					Value.MarkUnmodified();
 				}
 				finally
 				{
@@ -67,13 +69,15 @@
 
 		public async Task SaveAsync()
 		{
-			if (TryGetFileStream(out FileStream? fileStream))
+			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 			{
 				try
 				{
 					await using Utf8JsonWriter utf8JsonWriter = new(fileStream);
 
 					Write(utf8JsonWriter);
+
+					Value.MarkUnmodified();
 				}
 				finally
 				{

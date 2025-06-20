@@ -3,7 +3,7 @@
 	internal static class OptionsExtensions
 	{
 		public static IHostBuilder ConfigureSavableJson<TOptions>(this IHostBuilder hostBuilder, string file, string? section = null)
-			where TOptions : class
+			where TOptions : ModelBase
 		{
 			return hostBuilder.ConfigureServices((context, services) =>
 			{
