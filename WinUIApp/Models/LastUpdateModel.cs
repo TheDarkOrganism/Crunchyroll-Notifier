@@ -2,7 +2,7 @@
 {
 	internal sealed class LastUpdateModel : ModelBase
 	{
-		private DateTime _lastUpdate = DateTime.Now;
+		private DateTime _lastUpdate = DateTime.UtcNow;
 
 		[JsonPropertyName("lastUpdate")]
 		public DateTime LastUpdate
