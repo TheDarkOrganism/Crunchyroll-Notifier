@@ -3,6 +3,13 @@
 	internal sealed class SavableJsonOptions<TOptions> : ISavableJsonOptions<TOptions>
 		where TOptions : ModelBase
 	{
+		private static readonly JsonWriterOptions _jsonWriterOptions = new()
+		{
+			IndentCharacter = '\t',
+			Indented = true,
+			IndentSize = 1
+		};
+
 		private readonly string _file;
 		private readonly string _section;
 		private readonly IFileProvider _fileProvider;
@@ -54,7 +61,7 @@
 			{
 				try
 				{
-					using Utf8JsonWriter utf8JsonWriter = new(fileStream);
+					using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
 
 					Write(utf8JsonWriter);
 
@@ -73,7 +80,7 @@
 			{
 				try
 				{
-					await using Utf8JsonWriter utf8JsonWriter = new(fileStream);
+					await using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
 
 					Write(utf8JsonWriter);
 
