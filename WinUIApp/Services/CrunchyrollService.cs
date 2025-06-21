@@ -9,7 +9,7 @@ namespace WinUIApp.Services
 	{
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
 		{
-			return string.IsNullOrWhiteSpace(value) || values.Count == 0 || values.Contains(value, StringComparer.OrdinalIgnoreCase);
+			return string.IsNullOrWhiteSpace(value) || values.Count == 0 || values.Contains(value, StringComparer.CurrentCultureIgnoreCase);
 		}
 
 		[GeneratedRegex("\\(([A-Za-z\\-]+) Dub\\)")]
@@ -72,7 +72,7 @@ namespace WinUIApp.Services
 
 						XPathNavigator navigator = new XPathDocument(reader).CreateNavigator();
 
-						string pub = configModel.Visibility is VisibilityType.Default ? "pub" : $"crunchyroll:{configModel.Visibility.ToString().ToLower(CultureInfo.CurrentCulture)}Pub";
+						string pub = configModel.Visibility is VisibilityType.Default ? "pub" : $"crunchyroll:{configModel.Visibility.ToString().ToLower(CultureInfo.InvariantCulture)}Pub";
 
 						foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {configModel.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
 						{

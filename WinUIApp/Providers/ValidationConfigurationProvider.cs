@@ -84,6 +84,7 @@
 					foreach (JsonElement element in jsonElement.EnumerateArray())
 					{
 						ParseValue(element, innerType, $"{key ?? "Array"}:{index}");
+						
 						index++;
 					}
 					break;

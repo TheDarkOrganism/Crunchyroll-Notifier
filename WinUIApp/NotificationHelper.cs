@@ -30,21 +30,12 @@ namespace WinUIApp
 			ShowNotification(title, message, static _ => { });
 		}
 
-		private void ShowNotification(string title, string message, string buttonText, Func<AppNotificationButton, AppNotificationButton> modifier)
-		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(buttonText, nameof(buttonText));
-
-			ShowNotification(title, message, builder => builder.AddButton(modifier(new(buttonText))));
-		}
-
-		internal void Notify(string title, string message, string buttonText)
-		{
-			ShowNotification(title, message, buttonText, static button => button);
-		}
-
 		internal void Notify(string title, string message, string buttonText, Uri protocolUri)
 		{
-			ShowNotification(title, message, buttonText, button => button.SetInvokeUri(protocolUri));
+			ArgumentException.ThrowIfNullOrWhiteSpace(buttonText, nameof(buttonText));
+			ArgumentNullException.ThrowIfNull(protocolUri, nameof(protocolUri));
+
+			ShowNotification(title, message, builder => builder.AddButton(new AppNotificationButton(buttonText).SetInvokeUri(protocolUri)));
 		}
 	}
 }

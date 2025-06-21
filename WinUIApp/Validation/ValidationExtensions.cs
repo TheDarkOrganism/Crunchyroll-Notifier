@@ -33,7 +33,7 @@
 
 			if (control.DataContext is TModel model)
 			{
-				void Loaded(object? sender, object e)
+				void OnLayoutUpdated(object? sender, object e)
 				{
 					if (control.GetBindingPath() is string bindingPath)
 					{
@@ -42,10 +42,10 @@
 						CheckForErrors<TModel>(control, bindingPath, bindingPath);
 					}
 
-					control.LayoutUpdated -= Loaded;
+					control.LayoutUpdated -= OnLayoutUpdated;
 				}
 
-				control.LayoutUpdated += Loaded;
+				control.LayoutUpdated += OnLayoutUpdated;
 			}
 		}
 	}

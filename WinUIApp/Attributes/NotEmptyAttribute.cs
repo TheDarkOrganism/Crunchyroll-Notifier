@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace WinUIApp.Attributes
+﻿namespace WinUIApp.Attributes
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 	internal sealed class NotEmptyAttribute : ValidationAttribute

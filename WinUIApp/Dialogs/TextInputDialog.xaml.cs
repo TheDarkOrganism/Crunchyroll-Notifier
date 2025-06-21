@@ -2,7 +2,7 @@
 {
 	internal sealed partial class TextInputDialog : ContentDialog
 	{
-		private readonly TextInputModel _textInputModel;
+		private readonly TextInputModel _textInputModel = new();
 
 		public string Text => _textInputModel.Text;
 
@@ -10,8 +10,6 @@
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 			ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, 1, nameof(maxLength));
-
-			_textInputModel = new();
 
 			DataContext = _textInputModel;
 

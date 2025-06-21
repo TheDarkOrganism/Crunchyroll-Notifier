@@ -45,6 +45,7 @@
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
 		<Using Include="Microsoft.Windows.AppNotifications" />
+		<Using Include="System.Collections" />
 		<Using Include="System.Collections.ObjectModel" />
 		<Using Include="System.ComponentModel" />
 		<Using Include="System.ComponentModel.DataAnnotations" />
