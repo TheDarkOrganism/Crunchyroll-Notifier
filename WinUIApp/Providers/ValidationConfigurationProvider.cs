@@ -48,7 +48,16 @@
 								case EnumDataTypeAttribute enumDataTypeAttribute:
 									if (stringValue is null || !enumDataTypeAttribute.IsValid(stringValue))
 									{
-										WriteValue(subKey, Enum.GetNames(enumDataTypeAttribute.EnumType)[0]);
+										Type enumType = enumDataTypeAttribute.EnumType;
+
+										if (Enum.TryParse(enumType, stringValue, true, out object? result))
+										{
+											WriteValue(key, result);
+										}
+										else
+										{
+											WriteValue(key, Enum.GetNames(enumType)[0]);
+										}
 									}
 									break;
 								case RangeAttribute rangeAttribute:
