@@ -95,9 +95,9 @@
 
 			<Border x:Name="ErrorBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
 				<Grid>
-					<ContentPresenter x:Name="ContentPresenter" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}" />
+					<ContentPresenter x:Name="ContentPresenter" MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}" Width="{TemplateBinding Width}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}" />
 
-					<Button x:Name="DropDownButton" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="32" Content="▼" Background="Transparent" BorderThickness="0" IsTabStop="False" />
+					<Button x:Name="DropDownButton" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="32" Content="▼" Background="Transparent" BorderThickness="0" IsTabStop="False" Margin="80 0 0 0" />
 				</Grid>
 			</Border>
 

@@ -23,7 +23,7 @@
 			
 		</ScrollViewer.Resources>
 
-		<Grid x:Name="LayoutGrid" Style="{StaticResource GridStyle}" d:DataContext="{d:DesignInstance Type=models:ConfigModel}">
+		<Grid x:Name="LayoutGrid" Style="{StaticResource GridStyle}" Padding="10" d:DataContext="{d:DesignInstance Type=models:ConfigModel}">
 			
 			<Grid.Resources>
 
@@ -68,6 +68,8 @@
 						<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
 					</Style>
 
+					<markup:EnumToIndexConverter x:Key="EnumIndexConverter" />
+
 				</ResourceDictionary>
 
 			</Grid.Resources>
@@ -107,7 +109,7 @@
 
 			<TextBlock Text="Visibility" Grid.Row="1" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="1" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}}" SelectedItem="{Binding Visibility, Mode=TwoWay}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="1" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
@@ -115,7 +117,7 @@
 
 			<TextBlock Text="Feed Host" Grid.Row="2" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 			
 			<!--#endregion-->
 
@@ -131,7 +133,9 @@
 
 			<TextBlock Text="Show on first run" Grid.Row="4" Style="{StaticResource LabelStyle}" />
 
-			<CheckBox Grid.Row="4" IsChecked="{Binding ShowFirstRun, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
+			<StackPanel Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="31">
+				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay}" Style="{StaticResource InputStyle}" HorizontalContentAlignment="Center" />
+			</StackPanel>
 
 			<!--#endregion-->
 			
@@ -149,7 +153,7 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="DubsRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="DubsValues" Grid.Row="7" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=TwoWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="DubsValues" Grid.Row="7" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
@@ -167,7 +171,7 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="NamesRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="NamesValues" Grid.Row="10" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=TwoWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="NamesValues" Grid.Row="10" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 		</Grid>

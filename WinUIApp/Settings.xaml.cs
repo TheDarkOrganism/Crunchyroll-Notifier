@@ -16,6 +16,7 @@ namespace WinUIApp
 			LayoutGrid.DataContext = _options.Value;
 
 			AppWindow.SetIcon("HiDive-Notifier.ico");
+			AppWindow.Resize(new(463, AppWindow.Size.Height));
 
 #if !DEBUG
 			if (AppWindow.Presenter is OverlappedPresenter presenter)
