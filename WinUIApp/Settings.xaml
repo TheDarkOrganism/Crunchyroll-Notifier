@@ -93,47 +93,54 @@
 				<RowDefinition />
 				<RowDefinition />
 				<RowDefinition />
+				<RowDefinition />
 			</Grid.RowDefinitions>
 				
 			<!--#endregion-->
 			
+			<!--#region Save Warning -->
+
+			<TextBlock Text="Changes will be saved when this window closes or when the application exits." Style="{StaticResource LabelStyle}" Foreground="Red" Grid.ColumnSpan="2" TextWrapping="WrapWholeWords" />
+
+			<!--#endregion-->
+			
 			<!--#region Interval -->
 
-			<TextBlock Text="Interval" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Interval" Grid.Row="1" Style="{StaticResource LabelStyle}" />
 
-			<TimePicker ClockIdentifier="24HourClock" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
+			<TimePicker ClockIdentifier="24HourClock" Grid.Row="1" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
 
 			<!--#endregion-->
 
 			<!--#region Visibility -->
 
-			<TextBlock Text="Visibility" Grid.Row="1" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Visibility" Grid.Row="2" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="1" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
 			<!--#region Feed Host -->
 
-			<TextBlock Text="Feed Host" Grid.Row="2" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Feed Host" Grid.Row="3" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 			
 			<!--#endregion-->
 
 			<!--#region  Max Notifications -->
 
-			<TextBlock Text="Max Notifications" Grid.Row="3" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Max Notifications" Grid.Row="4" Style="{StaticResource LabelStyle}" />
 
-			<NumberBox Grid.Row="3" Template="{StaticResource NumberBoxErrorTemplate}" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding MaxNotifications, Mode=TwoWay}" Style="{StaticResource InputStyle}" ValueChanged="NumberBox_ValueChanged" Loaded="Control_Loaded" />
+			<NumberBox Grid.Row="4" Template="{StaticResource NumberBoxErrorTemplate}" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding MaxNotifications, Mode=TwoWay}" Style="{StaticResource InputStyle}" ValueChanged="NumberBox_ValueChanged" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
 			<!--#region  Show First Run -->
 
-			<TextBlock Text="Show on first run" Grid.Row="4" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Show on first run" Grid.Row="5" Style="{StaticResource LabelStyle}" />
 
-			<StackPanel Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="31">
+			<StackPanel Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="31">
 				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay}" Style="{StaticResource InputStyle}" HorizontalContentAlignment="Center" />
 			</StackPanel>
 
@@ -141,9 +148,9 @@
 			
 			<!--#region Dubs -->
 
-			<TextBlock Text="Dubs" Grid.Row="5" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Dubs" Grid.Row="6" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="6" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="7" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -153,15 +160,15 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="DubsRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="DubsValues" Grid.Row="7" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="DubsValues" Grid.Row="8" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
 			<!--#region Names -->
 
-			<TextBlock Text="Names" Grid.Row="8" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Names" Grid.Row="9" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="9" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="10" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -171,7 +178,7 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="NamesRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="NamesValues" Grid.Row="10" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="NamesValues" Grid.Row="11" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 		</Grid>
