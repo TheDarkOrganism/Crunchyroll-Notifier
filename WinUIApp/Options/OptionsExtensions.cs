@@ -9,7 +9,7 @@
 			{
 				section ??= Path.GetFileNameWithoutExtension(file);
 
-				_ = services.Configure<TOptions>(context.Configuration.GetRequiredSection(section), static options => options.ErrorOnUnknownConfiguration = false);
+				_ = services.Configure<TOptions>(context.Configuration.GetSection(section), static options => options.ErrorOnUnknownConfiguration = false);
 
 				_ = services.AddSingleton<ISavableJsonOptions<TOptions>>(provider => new SavableJsonOptions<TOptions>(file, section, context.HostingEnvironment.ContentRootFileProvider, provider.GetRequiredService<IOptions<TOptions>>()));
 			});
