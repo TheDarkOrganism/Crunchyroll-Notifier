@@ -9,7 +9,7 @@ namespace WinUIApp.Models
 		[JsonRequired]
 		[JsonConverter(typeof(Converters.TimeSpanConverter))]
 		[JsonPropertyName("interval")]
-		[TimeSpanRange(0, 1)]
+		[TimeSpanRange(0, 1, 0, 0, 0, 0, 10, 60)]
 		public TimeSpan Interval
 		{
 			get => _interval;
