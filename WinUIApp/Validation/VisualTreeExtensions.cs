@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
+using WinUIApp.Controls;
 
 namespace WinUIApp.Validation
 {
@@ -51,6 +52,7 @@ namespace WinUIApp.Validation
 				TextBox => GetBindingPath(control, TextBox.TextProperty),
 				NumberBox => GetBindingPath(control, NumberBox.ValueProperty) ?? GetBindingPath(control, NumberBox.TextProperty),
 				Selector => GetBindingPath(control, Selector.SelectedValueProperty) ?? GetBindingPath(control, Selector.SelectedItemProperty),
+				CustomTimePicker => GetBindingPath(control, CustomTimePicker.TimeProperty),
 				_ => null
 			};
 		}

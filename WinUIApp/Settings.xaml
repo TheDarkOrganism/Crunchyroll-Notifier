@@ -4,6 +4,7 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="using:WinUIApp"
+	xmlns:controls="using:WinUIApp.Controls"
 	xmlns:models="using:WinUIApp.Models"
 	xmlns:markup="using:WinUIApp.Markup"
 	xmlns:enums="using:WinUIApp.Enums"
@@ -108,7 +109,7 @@
 
 			<TextBlock Text="Interval" Grid.Row="1" Style="{StaticResource LabelStyle}" />
 
-			<TimePicker ClockIdentifier="24HourClock" Grid.Row="1" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" />
+			<controls:CustomTimePicker Grid.Row="1" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" HorizontalAlignment="Right" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 

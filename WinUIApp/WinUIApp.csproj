@@ -31,6 +31,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Controls\CustomTimePicker.xaml" />
 		<None Remove="Dialogs\TextInputDialog.xaml" />
 		<None Remove="Settings.xaml" />
 		<None Remove="Validation\ValidationTemplates.xaml" />
@@ -96,6 +97,9 @@
 		<None Update="Config.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<Page Update="Controls\CustomTimePicker.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Update="Settings.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
