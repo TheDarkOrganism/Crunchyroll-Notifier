@@ -38,6 +38,11 @@ namespace WinUIApp
 			{
 				string text = textInputDialog.Text;
 
+				if (string.IsNullOrWhiteSpace(text))
+				{
+					return;
+				}
+
 				switch (userAction)
 				{
 					case UserActionType.add:

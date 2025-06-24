@@ -109,7 +109,7 @@
 
 			<TextBlock Text="Interval" Grid.Row="1" Style="{StaticResource LabelStyle}" />
 
-			<controls:CustomTimePicker Grid.Row="1" Time="{Binding Interval, Mode=TwoWay}" Style="{StaticResource InputStyle}" HorizontalAlignment="Right" Loaded="Control_Loaded" />
+			<controls:CustomTimePicker Grid.Row="1" Time="{Binding Interval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" HorizontalAlignment="Right" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 
@@ -117,7 +117,7 @@
 
 			<TextBlock Text="Visibility" Grid.Row="2" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
@@ -125,7 +125,7 @@
 
 			<TextBlock Text="Feed Host" Grid.Row="3" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
 			
 			<!--#endregion-->
 
@@ -133,7 +133,7 @@
 
 			<TextBlock Text="Max Notifications" Grid.Row="4" Style="{StaticResource LabelStyle}" />
 
-			<NumberBox Grid.Row="4" Template="{StaticResource NumberBoxErrorTemplate}" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding MaxNotifications, Mode=TwoWay}" Style="{StaticResource InputStyle}" ValueChanged="NumberBox_ValueChanged" Loaded="Control_Loaded" />
+			<NumberBox Grid.Row="4" Template="{StaticResource NumberBoxErrorTemplate}" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding MaxNotifications, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" ValueChanged="NumberBox_ValueChanged" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
@@ -142,7 +142,7 @@
 			<TextBlock Text="Show on first run" Grid.Row="5" Style="{StaticResource LabelStyle}" />
 
 			<StackPanel Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="31">
-				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay}" Style="{StaticResource InputStyle}" HorizontalContentAlignment="Center" />
+				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" HorizontalContentAlignment="Center" />
 			</StackPanel>
 
 			<!--#endregion-->
