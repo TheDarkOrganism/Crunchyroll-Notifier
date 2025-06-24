@@ -32,7 +32,7 @@ namespace WinUIApp.Models
 
 		protected void ValidateProperty<TValue>(TValue value, [CallerArgumentExpression(nameof(value)), NotNull] string? propertyName = null)
 		{
-			if (ContainsErrors(propertyName))
+			if (ContainsErrors(propertyName) && _errors.Remove(propertyName))
 			{
 				OnErrorsChanged(propertyName);
 			}
