@@ -6,13 +6,15 @@ namespace WinUIApp.Models
 	{
 		private TimeSpan _interval = TimeSpan.FromSeconds(30);
 
+		private const int _minSeconds = 10;
+
 		[JsonRequired]
 		[JsonConverter(typeof(Converters.TimeSpanConverter))]
 		[JsonPropertyName("interval")]
-		[TimeSpanRange(0, 1, 0, 0, 0, 0, 10, 60)]
+		[TimeSpanRange(0, 1, 0, 0, 0, 0, _minSeconds, 60)]
 		public TimeSpan Interval
 		{
-			get => _interval;
+			get => ContainsErrors() ? TimeSpan.FromSeconds(_minSeconds) : _interval;
 			set
 			{
 				if (_interval != value)
@@ -107,20 +109,18 @@ namespace WinUIApp.Models
 		[JsonPropertyName("names")]
 		public ObservableCollection<string> Names { get; } = [];
 
-		private static void RemoveEmptyValues(ObservableCollection<string> values)
-		{
-			foreach (string value in values)
-			{
-				if (string.IsNullOrWhiteSpace(value))
-				{
-					_ = values.Remove(value);
-				}
-			}
-		}
-
 		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
 		{
-			OnModified();
+			if (sender is ObservableCollection<string> values && e.NewItems is IList newItems)
+			{
+				foreach (string value in newItems.OfType<string>())
+				{
+					if (string.IsNullOrWhiteSpace(value))
+					{
+						_ = values.Remove(value);
+					}
+				}
+			}
 		}
 
 		public ConfigModel()
@@ -129,9 +129,6 @@ namespace WinUIApp.Models
 			ValidateProperty(MaxNotifications);
 			ValidateProperty(Visibility);
 			ValidateProperty(FeedHost);
-
-			RemoveEmptyValues(Dubs);
-			RemoveEmptyValues(Names);
 
 			Dubs.CollectionChanged += OnCollectionChanged;
 			Names.CollectionChanged += OnCollectionChanged;

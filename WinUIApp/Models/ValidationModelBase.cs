@@ -12,17 +12,27 @@ namespace WinUIApp.Models
 		[JsonIgnore]
 		public bool HasErrors => _errors.Count > 0;
 
+		private void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new(propertyName));
+		}
+
 		private void OnErrorsChanged(string propertyName)
 		{
 			ErrorsChanged?.Invoke(this, new(propertyName));
-			OnPropertyChanged(HasErrors, nameof(HasErrors));
+			OnPropertyChanged(nameof(HasErrors));
 		}
 
-		protected internal void ValidateProperty<TValue>(TValue value, [CallerArgumentExpression(nameof(value))] string? propertyName = null)
+		protected bool ContainsErrors([CallerMemberName, NotNull] string? propertyName = null)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(propertyName, nameof(propertyName));
 
-			if (_errors.Remove(propertyName))
+			return _errors.ContainsKey(propertyName);
+		}
+
+		protected void ValidateProperty<TValue>(TValue value, [CallerArgumentExpression(nameof(value)), NotNull] string? propertyName = null)
+		{
+			if (ContainsErrors(propertyName))
 			{
 				OnErrorsChanged(propertyName);
 			}
@@ -40,16 +50,13 @@ namespace WinUIApp.Models
 			}
 		}
 
-		protected internal void OnPropertyChanged<TValue>(TValue value, [CallerMemberName] string? propertyName = null)
+		protected void OnPropertyChanged<TValue>(TValue value, [CallerMemberName] string? propertyName = null)
 		{
-			PropertyChanged?.Invoke(this, new(propertyName));
+			ValidateProperty(value, propertyName);
 
-			if (!string.IsNullOrWhiteSpace(propertyName))
-			{
-				OnModified();
+			OnPropertyChanged(propertyName);
 
-				ValidateProperty(value, propertyName);
-			}
+			OnModified();
 		}
 
 		public IEnumerable GetErrors(string? propertyName)
