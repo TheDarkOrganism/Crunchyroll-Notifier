@@ -7,12 +7,12 @@
 	</UserControl.Resources>
 
 	<StackPanel Style="{StaticResource ContentContainerStyle}">
-		<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" />
+		<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" HorizontalAlignment="{x:Bind HorizontalAlignment}" />
 		
 		<Grid>
 			<Border x:Name="ErrorBorder" />
 			
-			<Button x:Name="TimeButton">
+			<Button x:Name="TimeButton" HorizontalAlignment="{x:Bind HorizontalAlignment}">
 				<Button.Flyout>
 					<Flyout Placement="Bottom">
 						<Flyout.FlyoutPresenterStyle>
