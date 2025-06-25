@@ -5,6 +5,8 @@ namespace WinUIApp.Attributes
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 	internal sealed class TimeSpanRangeAttribute : ValidationAttribute
 	{
+		private const bool _defaultDayLock = false;
+
 		private readonly string _mininumMessage;
 
 		private readonly string _maxinumMessage;
@@ -13,7 +15,7 @@ namespace WinUIApp.Attributes
 
 		public TimeSpan Maxinum { get; }
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes, int minSeconds, int maxSeconds)
+		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes, int minSeconds, int maxSeconds, bool dayLock = _defaultDayLock)
 		{
 			ArgumentOutOfRangeException.ThrowIfGreaterThan(minDays, maxDays, nameof(minDays));
 			ArgumentOutOfRangeException.ThrowIfLessThan(maxDays, minDays, nameof(maxDays));
@@ -27,15 +29,20 @@ namespace WinUIApp.Attributes
 			Mininum = new(minDays, minHours, minMinutes, minSeconds);
 			Maxinum = new(maxDays, maxHours, maxMinutes, maxSeconds);
 
+			if (dayLock)
+			{
+				Maxinum = Maxinum.Min(TimeSpan.FromDays(maxDays));
+			}
+
 			_mininumMessage = Format(Mininum);
 			_maxinumMessage = Format(Maxinum);
 		}
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes) : this(minDays, maxDays, minHours, maxHours, minMinutes, maxMinutes, 0, 0) { }
+		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes, bool dayLock = _defaultDayLock) : this(minDays, maxDays, minHours, maxHours, minMinutes, maxMinutes, 0, 0, dayLock) { }
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours) : this(minDays, maxDays, minHours, maxHours, 0, 0) { }
+		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, bool dayLock = _defaultDayLock) : this(minDays, maxDays, minHours, maxHours, 0, 0, dayLock) { }
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays) : this(minDays, maxDays, 0, 0) { }
+		public TimeSpanRangeAttribute(int minDays, int maxDays) : this(minDays, maxDays, 0, 0, false) { }
 
 		public override bool IsValid(object? value)
 		{
