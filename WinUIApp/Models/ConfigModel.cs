@@ -11,7 +11,7 @@ namespace WinUIApp.Models
 		[JsonRequired]
 		[JsonConverter(typeof(Converters.TimeSpanConverter))]
 		[JsonPropertyName("interval")]
-		[TimeSpanRange(0, 1, 0, 0, 0, 0, _minSeconds, 60)]
+		[TimeSpanRange(0, 1, 0, 0, 0, 0, _minSeconds, 60, dayLock: true)]
 		public TimeSpan Interval
 		{
 			get => ContainsErrors() ? TimeSpan.FromSeconds(_minSeconds) : _interval;
