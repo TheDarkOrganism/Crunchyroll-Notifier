@@ -21,6 +21,7 @@
 	<Style x:Key="ErrorContentStyle" TargetType="TextBlock">
 		<Setter Property="FontSize" Value="12" />
 		<Setter Property="Foreground" Value="Red" />
+		<Setter Property="TextWrapping" Value="WrapWholeWords" />
 		<Setter Property="VerticalAlignment" Value="Bottom" />
 		<Setter Property="Visibility" Value="Collapsed" />
 	</Style>
