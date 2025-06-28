@@ -24,7 +24,7 @@
 			
 		</ScrollViewer.Resources>
 
-		<Grid x:Name="LayoutGrid" Style="{StaticResource GridStyle}" Padding="10" d:DataContext="{d:DesignInstance Type=models:ConfigModel}">
+		<Grid DataContext="{x:Bind _options.Value}" Style="{StaticResource GridStyle}" Padding="10" d:DataContext="{d:DesignInstance Type=models:ConfigModel}">
 			
 			<Grid.Resources>
 

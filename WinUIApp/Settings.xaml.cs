@@ -13,8 +13,6 @@ namespace WinUIApp
 
 			InitializeComponent();
 
-			LayoutGrid.DataContext = _options.Value;
-
 			AppWindow.SetIcon("HiDive-Notifier.ico");
 			AppWindow.Resize(new(463, AppWindow.Size.Height));
 
