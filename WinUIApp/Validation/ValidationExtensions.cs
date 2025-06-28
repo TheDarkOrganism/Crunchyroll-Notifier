@@ -5,7 +5,6 @@
 		private static void CheckForErrors<TModel>(Control control, string bindingPath, string? propertyName)
 			where TModel : notnull, INotifyDataErrorInfo
 		{
-			ArgumentNullException.ThrowIfNull(control, nameof(control));
 			ArgumentException.ThrowIfNullOrWhiteSpace(bindingPath, nameof(bindingPath));
 
 			if (string.IsNullOrWhiteSpace(propertyName) || bindingPath != propertyName)

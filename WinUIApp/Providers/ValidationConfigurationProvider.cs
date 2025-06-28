@@ -1,8 +1,20 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationProvider<T>(string file, IFileProvider fileProvider) : ConfigurationProvider
+	internal sealed class ValidationConfigurationProvider<T> : ConfigurationProvider
 		where T : notnull
 	{
+		private readonly string _file;
+		private readonly IFileProvider _fileProvider;
+
+		public ValidationConfigurationProvider(string file, IFileProvider fileProvider)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
+			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+
+			_file = file;
+			_fileProvider = fileProvider;
+		}
+
 		private void WriteValue<TValue>(string? key, TValue? value)
 		{
 			if (string.IsNullOrWhiteSpace(key))
@@ -119,7 +131,7 @@
 
 		public override void Load()
 		{
-			IFileInfo fileInfo = fileProvider.GetFileInfo(file);
+			IFileInfo fileInfo = _fileProvider.GetFileInfo(_file);
 
 			if (fileInfo.Exists)
 			{

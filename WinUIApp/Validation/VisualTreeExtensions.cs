@@ -37,7 +37,6 @@ namespace WinUIApp.Validation
 
 		private static string? GetBindingPath(Control control, DependencyProperty dependencyProperty)
 		{
-			ArgumentNullException.ThrowIfNull(control, nameof(control));
 			ArgumentNullException.ThrowIfNull(dependencyProperty, nameof(dependencyProperty));
 
 			return control.GetBindingExpression(dependencyProperty)?.ParentBinding.Path.Path;
