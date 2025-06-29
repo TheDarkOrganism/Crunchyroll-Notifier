@@ -143,6 +143,12 @@
 
 					ParseValue(jsonDocument.RootElement, typeof(T), null);
 				}
+				catch (JsonException ex)
+				{
+					Debug.WriteLine(ex);
+
+					ResourceHelper.RestoreFile(_file);
+				}
 				catch (Exception ex)
 				{
 					Debug.WriteLine(ex);
