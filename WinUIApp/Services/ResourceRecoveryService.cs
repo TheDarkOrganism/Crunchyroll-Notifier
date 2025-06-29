@@ -2,40 +2,33 @@
 {
 	internal sealed class ResourceRecoveryService : IHostedService
 	{
-		private static readonly Assembly _assembly = Assembly.GetExecutingAssembly();
-
-		private readonly string _appDirectory;
-
 		private readonly FileSystemWatcher _watcher;
 
-		public ResourceRecoveryService(string file, string appDirectory)
+		public ResourceRecoveryService(string file, IHostEnvironment hostEnvironment)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
-			ArgumentException.ThrowIfNullOrWhiteSpace(appDirectory, nameof(appDirectory));
+			ArgumentNullException.ThrowIfNull(hostEnvironment, nameof(hostEnvironment));
 
-			if (!Directory.Exists(appDirectory))
+			IFileInfo fileInfo = hostEnvironment.ContentRootFileProvider.GetFileInfo(file);
+
+			string name = fileInfo.Name;
+
+			if (!fileInfo.Exists)
 			{
-				throw new DirectoryNotFoundException();
+				ResourceHelper.RestoreFile(name);
 			}
 
-			_watcher = new(appDirectory)
+			_watcher = new FileSystemWatcher(hostEnvironment.ContentRootPath)
 			{
 				EnableRaisingEvents = true
 			};
 
-			if (!File.Exists(file))
-			{
-				ResourceHelper.RestoreFile(file);
-			}
-
-			_appDirectory = appDirectory;
-
-			_watcher.Filters.Add(file);
+			_watcher.Filters.Add(name);
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			_watcher.Deleted += (_, args) => ResourceHelper.RestoreFile(args.FullPath);
+			_watcher.Deleted += static (_, args) => ResourceHelper.RestoreFile(args.FullPath);
 
 			return Task.CompletedTask;
 		}
