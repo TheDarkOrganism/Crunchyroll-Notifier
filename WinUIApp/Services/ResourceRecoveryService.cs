@@ -25,7 +25,7 @@
 
 			if (!File.Exists(file))
 			{
-				RestoreFile(file);
+				ResourceHelper.RestoreFile(file);
 			}
 
 			_appDirectory = appDirectory;
@@ -33,23 +33,9 @@
 			_watcher.Filters.Add(file);
 		}
 
-		private void RestoreFile(string file)
-		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
-
-			using Stream? stream = _assembly.GetManifestResourceStream(string.Join('.', nameof(WinUIApp), Path.GetRelativePath(_appDirectory, file).Replace(Path.PathSeparator, '.')));
-		
-			if (stream is not null)
-			{
-				using FileStream fileStream = File.Create(file);
-
-				stream.CopyTo(fileStream);
-			}
-		}
-
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			_watcher.Deleted += (_, args) => RestoreFile(args.FullPath);
+			_watcher.Deleted += (_, args) => ResourceHelper.RestoreFile(args.FullPath);
 
 			return Task.CompletedTask;
 		}
