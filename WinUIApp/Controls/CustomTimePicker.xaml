@@ -10,7 +10,7 @@
 		<TextBlock x:Name="ErrorContent" Style="{StaticResource ErrorContentStyle}" HorizontalAlignment="{x:Bind HorizontalAlignment}" />
 		
 		<Grid>
-			<Border x:Name="ErrorBorder" />
+			<Border x:Name="ErrorBorder" BorderBrush="{x:Bind BorderBrush}" BorderThickness="{x:Bind BorderThickness}" />
 			
 			<Button x:Name="TimeButton" HorizontalAlignment="{x:Bind HorizontalAlignment}">
 				<Button.Flyout>
