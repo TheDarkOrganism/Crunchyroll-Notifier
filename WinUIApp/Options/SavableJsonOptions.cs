@@ -67,6 +67,7 @@
 
 					Value.MarkUnmodified();
 				}
+				catch { }
 				finally
 				{
 					fileStream.Dispose();
@@ -86,6 +87,7 @@
 
 					Value.MarkUnmodified();
 				}
+				catch { }
 				finally
 				{
 					await fileStream.DisposeAsync();

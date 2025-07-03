@@ -14,14 +14,24 @@
 			{
 				throw new FileNotFoundException("Unable to find the file as a embedded resource.", file);
 			}
+			
+			try
+			{
 
-			using Stream stream = fileInfo.CreateReadStream();
+				using Stream stream = fileInfo.CreateReadStream();
 
-			using FileStream fileStream = File.Create(file);
+				using FileStream fileStream = File.Create(file);
 
-			fileStream.SetLength(0);
+				fileStream.SetLength(0);
 
-			stream.CopyTo(fileStream);
+				stream.CopyTo(fileStream);
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(ex);
+
+				Application.Current.Exit();
+			}
 		}
 	}
 }
