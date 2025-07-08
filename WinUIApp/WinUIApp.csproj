@@ -19,6 +19,7 @@
 		<Version>$(AssemblyVersion)</Version>
 		<Authors>Richard Whicker</Authors>
 		<Company>TheDarkOrganism</Company>
+		<RepositoryUrl>https://github.com/TheDarkOrganism/Crunchyroll-Notifier</RepositoryUrl>
 		<Copyright>2025</Copyright>
 	</PropertyGroup>
 
