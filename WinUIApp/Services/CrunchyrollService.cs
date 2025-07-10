@@ -7,6 +7,12 @@ namespace WinUIApp.Services
 {
 	internal sealed partial class CrunchyrollService(ISavableJsonOptions<ConfigModel> configOptions, ISavableJsonOptions<LastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper) : IHostedService
 	{
+		private static readonly Dictionary<FeedHostType, string> _feedSources = new()
+		{
+			{ FeedHostType.Crunchyroll, "http://www.crunchyroll.com/rss/anime" },
+			{ FeedHostType.FeedBurner, "http://feeds.feedburner.com/crunchyroll/rss/anime" }
+		};
+
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
 		{
 			return string.IsNullOrWhiteSpace(value) || values.Count == 0 || values.Contains(value, StringComparer.CurrentCultureIgnoreCase);
@@ -43,18 +49,51 @@ namespace WinUIApp.Services
 
 				do
 				{
+					HttpResponseMessage? httpResponse = null;
+
 					try
 					{
 						#region Load RSS Feed
 
 						using HttpClient httpClient = httpClientFactory.CreateClient();
 
-						using XmlReader reader = XmlReader.Create(await httpClient.GetStreamAsync(configModel.FeedHost switch
+						FeedHostType feedHost = configModel.FeedHost;
+
+						try
 						{
-							FeedHostType.Crunchyroll => "http://www.crunchyroll.com/rss/anime",
-							FeedHostType.FeedBurner => "http://feeds.feedburner.com/crunchyroll/rss/anime",
-							_ => throw new NotImplementedException()
-						}, cancellationToken));
+							if (_feedSources.TryGetValue(feedHost, out string? host))
+							{
+								httpResponse = (await httpClient.GetAsync(host, cancellationToken)).EnsureSuccessStatusCode();
+							}
+						}
+						catch (HttpRequestException)
+						{
+							foreach (FeedHostType hostType in _feedSources.Keys.Where(t => t != feedHost))
+							{
+								try
+								{
+									if (_feedSources.TryGetValue(hostType, out string? sourse))
+									{
+										httpResponse = (await httpClient.GetAsync(sourse, cancellationToken)).EnsureSuccessStatusCode();
+
+										break;
+									}
+								}
+								catch (HttpRequestException)
+								{
+									continue;
+								}
+							}
+						}
+
+						if (httpResponse is null)
+						{
+							continue;
+						}
+
+						using Stream stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
+
+						using XmlReader reader = XmlReader.Create(stream);
 
 						if (manager is null)
 						{
@@ -100,15 +139,17 @@ namespace WinUIApp.Services
 					{
 						Debug.WriteLine(ex);
 					}
+					finally
+					{
+						httpResponse?.Dispose();
+
+						httpResponse = null;
+					}
 				} while (await periodicTimer.WaitForNextTickAsync(cancellationToken));
 			}
 			catch (Exception ex)
 			{
-				if (ex is OperationCanceledException)
-				{
-					Application.Current.Exit();
-				}
-				else
+				if (ex is not OperationCanceledException)
 				{
 					Debug.WriteLine(ex);
 				}
