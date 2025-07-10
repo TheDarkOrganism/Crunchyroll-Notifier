@@ -66,7 +66,7 @@ namespace WinUIApp.Models
 		private VisibilityType _visibility;
 
 		[JsonRequired]
-		[JsonConverter(typeof(Converters.EnumConverter))]
+		[JsonConverter(typeof(Converters.EnumConverter<VisibilityType>))]
 		[JsonPropertyName("visibility")]
 		[EnumDataType(typeof(VisibilityType))]
 		public VisibilityType Visibility
@@ -86,7 +86,7 @@ namespace WinUIApp.Models
 		private FeedHostType _feedHostType;
 
 		[JsonRequired]
-		[JsonConverter(typeof(Converters.EnumConverter))]
+		[JsonConverter(typeof(Converters.EnumConverter<FeedHostType>))]
 		[JsonPropertyName("feedHost")]
 		[EnumDataType(typeof(FeedHostType))]
 		public FeedHostType FeedHost

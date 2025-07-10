@@ -1,18 +1,15 @@
-﻿namespace WinUIApp.Converters
+﻿
+namespace WinUIApp.Converters
 {
-	internal sealed class EnumConverter : JsonConverter<object>
+	internal sealed class EnumConverter<TEnum> : JsonConverter<TEnum>
+		where TEnum : struct, Enum
 	{
-		public override bool CanConvert(Type typeToConvert)
+		public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
-			return typeToConvert.IsEnum;
+			return Enum.TryParse(reader.GetString(), true, out TEnum result) ? result : default;
 		}
 
-		public override object? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-		{
-			return Enum.TryParse(typeToConvert, reader.GetString(), true, out object? result) ? result : null;
-		}
-
-		public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+		public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
 		{
 			writer.WriteStringValue(value.ToString());
 		}
