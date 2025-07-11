@@ -1,14 +1,18 @@
-﻿namespace WinUIApp.Options
+﻿using System.Text.Json.Serialization.Metadata;
+
+namespace WinUIApp.Options
 {
-	internal sealed class SavableJsonOptions<TOptions> : ISavableJsonOptions<TOptions>
+	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions> : ISavableJsonOptions<TOptions>
 		where TOptions : ModelBase
 	{
-		private static readonly JsonWriterOptions _jsonWriterOptions = new()
+		private static readonly OptionsSerializerContext _serializerContext = new(new()
 		{
+			WriteIndented = true,
 			IndentCharacter = '\t',
-			Indented = true,
 			IndentSize = 1
-		};
+		});
+
+		private static readonly Type ValueType = typeof(Dictionary<string, TOptions>);
 
 		private readonly string _file;
 		private readonly string _section;
@@ -47,12 +51,12 @@
 			}
 		}
 
-		private void Write(Utf8JsonWriter utf8JsonWriter)
+		private Dictionary<string, TOptions> GetValue()
 		{
-			JsonSerializer.Serialize(utf8JsonWriter, new Dictionary<string, TOptions>
+			return new()
 			{
 				{ _section, Value }
-			});
+			};
 		}
 
 		public void Save()
@@ -61,13 +65,14 @@
 			{
 				try
 				{
-					using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
-
-					Write(utf8JsonWriter);
+					JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
 
 					Value.MarkUnmodified();
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex);
+				}
 				finally
 				{
 					fileStream.Dispose();
@@ -81,13 +86,14 @@
 			{
 				try
 				{
-					await using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
-
-					Write(utf8JsonWriter);
+					await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext);
 
 					Value.MarkUnmodified();
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex);
+				}
 				finally
 				{
 					await fileStream.DisposeAsync();
