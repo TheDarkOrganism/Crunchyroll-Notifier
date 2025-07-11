@@ -1,8 +1,10 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationProvider<T> : ConfigurationProvider
+	internal sealed class ValidationConfigurationProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : ConfigurationProvider
 		where T : notnull
 	{
+		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(T).GetValidationAttributes(static property => property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name);
+
 		private readonly string _file;
 		private readonly IFileProvider _fileProvider;
 
@@ -25,7 +27,7 @@
 			Data[key] = value is string str ? str : value?.ToString();
 		}
 
-		private void ParseValue(JsonElement jsonElement, Type type, string? key)
+		private void ParseValue(JsonElement jsonElement, string? key)
 		{
 			switch (jsonElement.ValueKind)
 			{
@@ -36,63 +38,57 @@
 					{
 						string name = jsonProperty.Name;
 
-						PropertyInfo? property = type.GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
-
 						string subKey = key is null ? name : $"{key}:{name}";
 
 						JsonElement value = jsonProperty.Value;
 
-						if (property is null)
-						{
-							ParseValue(value, type, subKey);
-
-							continue;
-						}
-
-						ParseValue(value, property.PropertyType, subKey);
+						ParseValue(value, subKey);
 
 						string? stringValue = value.ValueKind is JsonValueKind.Null ? null : value.ToString();
 
-						foreach (ValidationAttribute attribute in property.GetCustomAttributes<ValidationAttribute>())
+						if (_attributePairs.TryGetValue(name, out ValidationAttribute[]? attributes))
 						{
-							switch (attribute)
+							foreach (ValidationAttribute attribute in attributes)
 							{
-								case EnumDataTypeAttribute enumDataTypeAttribute:
-									if (stringValue is null || !enumDataTypeAttribute.IsValid(stringValue))
-									{
-										Type enumType = enumDataTypeAttribute.EnumType;
-
-										if (Enum.TryParse(enumType, stringValue, true, out object? result))
+								switch (attribute)
+								{
+									case EnumDataTypeAttribute enumDataTypeAttribute:
+										if (stringValue is null || !enumDataTypeAttribute.IsValid(stringValue))
 										{
-											WriteValue(key, result);
+											Type enumType = enumDataTypeAttribute.EnumType;
+
+											if (Enum.TryParse(enumType, stringValue, true, out object? result))
+											{
+												WriteValue(subKey, result);
+											}
+											else
+											{
+												WriteValue(subKey, Enum.GetNames(enumType)[0]);
+											}
 										}
-										else
+										break;
+									case RangeAttribute rangeAttribute:
+										if (stringValue is null)
 										{
-											WriteValue(key, Enum.GetNames(enumType)[0]);
+											WriteValue(subKey, rangeAttribute.Maximum);
+
+											continue;
 										}
-									}
-									break;
-								case RangeAttribute rangeAttribute:
-									if (stringValue is null)
-									{
-										WriteValue(subKey, rangeAttribute.Maximum);
 
-										continue;
-									}
-
-									if (double.TryParse(stringValue, out double number) && !rangeAttribute.IsValid(number) && double.TryParse(rangeAttribute.Minimum.ToString(), out double min) && double.TryParse(rangeAttribute.Maximum.ToString(), out double max))
-									{
-										WriteValue(subKey, Math.Clamp(number, min, max));
-									}
-									break;
-								case TimeSpanRangeAttribute timeSpanRangeAttribute:
-									if (TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
-									{
-										WriteValue(subKey, timeSpan.Clamp(timeSpanRangeAttribute.Mininum, timeSpanRangeAttribute.Maxinum));
-									}
-									break;
-								default:
-									break;
+										if (double.TryParse(stringValue, out double number) && !rangeAttribute.IsValid(number) && double.TryParse(rangeAttribute.Minimum.ToString(), out double min) && double.TryParse(rangeAttribute.Maximum.ToString(), out double max))
+										{
+											WriteValue(subKey, Math.Clamp(number, min, max));
+										}
+										break;
+									case TimeSpanRangeAttribute timeSpanRangeAttribute:
+										if (TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
+										{
+											WriteValue(subKey, timeSpan.Clamp(timeSpanRangeAttribute.Mininum, timeSpanRangeAttribute.Maxinum));
+										}
+										break;
+									default:
+										break;
+								}
 							}
 						}
 					}
@@ -100,12 +96,10 @@
 				case JsonValueKind.Array:
 					int index = 0;
 
-					Type innerType = type.GetElementType() ?? type.GetGenericArguments().First();
-
 					foreach (JsonElement element in jsonElement.EnumerateArray())
 					{
-						ParseValue(element, innerType, $"{key ?? "Array"}:{index}");
-						
+						ParseValue(element, $"{key ?? "Array"}:{index}");
+
 						index++;
 					}
 					break;
@@ -141,7 +135,7 @@
 				{
 					using JsonDocument jsonDocument = JsonDocument.Parse(stream);
 
-					ParseValue(jsonDocument.RootElement, typeof(T), null);
+					ParseValue(jsonDocument.RootElement, null);
 				}
 				catch (JsonException ex)
 				{
