@@ -2,8 +2,43 @@
 
 namespace WinUIApp.Models
 {
-	public abstract class ValidationModelBase : ModelBase, INotifyDataErrorInfo, INotifyPropertyChanged
+	public abstract class ValidationModelBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TModel> : ModelBase, INotifyDataErrorInfo, INotifyPropertyChanged
 	{
+		private static readonly Dictionary<string, ValidationAttribute[]> _validationAttributes = typeof(TModel).GetValidationAttributes();
+
+		private static readonly Dictionary<string, string> _friendlyNames = _validationAttributes.Keys.ToDictionary(static key => key, static key =>
+		{
+			int length = key.Length;
+
+			int newLength = length + key.Skip(1).Count(char.IsUpper);
+
+			if (length == newLength)
+			{
+				return key;
+			}
+
+			return string.Create(newLength, key, static (span, state) =>
+			{
+				ReadOnlySpan<char> stateSpan = state;
+
+				int offset = 0;
+
+				for (int i = 0; i < stateSpan.Length; i++)
+				{
+					char c = stateSpan[i];
+
+					if (i > 0 && char.IsUpper(c))
+					{
+						span[i + offset] = ' ';
+
+						offset++;
+					}
+
+					span[i + offset] = c;
+				}
+			});
+		});
+
 		public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -37,16 +72,24 @@ namespace WinUIApp.Models
 				OnErrorsChanged(propertyName);
 			}
 
-			List<ValidationResult> validationResults = [];
-
-			if (!Validator.TryValidateProperty(value, new(this)
+			if (_validationAttributes.TryGetValue(propertyName, out ValidationAttribute[]? validationAttributes))
 			{
-				MemberName = propertyName
-			}, validationResults))
-			{
-				_errors.Add(propertyName, validationResults.ConvertAll(static result => result.ErrorMessage ?? string.Empty).AsReadOnly());
+				List<string> errors = [];
 
-				OnErrorsChanged(propertyName);
+				foreach (ValidationAttribute validationAttribute in validationAttributes)
+				{
+					if (!validationAttribute.IsValid(value))
+					{
+						errors.Add(validationAttribute.FormatErrorMessage(_friendlyNames.TryGetValue(propertyName, out string? friendlyName) ? friendlyName : propertyName));
+					}
+				}
+
+				if (errors.Count > 0)
+				{
+					_errors.Add(propertyName, errors.AsReadOnly());
+
+					OnErrorsChanged(propertyName);
+				}
 			}
 		}
 

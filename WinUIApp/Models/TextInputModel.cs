@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public sealed partial class TextInputModel : ValidationModelBase
+	public sealed partial class TextInputModel : ValidationModelBase<TextInputModel>
 	{
 		private string _text = string.Empty;
 
