@@ -6,38 +6,7 @@ namespace WinUIApp.Models
 	{
 		private static readonly Dictionary<string, ValidationAttribute[]> _validationAttributes = typeof(TModel).GetValidationAttributes();
 
-		private static readonly Dictionary<string, string> _friendlyNames = _validationAttributes.Keys.ToDictionary(static key => key, static key =>
-		{
-			int length = key.Length;
-
-			int newLength = length + key.Skip(1).Count(char.IsUpper);
-
-			if (length == newLength)
-			{
-				return key;
-			}
-
-			return string.Create(newLength, key, static (span, state) =>
-			{
-				ReadOnlySpan<char> stateSpan = state;
-
-				int offset = 0;
-
-				for (int i = 0; i < stateSpan.Length; i++)
-				{
-					char c = stateSpan[i];
-
-					if (i > 0 && char.IsUpper(c))
-					{
-						span[i + offset] = ' ';
-
-						offset++;
-					}
-
-					span[i + offset] = c;
-				}
-			});
-		});
+		private static readonly Dictionary<string, string> _friendlyNames = _validationAttributes.Keys.ToDictionary(static key => key, static key => key.AddSpaces());
 
 		public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
