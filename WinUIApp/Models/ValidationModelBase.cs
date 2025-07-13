@@ -62,13 +62,13 @@ namespace WinUIApp.Models
 			}
 		}
 
-		protected void OnPropertyChanged<TValue>(TValue value, [CallerMemberName] string? propertyName = null)
+		protected void OnPropertyChanged<TValue>(TValue value, bool reloadConfiguration = false, [CallerMemberName] string? propertyName = null)
 		{
 			ValidateProperty(value, propertyName);
 
 			OnPropertyChanged(propertyName);
 
-			OnModified();
+			OnModified(reloadConfiguration);
 		}
 
 		public IEnumerable GetErrors(string? propertyName)

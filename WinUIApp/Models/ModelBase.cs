@@ -3,16 +3,21 @@
 	public abstract class ModelBase
 	{
 		[JsonIgnore]
-		public bool Modified { get; private set; }
+		internal bool Modified { get; private set; }
 
-		protected void OnModified()
+		[JsonIgnore]
+		internal bool ReloadConfiguration { get; private set; }
+
+		protected void OnModified(bool reloadConfiguration)
 		{
 			Modified = true;
+			ReloadConfiguration = reloadConfiguration;
 		}
 
 		internal void MarkUnmodified()
 		{
 			Modified = false;
+			ReloadConfiguration = false;
 		}
 	}
 }

@@ -115,7 +115,7 @@ namespace WinUIApp.Models
 				{
 					_useLogging = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged(value, true);
 				}
 			}
 		}

@@ -20,20 +20,23 @@ namespace WinUIApp.Options
 		private readonly string _section;
 		private readonly IFileProvider _fileProvider;
 		private readonly IOptions<TOptions> _options;
+		private readonly IConfigurationRoot _configurationRoot;
 		private readonly ILogger<SavableJsonOptions<TOptions>> _logger;
 
-		public SavableJsonOptions(string file, string section, IFileProvider fileProvider, IOptions<TOptions> options, ILogger<SavableJsonOptions<TOptions>> logger)
+		public SavableJsonOptions(string file, string section, IFileProvider fileProvider, IOptions<TOptions> options, IConfigurationRoot configurationRoot, ILogger<SavableJsonOptions<TOptions>> logger)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
 			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
 			ArgumentNullException.ThrowIfNull(options, nameof(options));
+			ArgumentNullException.ThrowIfNull(configurationRoot, nameof(configurationRoot));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
 			_file = file;
 			_section = section;
 			_fileProvider = fileProvider;
 			_options = options;
+			_configurationRoot = configurationRoot;
 			_logger = logger;
 		}
 
@@ -66,23 +69,36 @@ namespace WinUIApp.Options
 			};
 		}
 
+		private void HandleReload()
+		{
+			if (Value.ReloadConfiguration)
+			{
+				_configurationRoot.Reload();
+			}
+		}
+
 		public void Save()
 		{
-			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
+			lock (_lock)
 			{
-				try
+				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 				{
-					JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
+					try
+					{
+						JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
 
-					Value.MarkUnmodified();
-				}
-				catch (Exception ex)
-				{
-					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}.", nameof(FileStream), _file);
-				}
-				finally
-				{
-					fileStream.Dispose();
+						fileStream.Dispose();
+
+						HandleReload();
+
+						Value.MarkUnmodified();
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
+
+						fileStream.Dispose();
+					}
 				}
 			}
 		}
@@ -95,14 +111,16 @@ namespace WinUIApp.Options
 				{
 					await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext);
 
+					await fileStream.DisposeAsync();
+
+					HandleReload();
+
 					Value.MarkUnmodified();
 				}
 				catch (Exception ex)
 				{
-					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}.", nameof(FileStream), _file);
-				}
-				finally
-				{
+					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
+
 					await fileStream.DisposeAsync();
 				}
 			}
