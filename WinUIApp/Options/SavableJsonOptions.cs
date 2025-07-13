@@ -14,22 +14,27 @@ namespace WinUIApp.Options
 
 		private static readonly Type ValueType = typeof(Dictionary<string, TOptions>);
 
+		private readonly Lock _lock = new();
+
 		private readonly string _file;
 		private readonly string _section;
 		private readonly IFileProvider _fileProvider;
 		private readonly IOptions<TOptions> _options;
+		private readonly ILogger<SavableJsonOptions<TOptions>> _logger;
 
-		public SavableJsonOptions(string file, string section, IFileProvider fileProvider, IOptions<TOptions> options)
+		public SavableJsonOptions(string file, string section, IFileProvider fileProvider, IOptions<TOptions> options, ILogger<SavableJsonOptions<TOptions>> logger)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
 			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
 			ArgumentNullException.ThrowIfNull(options, nameof(options));
+			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
 			_file = file;
 			_section = section;
 			_fileProvider = fileProvider;
 			_options = options;
+			_logger = logger;
 		}
 
 		public TOptions Value => _options.Value;
@@ -44,8 +49,10 @@ namespace WinUIApp.Options
 
 				return true;
 			}
-			catch
+			catch (Exception ex)
 			{
+				_logger.LogError(ex, "Failed to get to {FileStream} for {File}.", nameof(FileStream), _file);
+
 				fileStream = null;
 				return false;
 			}
@@ -71,7 +78,7 @@ namespace WinUIApp.Options
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex);
+					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}.", nameof(FileStream), _file);
 				}
 				finally
 				{
@@ -92,7 +99,7 @@ namespace WinUIApp.Options
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex);
+					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}.", nameof(FileStream), _file);
 				}
 				finally
 				{

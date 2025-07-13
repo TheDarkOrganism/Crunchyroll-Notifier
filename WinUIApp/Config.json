@@ -3,6 +3,7 @@
 		"interval": "00:00:30",
 		"maxNotifications": 30,
 		"showFirstRun": true,
+		"useLogging": false,
 		"visibility": "Default",
 		"feedHost": "Crunchyroll"
 	}

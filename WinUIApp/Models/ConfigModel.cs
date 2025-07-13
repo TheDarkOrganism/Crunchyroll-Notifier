@@ -103,6 +103,23 @@ namespace WinUIApp.Models
 			}
 		}
 
+		private bool _useLogging;
+
+		[JsonPropertyName("useLogging")]
+		public bool UseLogging
+		{
+			get => _useLogging;
+			set
+			{
+				if (_useLogging != value)
+				{
+					_useLogging = value;
+
+					OnPropertyChanged(value);
+				}
+			}
+		}
+
 		[JsonPropertyName("dubs")]
 		public ObservableCollection<string> Dubs { get; } = [];
 

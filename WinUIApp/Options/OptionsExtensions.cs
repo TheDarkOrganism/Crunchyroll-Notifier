@@ -79,7 +79,7 @@
 					return new Options<TOptions>(options);
 				});
 
-				_ = services.AddSingleton<ISavableJsonOptions<TOptions>>(provider => new SavableJsonOptions<TOptions>(file, section, context.HostingEnvironment.ContentRootFileProvider, provider.GetRequiredService<IOptions<TOptions>>()));
+				_ = services.AddSingleton<ISavableJsonOptions<TOptions>>(provider => new SavableJsonOptions<TOptions>(file, section, context.HostingEnvironment.ContentRootFileProvider, provider.GetRequiredService<IOptions<TOptions>>(), provider.GetRequiredService<ILogger<SavableJsonOptions<TOptions>>>()));
 			});
 		}
 	}

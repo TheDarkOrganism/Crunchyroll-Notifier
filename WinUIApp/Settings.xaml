@@ -55,6 +55,17 @@
 						<Setter Property="HorizontalAlignment" Value="Right" />
 					</Style>
 
+					<Style x:Key="CheckBoxContainerStyle" TargetType="StackPanel">
+						<Setter Property="Grid.Column" Value="1" />
+						<Setter Property="HorizontalAlignment" Value="Right" />
+						<Setter Property="VerticalAlignment" Value="Center" />
+						<Setter Property="Width" Value="31" />
+					</Style>
+
+					<Style x:Key="CheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource InputStyle}">
+						<Setter Property="HorizontalContentAlignment" Value="Center" />
+					</Style>
+
 					<Style x:Key="AddButtonStyle" TargetType="Button">
 						<Setter Property="Content" Value="Add" />
 					</Style>
@@ -83,6 +94,7 @@
 			</Grid.ColumnDefinitions>
 
 			<Grid.RowDefinitions>
+				<RowDefinition />
 				<RowDefinition />
 				<RowDefinition />
 				<RowDefinition />
@@ -141,17 +153,27 @@
 
 			<TextBlock Text="Show on first run" Grid.Row="5" Style="{StaticResource LabelStyle}" />
 
-			<StackPanel Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="31">
-				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource InputStyle}" HorizontalContentAlignment="Center" />
+			<StackPanel Grid.Row="5" Style="{StaticResource CheckBoxContainerStyle}">
+				<CheckBox IsChecked="{Binding ShowFirstRun, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CheckBoxStyle}" />
+			</StackPanel>
+
+			<!--#endregion-->
+			
+			<!--#region Use Logging -->
+
+			<TextBlock Text="Use Logging" Grid.Row="6" Style="{StaticResource LabelStyle}" />
+
+			<StackPanel Grid.Row="6" Style="{StaticResource CheckBoxContainerStyle}">
+				<CheckBox IsChecked="{Binding UseLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CheckBoxStyle}" />
 			</StackPanel>
 
 			<!--#endregion-->
 			
 			<!--#region Dubs -->
 
-			<TextBlock Text="Dubs" Grid.Row="6" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Dubs" Grid.Row="7" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="7" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="8" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -161,15 +183,15 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="DubsRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="DubsValues" Grid.Row="8" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="DubsValues" Grid.Row="9" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
 			<!--#region Names -->
 
-			<TextBlock Text="Names" Grid.Row="9" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Names" Grid.Row="10" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="10" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="11" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -179,7 +201,7 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="NamesRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="NamesValues" Grid.Row="11" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="NamesValues" Grid.Row="12" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 		</Grid>

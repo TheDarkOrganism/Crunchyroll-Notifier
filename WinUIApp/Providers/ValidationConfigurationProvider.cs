@@ -7,14 +7,17 @@
 
 		private readonly string _file;
 		private readonly IFileProvider _fileProvider;
+		private readonly ILogger<ValidationConfigurationProvider<T>> _logger;
 
-		public ValidationConfigurationProvider(string file, IFileProvider fileProvider)
+		public ValidationConfigurationProvider(string file, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<T>> logger)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
 			_file = file;
 			_fileProvider = fileProvider;
+			_logger = logger;
 		}
 
 		private void WriteValue<TValue>(string? key, TValue? value)
@@ -139,13 +142,13 @@
 				}
 				catch (JsonException ex)
 				{
-					Debug.WriteLine(ex);
+					_logger.LogWarning(ex, "Failed to read json from {File}.", _file);
 
 					ResourceHelper.RestoreFile(_file);
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex);
+					_logger.LogCritical(ex, "Unable to read {File}.", _file);
 
 					Environment.Exit(13);
 				}

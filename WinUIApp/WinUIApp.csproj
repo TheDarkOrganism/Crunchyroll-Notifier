@@ -43,6 +43,7 @@
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Microsoft.Extensions.FileProviders" />
 		<Using Include="Microsoft.Extensions.Hosting" />
+		<Using Include="Microsoft.Extensions.Logging" />
 		<Using Include="Microsoft.Extensions.Options" />
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
@@ -58,6 +59,7 @@
 		<Using Include="System.Text.Json.Serialization" />
 		<Using Include="WinUIApp.Attributes" />
 		<Using Include="WinUIApp.Enums" />
+		<Using Include="WinUIApp.Logging" />
 		<Using Include="WinUIApp.Models" />
 		<Using Include="WinUIApp.Options" />
 		<Using Include="WinUIApp.Validation" />

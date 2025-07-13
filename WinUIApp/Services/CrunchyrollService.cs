@@ -5,7 +5,7 @@ using System.Xml.XPath;
 
 namespace WinUIApp.Services
 {
-	internal sealed partial class CrunchyrollService(ISavableJsonOptions<ConfigModel> configOptions, ISavableJsonOptions<LastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper) : IHostedService
+	internal sealed partial class CrunchyrollService(ISavableJsonOptions<ConfigModel> configOptions, ISavableJsonOptions<LastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger) : IHostedService
 	{
 		private static readonly Dictionary<FeedHostType, string> _feedSources = new()
 		{
@@ -66,8 +66,10 @@ namespace WinUIApp.Services
 								httpResponse = (await httpClient.GetAsync(host, cancellationToken)).EnsureSuccessStatusCode();
 							}
 						}
-						catch (HttpRequestException)
+						catch (HttpRequestException e)
 						{
+							logger.LogDebug(e, "Unable to load the feed for {HostType}.", feedHost);
+
 							foreach (FeedHostType hostType in _feedSources.Keys.Where(t => t != feedHost))
 							{
 								try
@@ -79,8 +81,10 @@ namespace WinUIApp.Services
 										break;
 									}
 								}
-								catch (HttpRequestException)
+								catch (HttpRequestException ex)
 								{
+									logger.LogWarning(ex, "Unable to load the feed for {HostType}.", hostType);
+
 									continue;
 								}
 							}
@@ -88,6 +92,8 @@ namespace WinUIApp.Services
 
 						if (httpResponse is null)
 						{
+							logger.LogWarning("Unable to load the any RSS feeds.");
+
 							continue;
 						}
 
@@ -137,7 +143,7 @@ namespace WinUIApp.Services
 					}
 					catch (Exception ex)
 					{
-						Debug.WriteLine(ex);
+						logger.LogError(ex, "Unable to read the RSS feed.");
 					}
 					finally
 					{
@@ -149,9 +155,13 @@ namespace WinUIApp.Services
 			}
 			catch (Exception ex)
 			{
-				if (ex is not OperationCanceledException)
+				if (ex is OperationCanceledException)
 				{
-					Debug.WriteLine(ex);
+					logger.LogDebug("Main loop stopped.");
+				}
+				else
+				{
+					logger.LogError(ex, "The main loop had a unknown error.");
 				}
 			}
 
