@@ -2,13 +2,18 @@
 {
 	internal static class StringExtensions
 	{
+		private static bool ShouldAddSpaces(string input, int index, char c)
+		{
+			return index > 0 && !char.IsWhiteSpace(input[index - 1]) && char.IsUpper(c);
+		}
+
 		public static string AddSpaces(this string input)
 		{
 			ArgumentNullException.ThrowIfNull(input, nameof(input));
 
 			int length = input.Length;
 
-			int newLength = length + input.Skip(1).Count(char.IsUpper);
+			int newLength = length + input.Where((c, i) => ShouldAddSpaces(input, i, c)).Count();
 
 			if (length == newLength)
 			{
@@ -23,7 +28,7 @@
 				{
 					char c = state[i];
 
-					if (i > 0 && char.IsUpper(c))
+					if (ShouldAddSpaces(state, i, c))
 					{
 						span[i + offset] = ' ';
 
