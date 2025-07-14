@@ -6,10 +6,10 @@
 
 <br>
 
-**Crunchyroll Notifier** is a windows application written in .Net 8.<br>
-It sends notifications to the user about new episodes on Cruchyroll.<br>
-This app uses the RSS feed found at [Recently Added Anime Videos](http://feeds.feedburner.com/crunchyroll/rss/anime)
-provided by Cruchyroll.
+**Crunchyroll Notifier** is a windows application written in .Net 9.<br>
+It sends notifications to the user about new episodes from Crunchyroll.<br>
+This app uses the RSS feeds found at [Recently Added Anime Videos (Crunchyroll)](http://www.crunchyroll.com/rss/anime)<br>
+or [Recently Added Anime Videos (FeedBurner)](http://feeds.feedburner.com/crunchyroll/rss/anime).
 
 <br>
 
@@ -17,59 +17,67 @@ provided by Cruchyroll.
 
 <br>
 
-### FeedConfig.json ###
+### Config.json ###
 
 <br>
 
-**Interval**: How often to check for new episodes in seconds.<br>
-**Type**: Double
-**Condition**: Must be greater than 10.<br>
+**interval**: How often to check for new episodes.<br>
+**Type**: [TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan)<br>
+**Condition**: Must be greater than or equal to 10 seconds.<br>
+**Default**: 30 seconds<br>
 **Required**: Yes<br>
 
 <br>
 
-**Visibility**: The visibility of a episode on the website.<br>
-**Type**: Enum
-**Values**: All, all, Free, free, Premium, premium<br>
-**Required**: Yes<br>
-
-<br>
-
-**MaxNotifications**: The number of episodes pulled from a feed at a time.<br>
-**Type**: Integer
+**maxNotifications**: The number of episodes pulled from a feed at a time.<br>
+**Type**: [Integer](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 **Condition**: Must be from 1 to 100.<br>
+**Default**: 30<br>
 **Required**: Yes<br>
 
 <br>
 
-**ShowFirstRun**: If the first run notification should show when the app first opens.<br>
-**Type**: Bool<br>
+**showFirstRun**: If there should be a notification when the app first opens (Sets to false after the notification is displayed).<br>
+**Type**: [Bool](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+**Default**: true<br>
 **Required**: Yes<br>
 
 <br>
 
-**Dubs**: The dubs to look for. (Shows all if missing).<br>
-**Type**: Array of string<br>
+**useLogging**: If logs should be saved to the computer.<br>
+**Type**: [Bool](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+**Default**: false<br>
 **Required**: No<br>
 
 <br>
 
-**Names**: The show names to look for. (Shows all if missing).<br>
-**Type**: Array of string<br>
+**visibility**: The visibility of an episode on the website.<br>
+**Type**: [VisibilityType](https://github.com/TheDarkOrganism/Crunchyroll-Notifier/blob/WinUIPort/WinUIApp/Enums/VisibilityType.cs)<br>
+**Values**: Default, default, Free, free, Premium, premium<br>
+**Default**: Default<br>
+**Required**: Yes<br>
+
+<br>
+
+**feedHost**: The host to get the RSS feed from (Falls back to other hosts when the selected host can't be reached).<br>
+**Type**: [FeedHostType](https://github.com/TheDarkOrganism/Crunchyroll-Notifier/blob/WinUIPort/WinUIApp/Enums/FeedHostType.cs)<br>
+**Values**: Crunchyroll, crunchyroll, FeedBurner, feedburner<br>
+**Default**: Crunchyroll<br>
+**Required**: Yes<br>
+
+<br>
+
+**dubs**: The dubs to look for (Shows all if missing or empty).<br>
+**Type**: [Array](https://learn.microsoft.com/en-us/dotnet/api/system.array) of [string](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+**Default**: Empty<br>
 **Required**: No<br>
 
 <br>
 
-#### * **For arrays if the are included they must not be empty.** ####
-
-<br>
-
-### FeedConfigSchema.json ###
-
-<br>
-
-It is the schema used to validate the FeedConfig.json
-file when the app is loaded.
+**names**: The show names to look for (Shows all if missing or empty).<br>
+**Type**: [Array](https://learn.microsoft.com/en-us/dotnet/api/system.array) of [string](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+**Default**: Empty<br>
+**Required**: No<br>
 
 <br>
 
@@ -77,8 +85,8 @@ file when the app is loaded.
 
 <br>
 
-Windows 10 Version 22621.0 & above (Including all later versions of windows such as Windows 11).
+Windows 10 Version 17763.0 and above (Including all later versions of windows such as Windows 11).
 
 <br>
 
-&copy; 2023 Richard Whicker
+&copy; 2025 Richard Whicker
