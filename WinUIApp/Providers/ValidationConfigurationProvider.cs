@@ -27,7 +27,25 @@
 				return;
 			}
 
-			Data[key] = value is string str ? str : value?.ToString();
+			Set(key, value is string str ? str : value?.ToString());
+		}
+
+		private static bool TryParse<TValue>(JsonElement jsonElement, [NotNullWhen(true)] out TValue? value)
+		{
+			value = jsonElement.ValueKind switch
+			{
+				JsonValueKind.Undefined => default,
+				JsonValueKind.Object => default,
+				JsonValueKind.Array => default,
+				JsonValueKind.String => jsonElement.GetString() is TValue v ? v : default,
+				JsonValueKind.Number => jsonElement.GetDouble() is TValue v ? v : default,
+				JsonValueKind.True => jsonElement.GetBoolean() is TValue v ? v : default,
+				JsonValueKind.False => jsonElement.GetBoolean() is TValue v ? v : default,
+				JsonValueKind.Null => default,
+				_ => throw new NotImplementedException()
+			};
+
+			return value is not null;
 		}
 
 		private void ParseValue(JsonElement jsonElement, string? key)
@@ -47,8 +65,6 @@
 
 						ParseValue(value, subKey);
 
-						string? stringValue = value.ValueKind is JsonValueKind.Null ? null : value.ToString();
-
 						if (_attributePairs.TryGetValue(name, out ValidationAttribute[]? attributes))
 						{
 							foreach (ValidationAttribute attribute in attributes)
@@ -56,7 +72,7 @@
 								switch (attribute)
 								{
 									case EnumDataTypeAttribute enumDataTypeAttribute:
-										if (stringValue is null || !enumDataTypeAttribute.IsValid(stringValue))
+										if (!TryParse(value, out string? stringValue) || !enumDataTypeAttribute.IsValid(stringValue))
 										{
 											Type enumType = enumDataTypeAttribute.EnumType;
 
@@ -66,25 +82,25 @@
 											}
 											else
 											{
-												WriteValue(subKey, Enum.GetNames(enumType)[0]);
+												Set(subKey, Enum.GetNames(enumType)[0]);
 											}
 										}
 										break;
 									case RangeAttribute rangeAttribute:
-										if (stringValue is null)
+										if (!TryParse(value, out double number))
 										{
 											WriteValue(subKey, rangeAttribute.Maximum);
 
 											continue;
 										}
 
-										if (double.TryParse(stringValue, out double number) && !rangeAttribute.IsValid(number) && double.TryParse(rangeAttribute.Minimum.ToString(), out double min) && double.TryParse(rangeAttribute.Maximum.ToString(), out double max))
+										if (!rangeAttribute.IsValid(number) && double.TryParse(rangeAttribute.Minimum.ToString(), out double min) && double.TryParse(rangeAttribute.Maximum.ToString(), out double max))
 										{
 											WriteValue(subKey, Math.Clamp(number, min, max));
 										}
 										break;
 									case TimeSpanRangeAttribute timeSpanRangeAttribute:
-										if (TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
+										if (TryParse(value, out stringValue) && TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
 										{
 											WriteValue(subKey, timeSpan.Clamp(timeSpanRangeAttribute.Mininum, timeSpanRangeAttribute.Maxinum));
 										}
