@@ -4,33 +4,38 @@
 	{
 		private static readonly EmbeddedFileProvider _embeddedFileProvider = new(Assembly.GetExecutingAssembly(), nameof(WinUIApp));
 
+		private static readonly Lock _lock = new();
+
 		public static void RestoreFile(string file)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 
-			IFileInfo fileInfo = _embeddedFileProvider.GetFileInfo(Path.GetFileName(file));
-
-			if (!fileInfo.Exists)
+			lock (_lock)
 			{
-				throw new FileNotFoundException("Unable to find the file as a embedded resource.", file);
-			}
-			
-			try
-			{
+				IFileInfo fileInfo = _embeddedFileProvider.GetFileInfo(Path.GetFileName(file));
 
-				using Stream stream = fileInfo.CreateReadStream();
+				if (!fileInfo.Exists)
+				{
+					throw new FileNotFoundException("Unable to find the file as a embedded resource.", file);
+				}
 
-				using FileStream fileStream = File.Create(file);
+				try
+				{
 
-				fileStream.SetLength(0);
+					using Stream stream = fileInfo.CreateReadStream();
 
-				stream.CopyTo(fileStream);
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex);
+					using FileStream fileStream = File.Create(file);
 
-				Application.Current.Exit();
+					fileStream.SetLength(0);
+
+					stream.CopyTo(fileStream);
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine(ex);
+
+					Application.Current.Exit();
+				}
 			}
 		}
 	}
