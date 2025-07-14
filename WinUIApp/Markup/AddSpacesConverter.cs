@@ -1,10 +1,10 @@
 ﻿namespace WinUIApp.Markup
 {
-	internal sealed partial class EnumToIndexConverter : IValueConverter
+	internal sealed partial class AddSpacesConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			return value is Enum result ? Enum.GetValues(result.GetType()).OfType<Enum>().ToList().IndexOf(result) : -1;
+			return value.ToString()?.AddSpaces() ?? string.Empty;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)

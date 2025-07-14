@@ -47,6 +47,7 @@
 		<Using Include="Microsoft.Extensions.Options" />
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
+		<Using Include="Microsoft.UI.Xaml.Data" />
 		<Using Include="Microsoft.Windows.AppNotifications" />
 		<Using Include="System.Collections" />
 		<Using Include="System.Collections.ObjectModel" />

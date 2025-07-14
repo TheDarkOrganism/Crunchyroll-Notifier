@@ -82,6 +82,8 @@
 
 					<markup:EnumToIndexConverter x:Key="EnumIndexConverter" />
 
+					<markup:AddSpacesConverter x:Key="AddSpacesConverter" />
+
 				</ResourceDictionary>
 
 			</Grid.Resources>
@@ -129,7 +131,13 @@
 
 			<TextBlock Text="Visibility" Grid.Row="2" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
+				<ComboBox.ItemTemplate>
+					<DataTemplate x:DataType="enums:VisibilityType">
+						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
 
 			<!--#endregion-->
 			
@@ -137,7 +145,13 @@
 
 			<TextBlock Text="Feed Host" Grid.Row="3" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded" />
+			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
+				<ComboBox.ItemTemplate>
+					<DataTemplate x:DataType="enums:FeedHostType">
+						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
 			
 			<!--#endregion-->
 
