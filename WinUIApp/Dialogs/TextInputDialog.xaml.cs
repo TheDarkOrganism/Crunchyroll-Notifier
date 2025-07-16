@@ -2,14 +2,18 @@
 {
 	internal sealed partial class TextInputDialog : ContentDialog
 	{
-		private readonly TextInputModel _textInputModel = new();
+		private readonly ITextInputModel _textInputModel;
+
+		public bool IsValid => !_textInputModel.HasErrors;
 
 		public string Text => _textInputModel.Text;
 
-		public TextInputDialog(UserActionType userAction, string name, int maxLength)
+		public TextInputDialog(UserActionType userAction, string name, int maxLength, ITextInputModel textInputModel)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 			ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, 1, nameof(maxLength));
+
+			_textInputModel = textInputModel;
 
 			DataContext = _textInputModel;
 
@@ -31,7 +35,7 @@
 
 		private void TextValueInput_Loaded(object sender, RoutedEventArgs e)
 		{
-			TextValueInput.LoadValidation<TextInputModel>();
+			TextValueInput.LoadValidation(_textInputModel);
 
 			TextValueInput.Loaded -= TextValueInput_Loaded;
 		}

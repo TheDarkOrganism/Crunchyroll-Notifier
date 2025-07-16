@@ -25,14 +25,15 @@ namespace WinUIApp
 #endif
 		}
 
-		private static async ValueTask AskForInput(ListView target, UserActionType userAction, string name, int maxlength)
+		private static async ValueTask AskForInput<TModel>(ListView target, UserActionType userAction, string name, int maxlength)
+			where TModel : TextInputModelBase<TModel>, new()
 		{
-			TextInputDialog textInputDialog = new(userAction, name, maxlength)
+			TextInputDialog textInputDialog = new(userAction, name, maxlength, new TModel())
 			{
 				XamlRoot = target.XamlRoot
 			};
 
-			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && target.ItemsSource is IList<string> values)
+			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && textInputDialog.IsValid && target.ItemsSource is IList<string> values)
 			{
 				string text = textInputDialog.Text;
 
@@ -57,7 +58,7 @@ namespace WinUIApp
 
 		private async ValueTask AskForDubInput(UserActionType userAction)
 		{
-			await AskForInput(DubsValues, userAction, nameof(ConfigModel.Dubs), 40);
+			await AskForInput<DubTextInputModel>(DubsValues, userAction, nameof(ConfigModel.Dubs), 40);
 		}
 
 		private async void DubsAddButton_Click(object sender, RoutedEventArgs e)
@@ -72,7 +73,7 @@ namespace WinUIApp
 
 		private async ValueTask AskForNameInput(UserActionType userAction)
 		{
-			await AskForInput(NamesValues, userAction, nameof(ConfigModel.Names), 60);
+			await AskForInput<NameTextInputModel>(NamesValues, userAction, nameof(ConfigModel.Names), 60);
 		}
 
 		private async void NamesAddButton_Click(object sender, RoutedEventArgs e)

@@ -7,8 +7,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	PrimaryButtonText="Ok"
-	SecondaryButtonText="Cancel"
-	d:DataContext="{d:DesignInstance Type=models:TextInputModel}">
+	SecondaryButtonText="Cancel">
 	<StackPanel>
 		<StackPanel.Resources>
 			<ResourceDictionary Source="/Validation/ValidationTemplates.xaml" />

@@ -1,11 +1,11 @@
 ﻿namespace WinUIApp.Models
 {
-	public sealed partial class TextInputModel : ValidationModelBase<TextInputModel>
+	public abstract class TextInputModelBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TModel> : ValidationModelBase<TModel>, ITextInputModel
 	{
 		private string _text = string.Empty;
 
 		[NotEmpty]
-		public string Text
+		public virtual string Text
 		{
 			get => _text;
 			set
@@ -19,7 +19,7 @@
 			}
 		}
 
-		public TextInputModel()
+		protected TextInputModelBase()
 		{
 			ValidateProperty(Text);
 		}
