@@ -2,7 +2,7 @@
 {
 	internal static class ValidationExtensions
 	{
-		private static void CheckForErrors<TModel>(Control control, string bindingPath, string? propertyName)
+		private static void CheckForErrors<TModel>(Control control, TModel model, string bindingPath, string? propertyName)
 			where TModel : notnull, INotifyDataErrorInfo
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(bindingPath, nameof(bindingPath));
@@ -12,7 +12,7 @@
 				return;
 			}
 
-			if (control.DataContext is TModel model && control.FindFirstVisualChild<TextBlock>("ErrorContent") is TextBlock textBlock && model.GetErrors(propertyName) is IReadOnlyCollection<string> errors)
+			if (control.FindFirstVisualChild<TextBlock>("ErrorContent") is TextBlock textBlock && model.GetErrors(propertyName) is IReadOnlyCollection<string> errors)
 			{
 				_ = VisualStateManager.GoToState(control, errors.Count > 0 ? "Invalid" : "Valid", true);
 
@@ -20,8 +20,7 @@
 			}
 		}
 
-		public static void LoadValidation<TModel>(this Control control)
-			where TModel : notnull, INotifyDataErrorInfo
+		private static void SetupControl(Control control)
 		{
 			ArgumentNullException.ThrowIfNull(control, nameof(control));
 
@@ -29,23 +28,45 @@
 			{
 				button.Click += (_, _) => comboBox.IsDropDownOpen = !comboBox.IsDropDownOpen;
 			}
+		}
+
+		private static void SetupBinding<TModel>(Control control, TModel model)
+			where TModel: notnull, INotifyDataErrorInfo
+		{
+			void OnLayoutUpdated(object? sender, object e)
+			{
+				if (control.GetBindingPath() is string bindingPath)
+				{
+					model.ErrorsChanged += (_, args) => CheckForErrors(control, model, bindingPath, args.PropertyName);
+
+					CheckForErrors(control, model, bindingPath, bindingPath);
+				}
+
+				control.LayoutUpdated -= OnLayoutUpdated;
+			}
+
+			control.LayoutUpdated += OnLayoutUpdated;
+		}
+
+		public static void LoadValidation<TModel>(this Control control)
+			where TModel : notnull, INotifyDataErrorInfo
+		{
+			SetupControl(control);
 
 			if (control.DataContext is TModel model)
 			{
-				void OnLayoutUpdated(object? sender, object e)
-				{
-					if (control.GetBindingPath() is string bindingPath)
-					{
-						model.ErrorsChanged += (_, args) => CheckForErrors<TModel>(control, bindingPath, args.PropertyName);
-
-						CheckForErrors<TModel>(control, bindingPath, bindingPath);
-					}
-
-					control.LayoutUpdated -= OnLayoutUpdated;
-				}
-
-				control.LayoutUpdated += OnLayoutUpdated;
+				SetupBinding(control, model);
 			}
+		}
+
+		public static void LoadValidation<TModel>(this Control control, TModel model)
+			where TModel : notnull, INotifyDataErrorInfo
+		{
+			ArgumentNullException.ThrowIfNull(model, nameof(model));
+
+			SetupControl(control);
+
+			SetupBinding(control, model);
 		}
 	}
 }
