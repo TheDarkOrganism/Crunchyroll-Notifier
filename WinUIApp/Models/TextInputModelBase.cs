@@ -4,7 +4,6 @@
 	{
 		private string _text = string.Empty;
 
-		[NotEmpty]
 		public virtual string Text
 		{
 			get => _text;

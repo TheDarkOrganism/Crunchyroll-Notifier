@@ -3,6 +3,8 @@
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 	internal sealed class NotEmptyAttribute : ValidationAttribute
 	{
+		public string? DisplayName { get; set; }
+
 		public override bool IsValid(object? value)
 		{
 			return value switch
@@ -17,7 +19,7 @@
 
 		public override string FormatErrorMessage(string name)
 		{
-			return string.Format("The field {0} was empty.", name);
+			return string.Format("The field {0} was empty.", DisplayName ?? name);
 		}
 	}
 }

@@ -7,9 +7,11 @@
 
 		private static readonly HashSet<string> _names = CultureInfo.GetCultures(CultureTypes.AllCultures).Skip(1).Select(static culture => culture.DisplayName.Split(' ')[0]).Distinct(_stringComparer).ToHashSet(_stringComparer);
 
+		public string? DisplayName { get; set; }
+
 		public override string FormatErrorMessage(string name)
 		{
-			return string.Format("The language {0} is invalid.", name);
+			return string.Format("The field {0} is not a valid language.", DisplayName ?? name);
 		}
 
 		public override bool IsValid(object? value)
