@@ -34,6 +34,13 @@ namespace WinUIApp.Models
 			return _errors.ContainsKey(propertyName);
 		}
 
+		protected bool IsValid<TValue>(TValue value, string propertyName)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(propertyName, nameof(propertyName));
+
+			return !_validationAttributes.TryGetValue(propertyName, out ValidationAttribute[]? validationAttributes) || validationAttributes.All(attribute => attribute.IsValid(value));
+		}
+
 		protected void ValidateProperty<TValue>(TValue value, [CallerArgumentExpression(nameof(value)), NotNull] string? propertyName = null)
 		{
 			if (ContainsErrors(propertyName) && _errors.Remove(propertyName))

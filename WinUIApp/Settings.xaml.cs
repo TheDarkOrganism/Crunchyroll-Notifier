@@ -33,7 +33,7 @@ namespace WinUIApp
 				XamlRoot = target.XamlRoot
 			};
 
-			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && textInputDialog.IsValid && target.ItemsSource is IList<string> values)
+			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && target.ItemsSource is IList<string> values)
 			{
 				string text = textInputDialog.Text;
 

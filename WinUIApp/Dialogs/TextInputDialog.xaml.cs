@@ -4,8 +4,6 @@
 	{
 		private readonly ITextInputModel _textInputModel;
 
-		public bool IsValid => !_textInputModel.HasErrors;
-
 		public string Text => _textInputModel.Text;
 
 		public TextInputDialog(UserActionType userAction, string name, int maxLength, ITextInputModel textInputModel)

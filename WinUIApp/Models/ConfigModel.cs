@@ -121,18 +121,21 @@ namespace WinUIApp.Models
 		}
 
 		[JsonPropertyName("dubs")]
+		[Language]
+		[NotEmpty]
 		public ObservableCollection<string> Dubs { get; } = [];
 
 		[JsonPropertyName("names")]
+		[NotEmpty]
 		public ObservableCollection<string> Names { get; } = [];
 
-		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e, string propertyName)
 		{
 			if (sender is ObservableCollection<string> values && e.NewItems is IList newItems)
 			{
 				foreach (string value in newItems.OfType<string>())
 				{
-					if (string.IsNullOrWhiteSpace(value))
+					if (!IsValid(value, propertyName))
 					{
 						_ = values.Remove(value);
 					}
@@ -147,8 +150,8 @@ namespace WinUIApp.Models
 			ValidateProperty(Visibility);
 			ValidateProperty(FeedHost);
 
-			Dubs.CollectionChanged += OnCollectionChanged;
-			Names.CollectionChanged += OnCollectionChanged;
+			Dubs.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Dubs));
+			Names.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Names));
 		}
 	}
 }

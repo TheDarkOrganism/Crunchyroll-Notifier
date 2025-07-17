@@ -8,6 +8,7 @@
 			return value switch
 			{
 				string str => !string.IsNullOrWhiteSpace(str),
+				IEnumerable<IEnumerable> enumerableObjects => enumerableObjects.All(IsValid),
 				ICollection values => values.Count > 0,
 				IEnumerable objects => objects.OfType<object>().Any(),
 				_ => base.IsValid(value),

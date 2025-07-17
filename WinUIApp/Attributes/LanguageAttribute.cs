@@ -14,6 +14,11 @@
 
 		public override bool IsValid(object? value)
 		{
+			if (value is IEnumerable<string> strings)
+			{
+				return strings.All(IsValid);
+			}
+
 			if (value is not string str || string.IsNullOrWhiteSpace(str))
 			{
 				return false;
