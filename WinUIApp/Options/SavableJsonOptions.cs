@@ -19,19 +19,18 @@
 		private readonly IConfigurationRoot _configurationRoot;
 		private readonly ILogger<SavableJsonOptions<TIOptions>> _logger;
 
-		public SavableJsonOptions(IFileModel<TIOptions> fileModel, IHostEnvironment hostEnvironment, IOptions<TIOptions> options, IConfiguration configuration, ILogger<SavableJsonOptions<TIOptions>> logger)
+		public SavableJsonOptions(IFileModel<TIOptions> fileModel, HostBuilderContext context, IOptions<TIOptions> options, ILogger<SavableJsonOptions<TIOptions>> logger)
 		{
 			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
-			ArgumentNullException.ThrowIfNull(hostEnvironment, nameof(hostEnvironment));
+			ArgumentNullException.ThrowIfNull(context, nameof(context));
 			ArgumentNullException.ThrowIfNull(options, nameof(options));
-			ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
 			_fileModel = fileModel;
 			_file = fileModel.File;
-			_fileProvider = hostEnvironment.ContentRootFileProvider;
+			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
 			_options = options;
-			_configurationRoot = (IConfigurationRoot)configuration;
+			_configurationRoot = (IConfigurationRoot)context.Configuration;
 			_logger = logger;
 		}
 
