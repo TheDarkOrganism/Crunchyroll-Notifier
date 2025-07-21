@@ -25,16 +25,18 @@ namespace WinUIApp
 		/// </summary>
 		public App()
 		{
-			const string configFile = "Config.json";
 			const string lastUpdateFile = "LastUpdate.json";
 
+			FileModel<ConfigModel, IConfigModel> configFileModel = new("Config.json");
+			FileModel<LastUpdateModel, ILastUpdateModel> lastUpdateFileModel = new(lastUpdateFile);
+
 			_host = Host.CreateDefaultBuilder()
-				.ConfigureAppConfiguration(static (context, builder) => builder.AddJsonFileWithValidation<ConfigModel>(configFile, context).AddJsonFile(lastUpdateFile))
-				.ConfigureServices(static services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
-				.ConfigureSavableJson<ConfigModel>(configFile)
-				.ConfigureSavableJson<LastUpdateModel>(lastUpdateFile)
-				.AddResourceRecovery(configFile)
-				.AddResourceRecovery(lastUpdateFile)
+				.ConfigureAppConfiguration((context, builder) => builder.AddJsonFileWithValidation(configFileModel, context).AddJsonFile(lastUpdateFile))
+				.ConfigureServices(services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddSingleton<IFileModel<IConfigModel>>(configFileModel).AddSingleton<IFileModel<ILastUpdateModel>>(lastUpdateFileModel).AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
+				.ConfigureSavableJson(configFileModel)
+				.ConfigureSavableJson(lastUpdateFileModel)
+				.AddResourceRecovery<IConfigModel>()
+				.AddResourceRecovery<ILastUpdateModel>()
 				.ConfigureLogging(LoggingHelper.ConfigureLogging)
 				.Build();
 

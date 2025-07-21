@@ -1,27 +1,27 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationSource<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : IConfigurationSource
-		where T : notnull
+	internal sealed class ValidationConfigurationSource<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TIModel> : IConfigurationSource
+		where TIModel : class, IModelBase
 	{
-		private readonly string _file;
+		private readonly IFileModel<TIModel> _fileModel;
 		private readonly IFileProvider _fileProvider;
-		private readonly ILogger<ValidationConfigurationProvider<T>> _logger;
+		private readonly ILogger<ValidationConfigurationProvider<TIModel>> _logger;
 
-		public ValidationConfigurationSource(string file, HostBuilderContext context)
+		public ValidationConfigurationSource(IFileModel<TIModel> fileModel, HostBuilderContext context)
 		{
 			ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-			_file = file;
+			_fileModel = fileModel;	
 			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
 
 			using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => LoggingHelper.ConfigureLogging(context, builder));
 
-			_logger = loggerFactory.CreateLogger<ValidationConfigurationProvider<T>>();
+			_logger = loggerFactory.CreateLogger<ValidationConfigurationProvider<TIModel>>();
 		}
 
 		public IConfigurationProvider Build(IConfigurationBuilder builder)
 		{
-			return new ValidationConfigurationProvider<T>(_file, _fileProvider, _logger);
+			return new ValidationConfigurationProvider<TIModel>(_fileModel, _fileProvider, _logger);
 		}
 	}
 }

@@ -1,10 +1,10 @@
 ﻿namespace WinUIApp.Services
 {
-	internal sealed class MainService(ISavableJsonOptions<ConfigModel> configOptions, IOptions<LastUpdateModel> lastUpdateOptions, NotificationHelper notificationHelper) : IHostedService
+	internal sealed class MainService(ISavableJsonOptions<IConfigModel> configOptions, IOptions<ILastUpdateModel> lastUpdateOptions, NotificationHelper notificationHelper) : IHostedService
 	{
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			ConfigModel configModel = configOptions.Value;
+			IConfigModel configModel = configOptions.Value;
 
 			if (!configModel.Modified && configModel.ShowFirstRun && !lastUpdateOptions.Value.Modified)
 			{

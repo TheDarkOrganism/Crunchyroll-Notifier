@@ -1,21 +1,23 @@
 ﻿namespace WinUIApp.Services
 {
-	internal sealed class ResourceRecoveryService : IHostedService
+	internal sealed class ResourceRecoveryService<TIModel> : IHostedService
+		where TIModel : class, IModelBase
 	{
+		private readonly IFileModel<TIModel> _fileModel;
 		private readonly FileSystemWatcher _watcher;
 
-		public ResourceRecoveryService(string file, IHostEnvironment hostEnvironment)
+		public ResourceRecoveryService(IFileModel<TIModel> fileModel, IHostEnvironment hostEnvironment)
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
+			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
 			ArgumentNullException.ThrowIfNull(hostEnvironment, nameof(hostEnvironment));
 
-			IFileInfo fileInfo = hostEnvironment.ContentRootFileProvider.GetFileInfo(file);
+			_fileModel = fileModel;
 
-			string name = fileInfo.Name;
+			IFileInfo fileInfo = hostEnvironment.ContentRootFileProvider.GetFileInfo(fileModel.File);
 
 			if (!fileInfo.Exists)
 			{
-				ResourceHelper.RestoreFile(name);
+				ResourceHelper.RestoreFile(fileModel);
 			}
 
 			_watcher = new FileSystemWatcher(hostEnvironment.ContentRootPath)
@@ -23,12 +25,12 @@
 				EnableRaisingEvents = true
 			};
 
-			_watcher.Filters.Add(name);
+			_watcher.Filters.Add(fileInfo.Name);
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
-			_watcher.Deleted += static (_, args) => ResourceHelper.RestoreFile(args.FullPath);
+			_watcher.Deleted += (_, _) => ResourceHelper.RestoreFile(_fileModel);
 
 			return Task.CompletedTask;
 		}

@@ -5,9 +5,9 @@ namespace WinUIApp
 {
 	public sealed partial class Settings : Window
 	{
-		private readonly ISavableJsonOptions<ConfigModel> _options;
+		private readonly ISavableJsonOptions<IConfigModel> _options;
 
-		public Settings(ISavableJsonOptions<ConfigModel> options)
+		public Settings(ISavableJsonOptions<IConfigModel> options)
 		{
 			_options = options;
 
@@ -26,7 +26,7 @@ namespace WinUIApp
 		}
 
 		private static async ValueTask AskForInput<TModel>(ListView target, UserActionType userAction, string name, int maxlength)
-			where TModel : TextInputModelBase<TModel>, new()
+			where TModel : notnull, TextInputModelBase<TModel>, new()
 		{
 			TextInputDialog textInputDialog = new(userAction, name, maxlength, new TModel())
 			{

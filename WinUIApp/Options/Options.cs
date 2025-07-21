@@ -1,8 +1,8 @@
 ﻿namespace WinUIApp.Options
 {
-	internal sealed class Options<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(TOptions options) : IOptions<TOptions>
-		where TOptions : class
+	internal sealed class Options<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions>(TIOptions options) : IOptions<TIOptions>
+		where TIOptions : class
 	{
-		public TOptions Value => options;
+		public TIOptions Value => options;
 	}
 }

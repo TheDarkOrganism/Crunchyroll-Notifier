@@ -1,21 +1,21 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T> : ConfigurationProvider
-		where T : notnull
+	internal sealed class ValidationConfigurationProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TIModel> : ConfigurationProvider
+		where TIModel : class, IModelBase
 	{
-		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(T).GetValidationAttributes(static property => property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name);
+		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(TIModel).GetValidationAttributes(static property => property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name);
 
-		private readonly string _file;
+		private readonly IFileModel<TIModel> _fileModel;
 		private readonly IFileProvider _fileProvider;
-		private readonly ILogger<ValidationConfigurationProvider<T>> _logger;
+		private readonly ILogger<ValidationConfigurationProvider<TIModel>> _logger;
 
-		public ValidationConfigurationProvider(string file, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<T>> logger)
+		public ValidationConfigurationProvider(IFileModel<TIModel> fileModel, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<TIModel>> logger)
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
+			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
 			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
-			_file = file;
+			_fileModel = fileModel;
 			_fileProvider = fileProvider;
 			_logger = logger;
 		}
@@ -144,29 +144,34 @@
 
 		public override void Load()
 		{
-			IFileInfo fileInfo = _fileProvider.GetFileInfo(_file);
+			string file = _fileModel.File;
+
+			IFileInfo fileInfo = _fileProvider.GetFileInfo(file);
 
 			if (fileInfo.Exists)
 			{
-				using Stream stream = fileInfo.CreateReadStream();
-
-				try
+				lock (_fileModel.Lock)
 				{
-					using JsonDocument jsonDocument = JsonDocument.Parse(stream);
+					using Stream stream = fileInfo.CreateReadStream();
 
-					ParseValue(jsonDocument.RootElement, null);
-				}
-				catch (JsonException ex)
-				{
-					_logger.LogWarning(ex, "Failed to read json from {File}.", _file);
+					try
+					{
+						using JsonDocument jsonDocument = JsonDocument.Parse(stream);
 
-					ResourceHelper.RestoreFile(_file);
-				}
-				catch (Exception ex)
-				{
-					_logger.LogCritical(ex, "Unable to read {File}.", _file);
+						ParseValue(jsonDocument.RootElement, null);
+					}
+					catch (JsonException ex)
+					{
+						_logger.LogWarning(ex, "Failed to read json from {File}.", file);
 
-					Environment.Exit(13);
+						ResourceHelper.RestoreFile(_fileModel);
+					}
+					catch (Exception ex)
+					{
+						_logger.LogCritical(ex, "Unable to read {File}.", file);
+
+						Environment.Exit(13);
+					}
 				}
 			}
 		}

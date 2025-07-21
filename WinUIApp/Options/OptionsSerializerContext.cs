@@ -1,8 +1,8 @@
 ﻿namespace WinUIApp.Options
 {
-	[JsonSerializable(typeof(ConfigModel))]
-	[JsonSerializable(typeof(LastUpdateModel))]
-	[JsonSerializable(typeof(Dictionary<string, ConfigModel>))]
-	[JsonSerializable(typeof(Dictionary<string, LastUpdateModel>))]
+	[JsonSerializable(typeof(IConfigModel))]
+	[JsonSerializable(typeof(ILastUpdateModel))]
+	[JsonSerializable(typeof(Dictionary<string, IConfigModel>))]
+	[JsonSerializable(typeof(Dictionary<string, ILastUpdateModel>))]
 	internal sealed partial class OptionsSerializerContext : JsonSerializerContext { }
 }

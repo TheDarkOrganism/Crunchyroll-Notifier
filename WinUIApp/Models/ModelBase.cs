@@ -1,12 +1,12 @@
 ﻿namespace WinUIApp.Models
 {
-	public abstract class ModelBase
+	public abstract class ModelBase : IModelBase
 	{
 		[JsonIgnore]
-		internal bool Modified { get; private set; }
+		public bool Modified { get; private set; }
 
 		[JsonIgnore]
-		internal bool ReloadConfiguration { get; private set; }
+		public bool ReloadConfiguration { get; private set; }
 
 		protected void OnModified(bool reloadConfiguration)
 		{
@@ -14,7 +14,7 @@
 			ReloadConfiguration = reloadConfiguration;
 		}
 
-		internal void MarkUnmodified()
+		public void MarkUnmodified()
 		{
 			Modified = false;
 			ReloadConfiguration = false;

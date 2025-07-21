@@ -2,18 +2,17 @@
 {
 	internal static class OptionsExtensions
 	{
-		public static IHostBuilder ConfigureSavableJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TOptions>(this IHostBuilder hostBuilder, string file, string? section = null)
-			where TOptions : ModelBase, new()
+		public static IHostBuilder ConfigureSavableJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TOptions, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions>(this IHostBuilder hostBuilder, FileModel<TOptions, TIOptions> fileModel)
+			where TOptions : notnull, ModelBase, TIOptions, new()
+			where TIOptions : class, IModelBase
 		{
 			return hostBuilder.ConfigureServices((context, services) =>
 			{
-				section ??= Path.GetFileNameWithoutExtension(file);
-
-				_ = services.AddSingleton<IOptions<TOptions>>(_ =>
+				_ = services.AddSingleton<IOptions<TIOptions>>(_ =>
 				{
 					TOptions options = new();
 
-					IConfigurationSection configurationSection = context.Configuration.GetSection(section);
+					IConfigurationSection configurationSection = context.Configuration.GetSection(fileModel.ConfigurationSection);
 
 					if (configurationSection.Exists())
 					{
@@ -79,7 +78,7 @@
 					return new Options<TOptions>(options);
 				});
 
-				_ = services.AddSingleton<ISavableJsonOptions<TOptions>>(provider => new SavableJsonOptions<TOptions>(file, section, context.HostingEnvironment.ContentRootFileProvider, provider.GetRequiredService<IOptions<TOptions>>(), (IConfigurationRoot)context.Configuration, provider.GetRequiredService<ILogger<SavableJsonOptions<TOptions>>>()));
+				_ = services.AddSingleton<ISavableJsonOptions<TIOptions>, SavableJsonOptions<TIOptions>>();
 			});
 		}
 	}

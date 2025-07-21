@@ -1,9 +1,7 @@
-﻿using System.Text.Json.Serialization.Metadata;
-
-namespace WinUIApp.Options
+﻿namespace WinUIApp.Options
 {
-	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions> : ISavableJsonOptions<TOptions>
-		where TOptions : ModelBase
+	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions> : ISavableJsonOptions<TIOptions>
+		where TIOptions : class, IModelBase
 	{
 		private static readonly OptionsSerializerContext _serializerContext = new(new()
 		{
@@ -12,35 +10,32 @@ namespace WinUIApp.Options
 			IndentSize = 1
 		});
 
-		private static readonly Type ValueType = typeof(Dictionary<string, TOptions>);
+		private static readonly Type ValueType = typeof(Dictionary<string, TIOptions>);
 
-		private readonly Lock _lock = new();
-
+		private readonly IFileModel<TIOptions> _fileModel;
 		private readonly string _file;
-		private readonly string _section;
 		private readonly IFileProvider _fileProvider;
-		private readonly IOptions<TOptions> _options;
+		private readonly IOptions<TIOptions> _options;
 		private readonly IConfigurationRoot _configurationRoot;
-		private readonly ILogger<SavableJsonOptions<TOptions>> _logger;
+		private readonly ILogger<SavableJsonOptions<TIOptions>> _logger;
 
-		public SavableJsonOptions(string file, string section, IFileProvider fileProvider, IOptions<TOptions> options, IConfigurationRoot configurationRoot, ILogger<SavableJsonOptions<TOptions>> logger)
+		public SavableJsonOptions(IFileModel<TIOptions> fileModel, IHostEnvironment hostEnvironment, IOptions<TIOptions> options, IConfiguration configuration, ILogger<SavableJsonOptions<TIOptions>> logger)
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
-			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
-			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
+			ArgumentNullException.ThrowIfNull(hostEnvironment, nameof(hostEnvironment));
 			ArgumentNullException.ThrowIfNull(options, nameof(options));
-			ArgumentNullException.ThrowIfNull(configurationRoot, nameof(configurationRoot));
+			ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
-			_file = file;
-			_section = section;
-			_fileProvider = fileProvider;
+			_fileModel = fileModel;
+			_file = fileModel.File;
+			_fileProvider = hostEnvironment.ContentRootFileProvider;
 			_options = options;
-			_configurationRoot = configurationRoot;
+			_configurationRoot = (IConfigurationRoot)configuration;
 			_logger = logger;
 		}
 
-		public TOptions Value => _options.Value;
+		public TIOptions Value => _options.Value;
 
 		private bool TryGetFileStream([NotNullWhen(true)] out FileStream? fileStream)
 		{
@@ -61,11 +56,11 @@ namespace WinUIApp.Options
 			}
 		}
 
-		private Dictionary<string, TOptions> GetValue()
+		private Dictionary<string, TIOptions> GetValue()
 		{
 			return new()
 			{
-				{ _section, Value }
+				{ _fileModel.ConfigurationSection, Value }
 			};
 		}
 
@@ -79,7 +74,7 @@ namespace WinUIApp.Options
 
 		public void Save()
 		{
-			lock (_lock)
+			lock (_fileModel.Lock)
 			{
 				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 				{

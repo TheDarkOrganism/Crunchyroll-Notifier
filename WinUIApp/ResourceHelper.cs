@@ -4,14 +4,15 @@
 	{
 		private static readonly EmbeddedFileProvider _embeddedFileProvider = new(Assembly.GetExecutingAssembly(), nameof(WinUIApp));
 
-		private static readonly Lock _lock = new();
-
-		public static void RestoreFile(string file)
+		public static void RestoreFile<TIModel>(IFileModel<TIModel> fileModel)
+			where TIModel : class, IModelBase
 		{
-			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
+			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
 
-			lock (_lock)
+			lock (fileModel.Lock)
 			{
+				string file = fileModel.File;
+
 				IFileInfo fileInfo = _embeddedFileProvider.GetFileInfo(Path.GetFileName(file));
 
 				if (!fileInfo.Exists)

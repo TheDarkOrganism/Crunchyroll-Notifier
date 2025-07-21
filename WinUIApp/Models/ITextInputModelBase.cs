@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public interface ITextInputModel : INotifyDataErrorInfo
+	public interface ITextInputModelBase : IValidationModelBase
 	{
 		string Text { get; set; }
 	}

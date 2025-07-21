@@ -4,7 +4,7 @@ using System.Xml.XPath;
 
 namespace WinUIApp.Services
 {
-	internal sealed partial class CrunchyrollService(ISavableJsonOptions<ConfigModel> configOptions, ISavableJsonOptions<LastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger) : IHostedService
+	internal sealed partial class CrunchyrollService(ISavableJsonOptions<IConfigModel> configOptions, ISavableJsonOptions<ILastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger) : IHostedService
 	{
 		private static readonly Dictionary<FeedHostType, string> _feedSources = new()
 		{
@@ -24,7 +24,7 @@ namespace WinUIApp.Services
 		{
 			#region Load Config
 
-			ConfigModel configModel = configOptions.Value;
+			IConfigModel configModel = configOptions.Value;
 
 			using PeriodicTimer periodicTimer = new(configModel.Interval);
 
@@ -38,7 +38,7 @@ namespace WinUIApp.Services
 
 			#endregion
 
-			LastUpdateModel lastUpdateModel = lastOptions.Value;
+			ILastUpdateModel lastUpdateModel = lastOptions.Value;
 
 			#region Run Main Loop
 

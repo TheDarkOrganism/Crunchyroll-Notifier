@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	internal sealed class LastUpdateModel : ModelBase
+	internal sealed class LastUpdateModel : ModelBase, ILastUpdateModel
 	{
 		private DateTime _lastUpdate = DateTime.UtcNow;
 

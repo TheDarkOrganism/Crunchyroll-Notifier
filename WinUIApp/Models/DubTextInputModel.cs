@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public sealed partial class DubTextInputModel : TextInputModelBase<DubTextInputModel>
+	public sealed partial class DubTextInputModel : TextInputModelBase<DubTextInputModel>, IDubTextInputModel
 	{
 		private const string _displayName = "Dub";
 
