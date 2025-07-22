@@ -2,6 +2,25 @@
 {
 	internal static class OptionsExtensions
 	{
+		private static object? ConvertValue(Type type, string? value, object? fallbackValue)
+		{
+			if (value is null && (type.IsValueType || Nullable.GetUnderlyingType(type) is null))
+			{
+				return fallbackValue;
+			}
+			
+			try
+			{
+				return Convert.ChangeType(value, type) ?? fallbackValue;
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(ex);
+
+				return fallbackValue;
+			}
+		}
+
 		public static IHostBuilder ConfigureSavableJson<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TOptions, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions>(this IHostBuilder hostBuilder, FileModel<TOptions, TIOptions> fileModel)
 			where TOptions : notnull, ModelBase, TIOptions, new()
 			where TIOptions : class, IModelBase
@@ -55,7 +74,7 @@
 								{
 									arraySection = configurationSection.GetSection($"{childSection.Key}:{index}");
 
-									if (arraySection.Exists() && list.Add(Convert.ChangeType(arraySection.Value, typeArguments[0])) == -1)
+									if (arraySection.Exists() && list.Add(ConvertValue(typeArguments[0], arraySection.Value, null)) == -1)
 									{
 										break;
 									}
@@ -70,7 +89,7 @@
 							{
 								nameof(DateTime) => DateTime.TryParse(value, out DateTime result) ? result : currentValue,
 								nameof(TimeSpan) => TimeSpan.TryParse(value, out TimeSpan result) ? result : currentValue,
-								_ => Convert.ChangeType(childSection.Value, propertyType)
+								_ => ConvertValue(propertyType, value, currentValue)
 							} ?? currentValue);
 						}
 					}
