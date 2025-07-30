@@ -4,7 +4,6 @@
 	{
 		private DateTime _lastUpdate = DateTime.UtcNow;
 
-		[JsonPropertyName("lastUpdate")]
 		public DateTime LastUpdate
 		{
 			get => _lastUpdate;

@@ -2,7 +2,7 @@
 
 namespace WinUIApp.Models
 {
-	public abstract class ValidationModelBase<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TModel> : ModelBase, IValidationModelBase
+	public abstract class ValidationModelBase<TModel> : ModelBase, IValidationModelBase
 		where TModel : notnull, ValidationModelBase<TModel>, new()
 	{
 		private static readonly Dictionary<string, ValidationAttribute[]> _validationAttributes = typeof(TModel).GetValidationAttributes();

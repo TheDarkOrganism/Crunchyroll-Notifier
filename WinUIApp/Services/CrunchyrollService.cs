@@ -6,6 +6,11 @@ namespace WinUIApp.Services
 {
 	internal sealed partial class CrunchyrollService(ISavableJsonOptions<IConfigModel> configOptions, ISavableJsonOptions<ILastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger) : IHostedService
 	{
+		private static readonly XmlReaderSettings _xmlReaderSettings = new()
+		{
+			DtdProcessing = DtdProcessing.Ignore
+		};
+
 		private static readonly Dictionary<FeedHostType, string> _feedSources = new()
 		{
 			{ FeedHostType.Crunchyroll, "http://www.crunchyroll.com/rss/anime" },
@@ -98,7 +103,7 @@ namespace WinUIApp.Services
 
 						using Stream stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken);
 
-						using XmlReader reader = XmlReader.Create(stream);
+						using XmlReader reader = XmlReader.Create(stream, _xmlReaderSettings);
 
 						if (manager is null)
 						{

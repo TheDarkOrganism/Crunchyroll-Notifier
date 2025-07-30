@@ -9,8 +9,6 @@ namespace WinUIApp.Models
 		private const int _minSeconds = 10;
 
 		[JsonRequired]
-		[JsonConverter(typeof(Converters.TimeSpanConverter))]
-		[JsonPropertyName("interval")]
 		[TimeSpanRange(0, 1, 0, 0, 0, 0, _minSeconds, 60, dayLock: true)]
 		public TimeSpan Interval
 		{
@@ -29,7 +27,6 @@ namespace WinUIApp.Models
 		private int _maxNotifications = 30;
 
 		[JsonRequired]
-		[JsonPropertyName("maxNotifications")]
 		[Range(1, 100)]
 		public int MaxNotifications
 		{
@@ -48,7 +45,6 @@ namespace WinUIApp.Models
 		private bool _showFirstRun = true;
 
 		[JsonRequired]
-		[JsonPropertyName("showFirstRun")]
 		public bool ShowFirstRun
 		{
 			get => _showFirstRun;
@@ -66,8 +62,6 @@ namespace WinUIApp.Models
 		private VisibilityType _visibility;
 
 		[JsonRequired]
-		[JsonConverter(typeof(Converters.EnumConverter<VisibilityType>))]
-		[JsonPropertyName("visibility")]
 		[EnumDataType(typeof(VisibilityType))]
 		public VisibilityType Visibility
 		{
@@ -86,8 +80,6 @@ namespace WinUIApp.Models
 		private FeedHostType _feedHostType;
 
 		[JsonRequired]
-		[JsonConverter(typeof(Converters.EnumConverter<FeedHostType>))]
-		[JsonPropertyName("feedHost")]
 		[EnumDataType(typeof(FeedHostType))]
 		public FeedHostType FeedHost
 		{
@@ -105,7 +97,6 @@ namespace WinUIApp.Models
 
 		private bool _useLogging;
 
-		[JsonPropertyName("useLogging")]
 		public bool UseLogging
 		{
 			get => _useLogging;
@@ -120,12 +111,10 @@ namespace WinUIApp.Models
 			}
 		}
 
-		[JsonPropertyName("dubs")]
 		[Language]
 		[NotEmpty]
 		public ObservableCollection<string> Dubs { get; } = [];
 
-		[JsonPropertyName("names")]
 		[NotEmpty]
 		public ObservableCollection<string> Names { get; } = [];
 

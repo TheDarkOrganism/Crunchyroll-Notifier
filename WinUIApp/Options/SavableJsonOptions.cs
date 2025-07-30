@@ -3,12 +3,7 @@
 	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions> : ISavableJsonOptions<TIOptions>
 		where TIOptions : class, IModelBase
 	{
-		private static readonly OptionsSerializerContext _serializerContext = new(new()
-		{
-			WriteIndented = true,
-			IndentCharacter = '\t',
-			IndentSize = 1
-		});
+		private static readonly ModelSerializerContext _serializerContext = ModelSerializerContext.Writing;
 
 		private static readonly Type ValueType = typeof(Dictionary<string, TIOptions>);
 

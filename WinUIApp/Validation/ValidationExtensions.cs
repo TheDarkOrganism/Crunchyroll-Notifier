@@ -31,7 +31,7 @@
 		}
 
 		private static void SetupBinding<TModel>(Control control, TModel model)
-			where TModel: notnull, INotifyDataErrorInfo
+			where TModel : notnull, INotifyDataErrorInfo
 		{
 			void OnLayoutUpdated(object? sender, object e)
 			{

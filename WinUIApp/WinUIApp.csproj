@@ -59,6 +59,7 @@
 		<Using Include="System.Reflection" />
 		<Using Include="System.Text.Json" />
 		<Using Include="System.Text.Json.Serialization" />
+		<Using Include="System.Text.Json.Serialization.Metadata" />
 		<Using Include="WinUIApp.Attributes" />
 		<Using Include="WinUIApp.Enums" />
 		<Using Include="WinUIApp.Logging" />

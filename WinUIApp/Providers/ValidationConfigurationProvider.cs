@@ -1,15 +1,16 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TIModel> : ConfigurationProvider
+	internal sealed class ValidationConfigurationProvider<TModel, TIModel> : ConfigurationProvider
+		where TModel : ModelBase, TIModel
 		where TIModel : class, IModelBase
 	{
-		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(TIModel).GetValidationAttributes(static property => property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name);
+		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(TModel).GetValidationAttributes();
 
 		private readonly IFileModel<TIModel> _fileModel;
 		private readonly IFileProvider _fileProvider;
-		private readonly ILogger<ValidationConfigurationProvider<TIModel>> _logger;
+		private readonly ILogger<ValidationConfigurationProvider<TModel, TIModel>> _logger;
 
-		public ValidationConfigurationProvider(IFileModel<TIModel> fileModel, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<TIModel>> logger)
+		public ValidationConfigurationProvider(IFileModel<TIModel> fileModel, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<TModel, TIModel>> logger)
 		{
 			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
 			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
@@ -65,7 +66,7 @@
 
 						ParseValue(value, subKey);
 
-						if (_attributePairs.TryGetValue(name, out ValidationAttribute[]? attributes))
+						if (_attributePairs?.TryGetValue(name, out ValidationAttribute[]? attributes) is true)
 						{
 							foreach (ValidationAttribute attribute in attributes)
 							{

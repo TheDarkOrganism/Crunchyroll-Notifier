@@ -1,26 +1,29 @@
-﻿
-namespace WinUIApp
+﻿namespace WinUIApp
 {
 	internal static class TypeExtensions
 	{
-		private static bool PropertyFilter(PropertyInfo propertyInfo)
+		private static readonly JsonKeyComparer _keyComparer = new();
+
+		private static bool PropertyFilter(JsonPropertyInfo propertyInfo)
 		{
-			return propertyInfo.GetCustomAttribute<JsonIgnoreAttribute>() is null;
+			return propertyInfo.AttributeProvider?.IsDefined(typeof(JsonIgnoreAttribute), true) is false;
 		}
 
-		private static ValidationAttribute[] GetValidationAttributes(PropertyInfo propertyInfo)
+		public static ValidationAttribute[] GetValidationAttributes(this JsonPropertyInfo propertyInfo)
 		{
-			return [.. propertyInfo.GetCustomAttributes<ValidationAttribute>()];
+			return [.. propertyInfo.AttributeProvider?.GetCustomAttributes(true).OfType<ValidationAttribute>() ?? []];
 		}
 
-		public static Dictionary<string, ValidationAttribute[]> GetValidationAttributes([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] this Type type)
+		public static IEnumerable<JsonPropertyInfo> GetDeclaredProperties(this Type type)
 		{
-			return type.GetProperties().Where(PropertyFilter).ToDictionary(static property => property.Name, GetValidationAttributes);
+			JsonTypeInfo? jsonTypeInfo = ModelSerializerContext.Default.GetTypeInfo(type);
+
+			return jsonTypeInfo?.Properties.Where(property => property.DeclaringType == type) ?? [];
 		}
 
-		public static Dictionary<string, ValidationAttribute[]> GetValidationAttributes([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] this Type type, Func<PropertyInfo, string> keyResolver)
+		public static Dictionary<string, ValidationAttribute[]> GetValidationAttributes(this Type type)
 		{
-			return type.GetProperties().Where(PropertyFilter).ToDictionary(keyResolver, GetValidationAttributes);
+			return GetDeclaredProperties(type).Where(PropertyFilter).ToDictionary(static property => property.Name, GetValidationAttributes, _keyComparer);
 		}
 	}
 }

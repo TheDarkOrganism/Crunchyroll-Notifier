@@ -1,6 +1,5 @@
 ﻿using H.NotifyIcon;
 using Microsoft.UI.Xaml.Input;
-using WinUIApp.Logging;
 using WinUIApp.Providers;
 using WinUIApp.Services;
 #if PACKAGED_APP
