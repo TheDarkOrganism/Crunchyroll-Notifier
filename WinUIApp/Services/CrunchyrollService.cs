@@ -94,7 +94,7 @@ namespace WinUIApp.Services
 							}
 						}
 
-						if (httpResponse is null)
+						if (httpResponse is null || httpResponse.Content.Headers.ContentType?.MediaType is not "application/xml" and not "application/xml+rss")
 						{
 							logger.LogWarning("Unable to load the any RSS feeds.");
 
