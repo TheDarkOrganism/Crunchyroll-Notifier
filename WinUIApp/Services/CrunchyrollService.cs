@@ -17,6 +17,11 @@ namespace WinUIApp.Services
 			{ FeedHostType.FeedBurner, "http://feeds.feedburner.com/crunchyroll/rss/anime" }
 		};
 
+		private static bool ValidateResponse([NotNullWhen(true)] HttpResponseMessage? httpResponseMessage)
+		{
+			return httpResponseMessage?.Content.Headers.ContentType?.MediaType is "application/xml" or "application/xml+rss";
+		}
+
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
 		{
 			return string.IsNullOrWhiteSpace(value) || values.Count == 0 || values.Contains(value, StringComparer.CurrentCultureIgnoreCase);
@@ -61,40 +66,30 @@ namespace WinUIApp.Services
 
 						using HttpClient httpClient = httpClientFactory.CreateClient();
 
-						FeedHostType feedHost = configModel.FeedHost;
-
-						try
+						foreach ((FeedHostType feedHost, string source) in _feedSources.OrderBy(pair => pair.Key != configModel.FeedHost))
 						{
-							if (_feedSources.TryGetValue(feedHost, out string? host))
+							try
 							{
-								httpResponse = (await httpClient.GetAsync(host, cancellationToken)).EnsureSuccessStatusCode();
-							}
-						}
-						catch (HttpRequestException e)
-						{
-							logger.LogDebug(e, "Unable to load the feed for {HostType}.", feedHost);
+								httpResponse = (await httpClient.GetAsync(source, cancellationToken)).EnsureSuccessStatusCode();
 
-							foreach (FeedHostType hostType in _feedSources.Keys.Where(t => t != feedHost))
-							{
-								try
+								if (ValidateResponse(httpResponse))
 								{
-									if (_feedSources.TryGetValue(hostType, out string? sourse))
-									{
-										httpResponse = (await httpClient.GetAsync(sourse, cancellationToken)).EnsureSuccessStatusCode();
-
-										break;
-									}
+									break;
 								}
-								catch (HttpRequestException ex)
+								else
 								{
-									logger.LogWarning(ex, "Unable to load the feed for {HostType}.", hostType);
-
 									continue;
 								}
 							}
+							catch (HttpRequestException ex)
+							{
+								logger.LogDebug(ex, "Unable to load the feed for {HostType}.", feedHost);
+
+								continue;
+							}
 						}
 
-						if (httpResponse is null || httpResponse.Content.Headers.ContentType?.MediaType is not "application/xml" and not "application/xml+rss")
+						if (!ValidateResponse(httpResponse))
 						{
 							logger.LogWarning("Unable to load the any RSS feeds.");
 
