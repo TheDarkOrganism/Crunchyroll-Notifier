@@ -17,9 +17,37 @@ namespace WinUIApp.Services
 			{ FeedHostType.FeedBurner, "http://feeds.feedburner.com/crunchyroll/rss/anime" }
 		};
 
-		private static bool ValidateResponse([NotNullWhen(true)] HttpResponseMessage? httpResponseMessage)
+		private bool ValidateResponse([NotNullWhen(true)] HttpResponseMessage? httpResponseMessage)
 		{
-			return httpResponseMessage?.Content.Headers.ContentType?.MediaType is "application/xml" or "application/xml+rss";
+			if (httpResponseMessage is null || !httpResponseMessage.IsSuccessStatusCode)
+			{
+				return false;
+			}
+
+			if (httpResponseMessage.RequestMessage?.RequestUri is not Uri uri)
+			{
+				logger.LogDebug("The {RequestMessage}.{UriName} was null.", nameof(HttpRequestMessage), nameof(HttpRequestMessage.RequestUri));
+
+				return false;
+			}
+
+			string? contentType = httpResponseMessage.Content.Headers.ContentType?.MediaType;
+
+			if (string.IsNullOrWhiteSpace(contentType))
+			{
+				logger.LogError("The Content-Type was null or empty for request to {Uri}.", uri);
+
+				return false;
+			}
+
+			if (contentType is "text/xml" or "application/xml+rss")
+			{
+				return true;
+			}
+
+			logger.LogWarning("The Content-Type for the {Uri} was an invalid {ContentType}.", uri, contentType);
+
+			return false;
 		}
 
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
@@ -70,7 +98,7 @@ namespace WinUIApp.Services
 						{
 							try
 							{
-								httpResponse = (await httpClient.GetAsync(source, cancellationToken)).EnsureSuccessStatusCode();
+								httpResponse = await httpClient.GetAsync(source, cancellationToken);
 
 								if (ValidateResponse(httpResponse))
 								{
