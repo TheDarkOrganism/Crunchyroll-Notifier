@@ -27,6 +27,16 @@
 		<DefineConstants>PACKAGED_APP</DefineConstants>
 	</PropertyGroup>
 
+	<Target Name="CheckForPorgam" BeforeTargets="BeforeBuild">
+		<ItemGroup>
+			<IncludesProgram Include="@(Compile)" Condition="'%(Filename)%(Extension)' == 'Program.cs'" />
+		</ItemGroup>
+
+		<PropertyGroup Condition="'@(IncludesProgram)' != ''">
+			<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+		</PropertyGroup>
+	</Target>
+
 	<PropertyGroup Condition="!$(Configuration.StartsWith('Debug'))">
 		<DebugType>none</DebugType>
 	</PropertyGroup>
