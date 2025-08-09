@@ -27,7 +27,7 @@
 		<DefineConstants>PACKAGED_APP</DefineConstants>
 	</PropertyGroup>
 
-	<Target Name="CheckForPorgam" BeforeTargets="BeforeBuild">
+	<Target Name="CheckForProgram" BeforeTargets="BeforeBuild">
 		<ItemGroup>
 			<IncludesProgram Include="@(Compile)" Condition="'%(Filename)%(Extension)' == 'Program.cs'" />
 		</ItemGroup>
