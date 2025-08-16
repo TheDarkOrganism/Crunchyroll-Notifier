@@ -42,6 +42,8 @@
 					{
 						break;
 					}
+
+					index++;
 				} while (arraySection.Exists());
 
 				return altFallbackValue;
