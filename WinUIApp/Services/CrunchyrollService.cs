@@ -4,51 +4,18 @@ using System.Xml.XPath;
 
 namespace WinUIApp.Services
 {
-	internal sealed partial class CrunchyrollService(ISavableJsonOptions<IConfigModel> configOptions, ISavableJsonOptions<ILastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger) : IHostedService
+	internal sealed partial class CrunchyrollService(ISavableJsonOptions<IConfigModel> configOptions, ISavableJsonOptions<ILastUpdateModel> lastOptions, IHttpClientFactory httpClientFactory, NotificationHelper notificationHelper, ILogger<CrunchyrollService> logger, ILogger<FeedSource> feedSourceLogger) : IHostedService
 	{
 		private static readonly XmlReaderSettings _xmlReaderSettings = new()
 		{
 			DtdProcessing = DtdProcessing.Ignore
 		};
 
-		private static readonly Dictionary<FeedHostType, string> _feedSources = new()
+		private readonly Dictionary<FeedHostType, FeedSource> _feedSources = new()
 		{
-			{ FeedHostType.Crunchyroll, "http://www.crunchyroll.com/rss/anime" },
-			{ FeedHostType.FeedBurner, "http://feeds.feedburner.com/crunchyroll/rss/anime" }
+			{ FeedHostType.Crunchyroll, new("https://www.crunchyroll.com/rss/anime", feedSourceLogger) },
+			{ FeedHostType.FeedBurner, new("https://feeds.feedburner.com/crunchyroll/rss/anime", feedSourceLogger) }
 		};
-
-		private bool ValidateResponse([NotNullWhen(true)] HttpResponseMessage? httpResponseMessage)
-		{
-			if (httpResponseMessage is null || !httpResponseMessage.IsSuccessStatusCode)
-			{
-				return false;
-			}
-
-			if (httpResponseMessage.RequestMessage?.RequestUri is not Uri uri)
-			{
-				logger.LogDebug("The {RequestMessage}.{UriName} was null.", nameof(HttpRequestMessage), nameof(HttpRequestMessage.RequestUri));
-
-				return false;
-			}
-
-			string? contentType = httpResponseMessage.Content.Headers.ContentType?.MediaType;
-
-			if (string.IsNullOrWhiteSpace(contentType))
-			{
-				logger.LogError("The Content-Type was null or empty for request to {Uri}.", uri);
-
-				return false;
-			}
-
-			if (contentType is "text/xml" or "application/xml+rss")
-			{
-				return true;
-			}
-
-			logger.LogWarning("The Content-Type for the {Uri} was an invalid {ContentType}.", uri, contentType);
-
-			return false;
-		}
 
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
 		{
@@ -86,6 +53,8 @@ namespace WinUIApp.Services
 
 				do
 				{
+					FeedSource? source = null;
+
 					HttpResponseMessage? httpResponse = null;
 
 					try
@@ -94,30 +63,35 @@ namespace WinUIApp.Services
 
 						using HttpClient httpClient = httpClientFactory.CreateClient();
 
-						foreach ((FeedHostType feedHost, string source) in _feedSources.OrderBy(pair => pair.Key != configModel.FeedHost))
+						foreach (KeyValuePair<FeedHostType, FeedSource> pair in _feedSources.OrderBy(pair => pair.Key != configModel.FeedHost))
 						{
-							try
-							{
-								httpResponse = await httpClient.GetAsync(source, cancellationToken);
+							source = pair.Value;
 
-								if (ValidateResponse(httpResponse))
+							if (source.GetSource() is Uri uri)
+							{
+								try
 								{
-									break;
+									httpResponse = await httpClient.GetAsync(uri, cancellationToken);
+
+									if (source.ValidateResponse(httpResponse))
+									{
+										break;
+									}
+									else
+									{
+										continue;
+									}
 								}
-								else
+								catch (HttpRequestException ex)
 								{
+									logger.LogDebug(ex, "Unable to load the feed for {HostType}.", pair.Key);
+
 									continue;
 								}
 							}
-							catch (HttpRequestException ex)
-							{
-								logger.LogDebug(ex, "Unable to load the feed for {HostType}.", feedHost);
-
-								continue;
-							}
 						}
 
-						if (!ValidateResponse(httpResponse))
+						if (source is null || !source.ValidateResponse(httpResponse))
 						{
 							logger.LogWarning("Unable to load the any RSS feeds.");
 
