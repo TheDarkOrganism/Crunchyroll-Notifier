@@ -28,19 +28,16 @@ namespace WinUIApp
 		private static async ValueTask AskForInput<TModel>(ListView target, UserActionType userAction, string name, int maxlength)
 			where TModel : notnull, TextInputModelBase<TModel>, new()
 		{
-			TextInputDialog textInputDialog = new(userAction, name, maxlength, new TModel())
+			TModel model = new();
+
+			TextInputDialog textInputDialog = new(userAction, name, maxlength, model)
 			{
 				XamlRoot = target.XamlRoot
 			};
 
-			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && target.ItemsSource is IList<string> values)
+			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && target.ItemsSource is IList<string> values && !model.HasErrors)
 			{
 				string text = textInputDialog.Text;
-
-				if (string.IsNullOrWhiteSpace(text))
-				{
-					return;
-				}
 
 				switch (userAction)
 				{
