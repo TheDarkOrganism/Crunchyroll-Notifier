@@ -19,7 +19,7 @@ namespace WinUIApp.Services
 
 		private static bool CheckValue(string? value, ObservableCollection<string> values)
 		{
-			return string.IsNullOrWhiteSpace(value) || values.Count == 0 || values.Contains(value, StringComparer.CurrentCultureIgnoreCase);
+			return values.Count == 0 || values.Contains(value, StringComparer.CurrentCultureIgnoreCase);
 		}
 
 		[GeneratedRegex("\\(([A-Za-z\\-]+) Dub\\)")]
