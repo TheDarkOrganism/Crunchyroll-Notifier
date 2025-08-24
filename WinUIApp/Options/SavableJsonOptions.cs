@@ -9,6 +9,7 @@
 
 		private readonly IFileModel<TIOptions> _fileModel;
 		private readonly string _file;
+		private readonly Lock _lock;
 		private readonly IFileProvider _fileProvider;
 		private readonly IOptions<TIOptions> _options;
 		private readonly IConfigurationRoot _configurationRoot;
@@ -23,6 +24,7 @@
 
 			_fileModel = fileModel;
 			_file = fileModel.File;
+			_lock = fileModel.Lock;
 			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
 			_options = options;
 			_configurationRoot = (IConfigurationRoot)context.Configuration;
@@ -68,7 +70,7 @@
 
 		public void Save()
 		{
-			lock (_fileModel.Lock)
+			lock (_lock)
 			{
 				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 				{
@@ -94,7 +96,7 @@
 
 		public async Task SaveAsync()
 		{
-			using Lock.Scope scope = _fileModel.Lock.EnterScope();
+			_lock.Enter();
 
 			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 			{
