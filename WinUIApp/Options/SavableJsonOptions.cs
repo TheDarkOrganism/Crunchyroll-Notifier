@@ -76,8 +76,6 @@
 					{
 						JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
 
-						fileStream.Dispose();
-
 						HandleReload();
 
 						Value.MarkUnmodified();
@@ -85,7 +83,9 @@
 					catch (Exception ex)
 					{
 						_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
-
+					}
+					finally
+					{
 						fileStream.Dispose();
 					}
 				}
@@ -94,13 +94,13 @@
 
 		public async Task SaveAsync()
 		{
+			using Lock.Scope scope = _fileModel.Lock.EnterScope();
+
 			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 			{
 				try
 				{
 					await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext);
-
-					await fileStream.DisposeAsync();
 
 					HandleReload();
 
@@ -109,7 +109,9 @@
 				catch (Exception ex)
 				{
 					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
-
+				}
+				finally
+				{
 					await fileStream.DisposeAsync();
 				}
 			}
