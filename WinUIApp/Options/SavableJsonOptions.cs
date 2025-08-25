@@ -10,7 +10,7 @@
 		private readonly IFileModel<TIOptions> _fileModel;
 		private readonly string _file;
 		private readonly Lock _lock;
-		private readonly IFileProvider _fileProvider;
+		private readonly IHostEnvironment _environment;
 		private readonly IOptions<TIOptions> _options;
 		private readonly IConfigurationRoot _configurationRoot;
 		private readonly ILogger<SavableJsonOptions<TIOptions>> _logger;
@@ -25,7 +25,7 @@
 			_fileModel = fileModel;
 			_file = fileModel.File;
 			_lock = fileModel.Lock;
-			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
+			_environment = context.HostingEnvironment;
 			_options = options;
 			_configurationRoot = (IConfigurationRoot)context.Configuration;
 			_logger = logger;
@@ -37,9 +37,9 @@
 		{
 			try
 			{
-				IFileInfo fileInfo = _fileProvider.GetFileInfo(_file);
+				IFileInfo fileInfo = _environment.ContentRootFileProvider.GetFileInfo(_file);
 
-				fileStream = File.Create(fileInfo.PhysicalPath ?? fileInfo.Name);
+				fileStream = File.Create(fileInfo.PhysicalPath ?? Path.Combine(_environment.ContentRootPath, fileInfo.Name));
 
 				return true;
 			}
