@@ -5,6 +5,6 @@
 	{
 		void Save();
 
-		Task SaveAsync();
+		Task SaveAsync(CancellationToken cancellationToken);
 	}
 }

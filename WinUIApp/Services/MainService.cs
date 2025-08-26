@@ -10,7 +10,7 @@
 			{
 				configModel.ShowFirstRun = false;
 
-				await configOptions.SaveAsync();
+				await configOptions.SaveAsync(cancellationToken);
 
 				notificationHelper.Notify("Welcome", "You can find the settings under the system tray and by clicking on the icon.");
 			}

@@ -151,28 +151,28 @@
 
 			if (fileInfo.Exists)
 			{
-				lock (_fileModel.Lock)
+				try
 				{
-					using Stream stream = fileInfo.CreateReadStream();
-
-					try
+					_fileModel.Wait(() =>
 					{
+						using Stream stream = fileInfo.CreateReadStream();
+
 						using JsonDocument jsonDocument = JsonDocument.Parse(stream);
 
 						ParseValue(jsonDocument.RootElement, null);
-					}
-					catch (JsonException ex)
-					{
-						_logger.LogWarning(ex, "Failed to read json from {File}.", file);
+					}, _logger);
+				}
+				catch (JsonException ex)
+				{
+					_logger.LogWarning(ex, "Failed to read json from {File}.", file);
 
-						ResourceHelper.RestoreFile(_fileModel);
-					}
-					catch (Exception ex)
-					{
-						_logger.LogCritical(ex, "Unable to read {File}.", file);
+					ResourceHelper.RestoreFile(_fileModel, _logger);
+				}
+				catch (Exception ex)
+				{
+					_logger.LogCritical(ex, "Unable to read {File}.", file);
 
-						Environment.Exit(13);
-					}
+					Environment.Exit(13);
 				}
 			}
 		}

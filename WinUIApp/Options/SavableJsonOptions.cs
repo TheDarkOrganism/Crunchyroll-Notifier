@@ -1,4 +1,6 @@
-﻿namespace WinUIApp.Options
+﻿using System.Threading;
+
+namespace WinUIApp.Options
 {
 	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions> : ISavableJsonOptions<TIOptions>
 		where TIOptions : class, IModelBase
@@ -9,7 +11,6 @@
 
 		private readonly IFileModel<TIOptions> _fileModel;
 		private readonly string _file;
-		private readonly Lock _lock;
 		private readonly IHostEnvironment _environment;
 		private readonly IOptions<TIOptions> _options;
 		private readonly IConfigurationRoot _configurationRoot;
@@ -24,7 +25,6 @@
 
 			_fileModel = fileModel;
 			_file = fileModel.File;
-			_lock = fileModel.Lock;
 			_environment = context.HostingEnvironment;
 			_options = options;
 			_configurationRoot = (IConfigurationRoot)context.Configuration;
@@ -70,7 +70,7 @@
 
 		public void Save()
 		{
-			lock (_lock)
+			_fileModel.Wait(() =>
 			{
 				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 				{
@@ -91,32 +91,33 @@
 						fileStream.Dispose();
 					}
 				}
-			}
+			}, _logger);
 		}
 
-		public async Task SaveAsync()
+		public async Task SaveAsync(CancellationToken cancellationToken)
 		{
-			_lock.Enter();
-
-			if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
+			await _fileModel.WaitAsync(async token =>
 			{
-				try
+				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
 				{
-					await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext);
+					try
+					{
+						await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext, token);
 
-					HandleReload();
+						HandleReload();
 
-					Value.MarkUnmodified();
+						Value.MarkUnmodified();
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
+					}
+					finally
+					{
+						await fileStream.DisposeAsync();
+					}
 				}
-				catch (Exception ex)
-				{
-					_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
-				}
-				finally
-				{
-					await fileStream.DisposeAsync();
-				}
-			}
+			}, _logger, cancellationToken);
 		}
 	}
 }

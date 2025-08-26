@@ -137,7 +137,7 @@ namespace WinUIApp.Services
 
 						if (lastUpdateModel.LastUpdate != copy)
 						{
-							await lastOptions.SaveAsync();
+							await lastOptions.SaveAsync(cancellationToken);
 						}
 
 						#endregion
@@ -171,7 +171,7 @@ namespace WinUIApp.Services
 
 		public async Task StopAsync(CancellationToken cancellationToken)
 		{
-			await lastOptions.SaveAsync();
+			await lastOptions.SaveAsync(cancellationToken);
 		}
 	}
 }
