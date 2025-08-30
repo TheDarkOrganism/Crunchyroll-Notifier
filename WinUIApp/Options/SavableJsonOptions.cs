@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace WinUIApp.Options
+﻿namespace WinUIApp.Options
 {
 	internal sealed partial class SavableJsonOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions> : ISavableJsonOptions<TIOptions>
 		where TIOptions : class, IModelBase
