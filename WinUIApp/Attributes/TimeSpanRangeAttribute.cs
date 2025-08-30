@@ -1,12 +1,11 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace WinUIApp.Attributes
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 	internal sealed class TimeSpanRangeAttribute : ValidationAttribute
 	{
-		private const bool _defaultDayLock = false;
-
 		private readonly string _mininumMessage;
 
 		private readonly string _maxinumMessage;
@@ -15,16 +14,12 @@ namespace WinUIApp.Attributes
 
 		public TimeSpan Maxinum { get; }
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes, int minSeconds, int maxSeconds, bool dayLock = _defaultDayLock)
+		public TimeSpanRangeAttribute(int minDays = 0, int maxDays = int.MaxValue, int minHours = 0, int maxHours = 24, int minMinutes = 0, int maxMinutes = 60, int minSeconds = 0, int maxSeconds = 60, bool dayLock = false)
 		{
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(minDays, maxDays, nameof(minDays));
-			ArgumentOutOfRangeException.ThrowIfLessThan(maxDays, minDays, nameof(maxDays));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(minHours, maxHours, nameof(minHours));
-			ArgumentOutOfRangeException.ThrowIfLessThan(maxHours, minHours, nameof(maxHours));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(minMinutes, maxMinutes, nameof(minMinutes));
-			ArgumentOutOfRangeException.ThrowIfLessThan(maxMinutes, minMinutes, nameof(maxMinutes));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(minSeconds, maxSeconds, nameof(minSeconds));
-			ArgumentOutOfRangeException.ThrowIfLessThan(maxSeconds, minSeconds, nameof(maxSeconds));
+			ValidateParams(minDays, maxDays, int.MaxValue);
+			ValidateParams(minHours, maxHours, 24);
+			ValidateParams(minMinutes, maxMinutes, 60);
+			ValidateParams(minSeconds, maxSeconds, 60);
 
 			Mininum = new(minDays, minHours, minMinutes, minSeconds);
 			Maxinum = new(maxDays, maxHours, maxMinutes, maxSeconds);
@@ -38,11 +33,24 @@ namespace WinUIApp.Attributes
 			_maxinumMessage = Format(Maxinum);
 		}
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, int minMinutes, int maxMinutes, bool dayLock = _defaultDayLock) : this(minDays, maxDays, minHours, maxHours, minMinutes, maxMinutes, 0, 0, dayLock) { }
+		private static void ValidateParam(int value, int limit, string paramName)
+		{
+			ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limit, nameof(limit));
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays, int minHours, int maxHours, bool dayLock = _defaultDayLock) : this(minDays, maxDays, minHours, maxHours, 0, 0, dayLock) { }
+			ArgumentOutOfRangeException.ThrowIfGreaterThan(value, limit, paramName);
+			ArgumentOutOfRangeException.ThrowIfLessThan(value, -limit, paramName);
+		}
 
-		public TimeSpanRangeAttribute(int minDays, int maxDays) : this(minDays, maxDays, 0, 0, false) { }
+		private static void ValidateParams(int min, int max, int limit, [CallerArgumentExpression(nameof(min))] string? minParamName = null, [CallerArgumentExpression(nameof(max))] string? maxParamName = null)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(minParamName, nameof(minParamName));
+			ArgumentException.ThrowIfNullOrWhiteSpace(maxParamName, nameof(maxParamName));
+
+			ArgumentOutOfRangeException.ThrowIfGreaterThan(min, max, minParamName);
+			ValidateParam(min, limit, minParamName);
+			ArgumentOutOfRangeException.ThrowIfLessThan(max, min, maxParamName);
+			ValidateParam(max, limit, maxParamName);
+		}
 
 		public override bool IsValid(object? value)
 		{
@@ -88,7 +96,7 @@ namespace WinUIApp.Attributes
 				stringBuilder = stringBuilder.AppendFormat(format, seconds, "second", GetFormatEnd(seconds));
 			}
 
-			return stringBuilder.ToString().Trim();
+			return stringBuilder.ToString().TrimEnd();
 		}
 
 		public override string FormatErrorMessage(string name)

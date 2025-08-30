@@ -9,7 +9,7 @@ namespace WinUIApp.Models
 		private const int _minSeconds = 10;
 
 		[JsonRequired]
-		[TimeSpanRange(0, 1, 0, 0, 0, 0, _minSeconds, 60, dayLock: true)]
+		[TimeSpanRange(maxDays: 1, minSeconds: _minSeconds, dayLock: true)]
 		public TimeSpan Interval
 		{
 			get => ContainsErrors() ? TimeSpan.FromSeconds(_minSeconds) : _interval;
