@@ -37,7 +37,7 @@ namespace WinUIApp
 
 			if (await textInputDialog.ShowAsync(ContentDialogPlacement.InPlace) == ContentDialogResult.Primary && target.ItemsSource is IList<string> values && !model.HasErrors)
 			{
-				string text = textInputDialog.Text;
+				string text = model.Text;
 
 				switch (userAction)
 				{

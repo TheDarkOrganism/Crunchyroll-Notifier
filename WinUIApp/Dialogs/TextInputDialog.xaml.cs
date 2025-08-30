@@ -4,8 +4,6 @@
 	{
 		private readonly ITextInputModelBase _textInputModel;
 
-		public string Text => _textInputModel.Text;
-
 		public TextInputDialog(UserActionType userAction, string name, int maxLength, ITextInputModelBase textInputModel)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
