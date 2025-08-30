@@ -3,7 +3,6 @@
 	x:Class="WinUIApp.App"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:WinUIApp"
 	xmlns:tray="using:H.NotifyIcon">
 	<Application.Resources>
 		<ResourceDictionary>
@@ -12,17 +11,9 @@
 			</ResourceDictionary.MergedDictionaries>
 
 			<ResourceDictionary x:Key="Tray">
-				<XamlUICommand x:Key="Settings" Label="Settings" Description="Opens the settings.">
-					<XamlUICommand.IconSource>
-						<SymbolIconSource Symbol="Setting" />
-					</XamlUICommand.IconSource>
-				</XamlUICommand>
+				<XamlUICommand x:Key="Settings" Label="Settings" Description="Opens the settings." />
 
-				<XamlUICommand x:Key="Exit" Label="Exit" Description="Closes the application.">
-					<XamlUICommand.IconSource>
-						<SymbolIconSource Symbol="Stop" />
-					</XamlUICommand.IconSource>
-				</XamlUICommand>
+				<XamlUICommand x:Key="Exit" Label="Exit" Description="Closes the application." />
 
 				<tray:TaskbarIcon x:Key="TrayIcon" LeftClickCommand="{StaticResource Settings}" IconSource="/Crunchyroll-Notifier.ico">
 					<tray:TaskbarIcon.ContextFlyout>

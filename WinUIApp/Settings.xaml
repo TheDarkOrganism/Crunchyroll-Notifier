@@ -3,7 +3,6 @@
 	x:Class="WinUIApp.Settings"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:local="using:WinUIApp"
 	xmlns:controls="using:WinUIApp.Controls"
 	xmlns:models="using:WinUIApp.Models"
 	xmlns:markup="using:WinUIApp.Markup"
