@@ -8,7 +8,12 @@ namespace WinUIApp.Services
 	{
 		private static readonly XmlReaderSettings _xmlReaderSettings = new()
 		{
-			DtdProcessing = DtdProcessing.Ignore
+			Async = true,
+			CloseInput = true,
+			ConformanceLevel = ConformanceLevel.Document,
+			DtdProcessing = DtdProcessing.Ignore,
+			IgnoreComments = true,
+			IgnoreWhitespace = true
 		};
 
 		private readonly Dictionary<FeedHostType, FeedSource> _feedSources = new()
@@ -141,6 +146,10 @@ namespace WinUIApp.Services
 						}
 
 						#endregion
+					}
+					catch (XmlException ex)
+					{
+						logger.LogError(ex, "The RSS feed is not valid XML.");
 					}
 					catch (Exception ex)
 					{
