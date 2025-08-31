@@ -14,7 +14,7 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
 
-		<AssemblyName>CrunchyrollNotifier</AssemblyName>
+		<AssemblyName>Crunchyroll Notifier</AssemblyName>
 		<AssemblyVersion>1.1.1</AssemblyVersion>
 		<Version>$(AssemblyVersion)</Version>
 		<Authors>Richard Whicker</Authors>
