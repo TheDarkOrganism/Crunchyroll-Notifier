@@ -2,6 +2,8 @@
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
@@ -42,6 +44,23 @@
 				<uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
 				<uap:SplashScreen Image="Assets\SplashScreen.png" />
 			</uap:VisualElements>
+			<Extensions>
+				<desktop:Extension Category="windows.toastNotificationActivation">
+					<desktop:ToastNotificationActivation ToastActivatorCLSID="846B87DA-E740-426A-8244-0B2FCF161A25" />
+				</desktop:Extension>
+
+				<com:Extension Category="windows.comServer">
+					<com:ComServer>
+						<com:ExeServer Executable="Crunchyroll Notifier.exe" DisplayName="Crunchyroll Notifier" Arguments="----AppNotificationActivated:">
+							<com:Class Id="846B87DA-E740-426A-8244-0B2FCF161A25" />
+						</com:ExeServer>
+					</com:ComServer>
+				</com:Extension>
+			</Extensions>
 		</Application>
 	</Applications>
+
+	<Capabilities>
+		<rescap:Capability Name="runFullTrust"/>
+	</Capabilities>
 </Package>
