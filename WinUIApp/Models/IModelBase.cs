@@ -6,6 +6,8 @@
 
 		bool ReloadConfiguration { get; }
 
+		void MarkReloaded();
+
 		void MarkUnmodified();
 	}
 }

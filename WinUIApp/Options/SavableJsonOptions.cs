@@ -63,11 +63,15 @@
 			if (Value.ReloadConfiguration)
 			{
 				_configurationRoot.Reload();
+
+				Value.MarkReloaded();
 			}
 		}
 
 		public void Save()
 		{
+			bool saved = false;
+
 			_fileModel.Wait(() =>
 			{
 				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
@@ -76,9 +80,9 @@
 					{
 						JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
 
-						HandleReload();
-
 						Value.MarkUnmodified();
+
+						saved = true;
 					}
 					catch (Exception ex)
 					{
@@ -90,10 +94,17 @@
 					}
 				}
 			}, _logger);
+
+			if (saved)
+			{
+				HandleReload();
+			}
 		}
 
 		public async Task SaveAsync(CancellationToken cancellationToken)
 		{
+			bool saved = false;
+
 			await _fileModel.WaitAsync(async token =>
 			{
 				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
@@ -102,9 +113,9 @@
 					{
 						await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext, token);
 
-						HandleReload();
-
 						Value.MarkUnmodified();
+
+						saved = true;
 					}
 					catch (Exception ex)
 					{
@@ -116,6 +127,11 @@
 					}
 				}
 			}, _logger, cancellationToken);
+
+			if (saved)
+			{
+				HandleReload();
+			}
 		}
 	}
 }

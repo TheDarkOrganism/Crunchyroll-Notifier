@@ -14,10 +14,14 @@
 			ReloadConfiguration = reloadConfiguration;
 		}
 
+		public void MarkReloaded()
+		{
+			ReloadConfiguration = false;
+		}
+
 		public void MarkUnmodified()
 		{
 			Modified = false;
-			ReloadConfiguration = false;
 		}
 	}
 }
