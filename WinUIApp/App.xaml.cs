@@ -1,5 +1,7 @@
 ﻿using H.NotifyIcon;
 using Microsoft.UI.Xaml.Input;
+using Serilog;
+using Serilog.Events;
 using WinUIApp.Providers;
 using WinUIApp.Services;
 #if PACKAGED_APP
@@ -36,8 +38,11 @@ namespace WinUIApp
 				.ConfigureSavableJson(lastUpdateFileModel)
 				.AddResourceRecovery<IConfigModel>()
 				.AddResourceRecovery<ILastUpdateModel>()
-				.ConfigureLogging(LoggingHelper.ConfigureLogging)
-				.Build();
+				.UseSerilog(static (context, config) => config.MinimumLevel.Verbose()
+					.Enrich.FromLogContext()
+					.WriteTo.Debug()
+					.WriteTo.Async(a => a.Conditional(_ => bool.TryParse(context.Configuration.GetSection("Config").GetSection("useLogging").Value, out bool result) && result, configureSync => configureSync.File(Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs", "Log-.txt"), LogEventLevel.Information, shared: true, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)))
+				).Build();
 
 			InitializeComponent();
 		}

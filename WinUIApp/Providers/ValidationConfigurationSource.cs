@@ -1,4 +1,7 @@
-﻿namespace WinUIApp.Providers
+﻿using Serilog;
+using Serilog.Extensions.Logging;
+
+namespace WinUIApp.Providers
 {
 	internal sealed class ValidationConfigurationSource<TModel, TIModel> : IConfigurationSource
 		where TModel : ModelBase, TIModel
@@ -15,7 +18,7 @@
 			_fileModel = fileModel;
 			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
 
-			using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => LoggingHelper.ConfigureLogging(context, builder));
+			using SerilogLoggerFactory loggerFactory = new(Log.Logger);
 
 			_logger = loggerFactory.CreateLogger<ValidationConfigurationProvider<TModel, TIModel>>();
 		}

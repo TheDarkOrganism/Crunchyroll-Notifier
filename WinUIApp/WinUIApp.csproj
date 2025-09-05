@@ -72,7 +72,6 @@
 		<Using Include="System.Text.Json.Serialization.Metadata" />
 		<Using Include="WinUIApp.Attributes" />
 		<Using Include="WinUIApp.Enums" />
-		<Using Include="WinUIApp.Logging" />
 		<Using Include="WinUIApp.Models" />
 		<Using Include="WinUIApp.Options" />
 		<Using Include="WinUIApp.Validation" />
@@ -108,6 +107,10 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Config.json">
