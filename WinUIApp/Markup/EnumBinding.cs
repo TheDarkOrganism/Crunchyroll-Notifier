@@ -7,9 +7,13 @@ namespace WinUIApp.Markup
 		[AllowNull]
 		public Type EnumType { get; set; }
 
+		public int Skip { get; set; }
+
 		protected override object ProvideValue()
 		{
-			return Enum.GetValues(EnumType).OfType<Enum>();
+			IEnumerable<Enum> enums = Enum.GetValues(EnumType).OfType<Enum>();
+
+			return Skip == 0 ? enums : (Skip > 0 ? enums.Skip(Skip) : enums.SkipLast(Math.Abs(Skip)));
 		}
 	}
 }
