@@ -81,7 +81,7 @@
 			}
 		}
 
-		public static IHostBuilder ConfigureSavableJson<TOptions, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions>(this IHostBuilder hostBuilder, FileModel<TOptions, TIOptions> fileModel)
+		public static IHostBuilder ConfigureSavableJson<TOptions, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TIOptions>(this IHostBuilder hostBuilder, FileModel<TOptions, TIOptions> fileModel)
 			where TOptions : notnull, ModelBase, TIOptions, new()
 			where TIOptions : class, IModelBase
 		{
