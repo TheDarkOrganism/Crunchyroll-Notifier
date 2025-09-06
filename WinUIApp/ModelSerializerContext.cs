@@ -29,5 +29,10 @@
 				return _writing;
 			}
 		}
+
+		public string GetJsonName(string name)
+		{
+			return Options.PropertyNamingPolicy?.ConvertName(name) ?? name;
+		}
 	}
 }
