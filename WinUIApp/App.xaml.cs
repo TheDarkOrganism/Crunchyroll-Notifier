@@ -1,7 +1,6 @@
 ﻿using H.NotifyIcon;
 using Microsoft.UI.Xaml.Input;
 using Serilog;
-using Serilog.Events;
 using WinUIApp.Providers;
 using WinUIApp.Services;
 #if PACKAGED_APP
@@ -38,11 +37,23 @@ namespace WinUIApp
 				.ConfigureSavableJson(lastUpdateFileModel)
 				.AddResourceRecovery<IConfigModel>()
 				.AddResourceRecovery<ILastUpdateModel>()
-				.UseSerilog(static (context, config) => config.MinimumLevel.Verbose()
-					.Enrich.FromLogContext()
-					.WriteTo.Debug()
-					.WriteTo.Async(a => a.Conditional(_ => bool.TryParse(context.Configuration.GetSection("Config").GetSection("useLogging").Value, out bool result) && result, configureSync => configureSync.File(Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs", "Log-.txt"), LogEventLevel.Information, shared: true, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)))
-				).Build();
+				.UseSerilog((context, provider, config) => config.MinimumLevel.Verbose()
+						.Enrich.FromLogContext()
+						.WriteTo.Debug()
+						.WriteTo.Async(configure =>
+						{
+							ModelSerializerContext serializerContext = ModelSerializerContext.Default;
+
+							IConfigurationSection section = context.Configuration.GetSection(configFileModel.ConfigurationSection);
+
+							IConfigurationSection loggingSection = section.GetSection(serializerContext.GetJsonName(nameof(ConfigModel.UseLogging)));
+
+							IConfigurationSection logLevelSection = section.GetSection(serializerContext.GetJsonName(nameof(ConfigModel.LogLevel)));
+
+							_ = configure.Conditional(log => Enum.TryParse(logLevelSection.Value, out LogEventLevel logLevel) && log.Level >= logLevel && bool.TryParse(loggingSection.Value, out bool useLogging) && useLogging, configureSync => configureSync.File(Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs", "Log-.txt"), shared: true, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7));
+						})
+				)
+				.Build();
 
 			InitializeComponent();
 		}
