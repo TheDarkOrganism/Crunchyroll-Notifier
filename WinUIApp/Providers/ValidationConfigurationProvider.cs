@@ -49,6 +49,13 @@
 			return value is not null;
 		}
 
+		private static bool TryParseEnum(JsonElement jsonElement, EnumDataTypeAttribute enumDataTypeAttribute, [NotNullWhen(true)] out object? enumValue)
+		{
+			enumValue = null;
+
+			return TryParse(jsonElement, out string? stringValue) && enumDataTypeAttribute.IsValid(stringValue) && Enum.TryParse(enumDataTypeAttribute.EnumType, stringValue, true, out enumValue);
+		}
+
 		private void ParseValue(JsonElement jsonElement, string? key)
 		{
 			switch (jsonElement.ValueKind)
@@ -70,21 +77,39 @@
 						{
 							foreach (ValidationAttribute attribute in attributes)
 							{
+								object? enumValue;
+
 								switch (attribute)
 								{
-									case EnumDataTypeAttribute enumDataTypeAttribute:
-										if (!TryParse(value, out string? stringValue) || !enumDataTypeAttribute.IsValid(stringValue))
-										{
-											Type enumType = enumDataTypeAttribute.EnumType;
+									case AllowedValuesAttribute allowedValuesAttribute:
+										object?[] values = allowedValuesAttribute.Values;
 
-											if (Enum.TryParse(enumType, stringValue, true, out object? result))
-											{
-												WriteValue(subKey, result);
-											}
-											else
-											{
-												Set(subKey, Enum.GetNames(enumType)[0]);
-											}
+										if (values.Length == 0)
+										{
+											continue;
+										}
+
+										if (attributes.OfType<EnumDataTypeAttribute>().FirstOrDefault() is EnumDataTypeAttribute enumDataType && TryParseEnum(value, enumDataType, out enumValue) && allowedValuesAttribute.IsValid(enumValue))
+										{
+											continue;
+										}
+
+										if (TryParse(value, out object? objectValue) && allowedValuesAttribute.IsValid(objectValue))
+										{
+											continue;
+										}
+
+										WriteValue(subKey, values[0]);
+										
+										break;
+									case EnumDataTypeAttribute enumDataTypeAttribute:
+										if (TryParseEnum(value, enumDataTypeAttribute, out enumValue))
+										{
+											WriteValue(subKey, enumValue);
+										}
+										else
+										{
+											Set(subKey, Enum.GetNames(enumDataTypeAttribute.EnumType)[0]);
 										}
 										break;
 									case RangeAttribute rangeAttribute:
@@ -101,7 +126,7 @@
 										}
 										break;
 									case TimeSpanRangeAttribute timeSpanRangeAttribute:
-										if (TryParse(value, out stringValue) && TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
+										if (TryParse(value, out string? stringValue) && TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
 										{
 											WriteValue(subKey, timeSpan.Clamp(timeSpanRangeAttribute.Mininum, timeSpanRangeAttribute.Maxinum));
 										}
