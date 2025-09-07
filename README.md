@@ -51,6 +51,14 @@ or [Recently Added Anime Videos (FeedBurner)](http://feeds.feedburner.com/crunch
 
 <br>
 
+**logLevel**: The level of logging to use (Only used if useLogging is true).<br>
+**Type**: [LogEventLevel](https://github.com/serilog/serilog/blob/dev/src/Serilog/Events/LogEventLevel.cs)<br>
+**Values**: Information, information, Warning, warning, Error, error, Fatal, fatal<br>
+**Default**: Information<br>
+**Required**: No<br>
+
+<br>
+
 **visibility**: The visibility of an episode on the website.<br>
 **Type**: [VisibilityType](https://github.com/TheDarkOrganism/Crunchyroll-Notifier/blob/WinUIPort/WinUIApp/Enums/VisibilityType.cs)<br>
 **Values**: Default, default, Free, free, Premium, premium<br>

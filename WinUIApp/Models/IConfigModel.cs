@@ -14,6 +14,8 @@
 
 		bool UseLogging { get; set; }
 
+		LogEventLevel LogLevel { get; set; }
+
 		ObservableCollection<string> Dubs { get; }
 
 		ObservableCollection<string> Names { get; }

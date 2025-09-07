@@ -111,6 +111,25 @@ namespace WinUIApp.Models
 			}
 		}
 
+		private LogEventLevel _logLevel = LogEventLevel.Information;
+
+		[JsonRequired]
+		[EnumDataType(typeof(LogEventLevel))]
+		[AllowedValues(LogEventLevel.Information, LogEventLevel.Warning, LogEventLevel.Error, LogEventLevel.Fatal)]
+		public LogEventLevel LogLevel
+		{
+			get => _logLevel;
+			set
+			{
+				if (_logLevel != value)
+				{
+					_logLevel = value;
+
+					OnPropertyChanged(value, true);
+				}
+			}
+		}
+
 		[Language]
 		[NotEmpty]
 		public ObservableCollection<string> Dubs { get; } = [];
@@ -138,6 +157,7 @@ namespace WinUIApp.Models
 			ValidateProperty(MaxNotifications);
 			ValidateProperty(Visibility);
 			ValidateProperty(FeedHost);
+			ValidateProperty(LogLevel);
 
 			Dubs.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Dubs));
 			Names.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Names));
