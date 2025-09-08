@@ -13,7 +13,7 @@ namespace WinUIApp
 
 			InitializeComponent();
 
-			AppWindow.SetIcon("HiDive-Notifier.ico");
+			AppWindow.SetIcon("Crunchyroll-Notifier.ico");
 			AppWindow.Resize(new(463, AppWindow.Size.Height));
 
 #if !DEBUG
