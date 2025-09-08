@@ -11,9 +11,7 @@ namespace WinUIApp.Markup
 
 		protected override object ProvideValue()
 		{
-			IEnumerable<Enum> enums = Enum.GetValues(EnumType).OfType<Enum>();
-
-			return Skip == 0 ? enums : (Skip > 0 ? enums.Skip(Skip) : enums.SkipLast(Math.Abs(Skip)));
+			return Enum.GetValues(EnumType).OfType<Enum>().DynamicSkip(Skip);
 		}
 	}
 }

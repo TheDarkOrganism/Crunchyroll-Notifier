@@ -4,7 +4,19 @@
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			return value is Enum result ? Enum.GetValues(result.GetType()).OfType<Enum>().ToList().IndexOf(result) : -1;
+			if (value is not Enum result)
+			{
+				return -1;
+			}
+
+			IEnumerable<Enum> enumValues = Enum.GetValues(result.GetType()).OfType<Enum>();
+
+			if (int.TryParse(parameter as string, out int skip))
+			{
+				enumValues = enumValues.DynamicSkip(skip);
+			}
+
+			return enumValues.ToList().IndexOf(result);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)
