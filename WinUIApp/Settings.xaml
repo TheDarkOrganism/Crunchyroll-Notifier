@@ -3,6 +3,7 @@
 	x:Class="WinUIApp.Settings"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:serilog="using:Serilog.Events"
 	xmlns:controls="using:WinUIApp.Controls"
 	xmlns:models="using:WinUIApp.Models"
 	xmlns:markup="using:WinUIApp.Markup"
@@ -82,6 +83,8 @@
 					<markup:EnumToIndexConverter x:Key="EnumIndexConverter" />
 
 					<markup:AddSpacesConverter x:Key="AddSpacesConverter" />
+
+					<markup:BoolConverter x:Key="BoolConverter" />
 
 				</ResourceDictionary>
 
@@ -177,16 +180,30 @@
 			<TextBlock Text="Use Logging" Grid.Row="6" Style="{StaticResource LabelStyle}" />
 
 			<StackPanel Grid.Row="6" Style="{StaticResource CheckBoxContainerStyle}">
-				<CheckBox IsChecked="{Binding UseLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CheckBoxStyle}" />
+				<CheckBox x:Name="LoggingCheckBox" IsChecked="{Binding UseLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CheckBoxStyle}" />
 			</StackPanel>
+
+			<!--#endregion-->
+			
+			<!--#endregion Log Level -->
+
+			<TextBlock Text="Log Level" Grid.Row="7" Style="{StaticResource LabelStyle}" />
+
+			<ComboBox Grid.Row="7" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=serilog:LogEventLevel, Skip=2}, Mode=OneTime}" SelectedItem="{Binding LogLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding LogLevel, Converter={StaticResource EnumIndexConverter}, ConverterParameter=2, Mode=OneTime}" Style="{StaticResource DropdownStyle}" IsEnabled="{Binding ElementName=LoggingCheckBox, Path=IsChecked, Converter={StaticResource BoolConverter}, Mode=OneWay}" Loaded="Control_Loaded">
+				<ComboBox.ItemTemplate>
+					<DataTemplate x:DataType="serilog:LogEventLevel">
+						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />
+					</DataTemplate>
+				</ComboBox.ItemTemplate>
+			</ComboBox>
 
 			<!--#endregion-->
 			
 			<!--#region Dubs -->
 
-			<TextBlock Text="Dubs" Grid.Row="7" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Dubs" Grid.Row="8" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="8" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="9" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -196,15 +213,15 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="DubsRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="DubsValues" Grid.Row="9" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="DubsValues" Grid.Row="10" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Dubs, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 			
 			<!--#region Names -->
 
-			<TextBlock Text="Names" Grid.Row="10" Style="{StaticResource LabelStyle}" />
+			<TextBlock Text="Names" Grid.Row="11" Style="{StaticResource LabelStyle}" />
 
-			<Grid Grid.Row="11" Style="{StaticResource InputContainerStyle}">
+			<Grid Grid.Row="12" Style="{StaticResource InputContainerStyle}">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition />
 					<ColumnDefinition />
@@ -214,7 +231,7 @@
 				<Button Style="{StaticResource RemoveButtonStyle}" Click="NamesRemoveButton_Click" />
 			</Grid>
 
-			<ListView x:Name="NamesValues" Grid.Row="12" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
+			<ListView x:Name="NamesValues" Grid.Row="13" Template="{StaticResource ListViewBaseErrorTemplate}" ItemsSource="{Binding Names, Mode=OneWay}" Style="{StaticResource ValueListStyle}" Loaded="Control_Loaded" />
 
 			<!--#endregion-->
 		</Grid>
