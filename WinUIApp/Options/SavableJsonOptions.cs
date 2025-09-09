@@ -31,6 +31,25 @@
 
 		public TIOptions Value => _options.Value;
 
+		private bool CanSave()
+		{
+			if (!Value.Modified)
+			{
+				_logger.LogDebug("{File} can't be saved due to the {Model} not being modified.", _file, nameof(TIOptions));
+
+				return false;
+			}
+
+			if (Value is INotifyDataErrorInfo errorInfo && errorInfo.HasErrors)
+			{
+				_logger.LogDebug("{File} can't be saved due to the {Model} having validation errors.", _file, nameof(TIOptions));
+
+				return false;
+			}
+
+			return true;
+		}
+
 		private bool TryGetFileStream([NotNullWhen(true)] out FileStream? fileStream)
 		{
 			try
@@ -74,7 +93,7 @@
 
 			_fileModel.Wait(() =>
 			{
-				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
+				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
 				{
 					try
 					{
@@ -107,7 +126,7 @@
 
 			await _fileModel.WaitAsync(async token =>
 			{
-				if (Value.Modified && TryGetFileStream(out FileStream? fileStream))
+				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
 				{
 					try
 					{
