@@ -37,7 +37,7 @@ namespace WinUIApp
 				.ConfigureSavableJson(lastUpdateFileModel)
 				.AddResourceRecovery<IConfigModel>()
 				.AddResourceRecovery<ILastUpdateModel>()
-				.UseSerilog((context, provider, config) => config.MinimumLevel.Verbose()
+				.UseSerilog((context, config) => config.MinimumLevel.Verbose()
 						.Enrich.FromLogContext()
 						.WriteTo.Debug()
 						.WriteTo.Async(configure =>
