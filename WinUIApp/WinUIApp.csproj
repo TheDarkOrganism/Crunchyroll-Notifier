@@ -89,7 +89,11 @@
 		<Content Include="Crunchyroll-Notifier.ico" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(WindowsPackageType)'=='None'">
+		<Content Remove="Assets/**" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(WindowsPackageType)'!='None'">
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
