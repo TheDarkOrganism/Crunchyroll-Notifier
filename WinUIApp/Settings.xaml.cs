@@ -3,7 +3,7 @@ using WinUIApp.Dialogs;
 
 namespace WinUIApp
 {
-	public sealed partial class Settings : Window
+	internal sealed partial class Settings : Window
 	{
 		private readonly ISavableJsonOptions<IConfigModel> _options;
 

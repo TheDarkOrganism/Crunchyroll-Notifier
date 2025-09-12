@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public interface IModelBase
+	internal interface IModelBase
 	{
 		bool Modified { get; }
 

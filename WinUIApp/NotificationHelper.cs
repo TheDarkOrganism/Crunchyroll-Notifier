@@ -2,7 +2,7 @@
 
 namespace WinUIApp
 {
-	public sealed class NotificationHelper
+	internal sealed class NotificationHelper
 	{
 		private readonly AppNotificationManager _notificationManager;
 

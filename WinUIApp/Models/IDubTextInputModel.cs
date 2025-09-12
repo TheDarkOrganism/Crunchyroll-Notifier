@@ -1,4 +1,4 @@
 ﻿namespace WinUIApp.Models
 {
-	public interface IDubTextInputModel : ITextInputModelBase { }
+	internal interface IDubTextInputModel : ITextInputModelBase { }
 }

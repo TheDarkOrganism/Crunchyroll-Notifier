@@ -1,4 +1,4 @@
 ﻿namespace WinUIApp.Models
 {
-	public interface IValidationModelBase : IModelBase, INotifyDataErrorInfo, INotifyPropertyChanged { }
+	internal interface IValidationModelBase : IModelBase, INotifyDataErrorInfo, INotifyPropertyChanged { }
 }

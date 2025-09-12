@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Enums
 {
-	public enum VisibilityType
+	internal enum VisibilityType
 	{
 		Default,
 		Free,

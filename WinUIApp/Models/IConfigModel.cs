@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public interface IConfigModel : IValidationModelBase
+	internal interface IConfigModel : IValidationModelBase
 	{
 		TimeSpan Interval { get; set; }
 

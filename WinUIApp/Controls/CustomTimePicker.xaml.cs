@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Controls
 {
-	public sealed partial class CustomTimePicker : UserControl
+	internal sealed partial class CustomTimePicker : UserControl
 	{
 		private readonly IEnumerable<int> _range24 = Enumerable.Range(0, 24);
 

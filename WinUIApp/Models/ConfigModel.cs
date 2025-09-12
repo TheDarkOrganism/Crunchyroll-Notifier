@@ -2,7 +2,7 @@
 
 namespace WinUIApp.Models
 {
-	public sealed partial class ConfigModel : ValidationModelBase<ConfigModel>, IConfigModel
+	internal sealed partial class ConfigModel : ValidationModelBase<ConfigModel>, IConfigModel
 	{
 		private TimeSpan _interval = TimeSpan.FromSeconds(30);
 

@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Models
 {
-	public abstract class ModelBase : IModelBase
+	internal abstract class ModelBase : IModelBase
 	{
 		[JsonIgnore]
 		public bool Modified { get; private set; }
