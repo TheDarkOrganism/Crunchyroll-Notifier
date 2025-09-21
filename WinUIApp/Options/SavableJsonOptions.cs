@@ -5,7 +5,24 @@
 	{
 		private static readonly ModelSerializerContext _serializerContext = ModelSerializerContext.Writing;
 
-		private static readonly Type ValueType = typeof(Dictionary<string, TIOptions>);
+		private static readonly JsonSerializerOptions _jsonSerializerOptions = _serializerContext.Options;
+
+		private static readonly JsonDocumentOptions _jsonDocumentOptions = new()
+		{
+			AllowTrailingCommas = _jsonSerializerOptions.AllowTrailingCommas,
+			MaxDepth = _jsonSerializerOptions.MaxDepth,
+			CommentHandling = _jsonSerializerOptions.ReadCommentHandling
+		};
+
+		private static readonly JsonWriterOptions _jsonWriterOptions = new()
+		{
+			Encoder = _jsonSerializerOptions.Encoder,
+			IndentCharacter = _jsonSerializerOptions.IndentCharacter,
+			Indented = _jsonSerializerOptions.WriteIndented,
+			IndentSize = _jsonSerializerOptions.IndentSize,
+			MaxDepth = _jsonSerializerOptions.MaxDepth,
+			NewLine = _jsonSerializerOptions.NewLine
+		};
 
 		private readonly IFileModel<TIOptions> _fileModel;
 		private readonly string _file;
@@ -56,7 +73,7 @@
 			{
 				IFileInfo fileInfo = _environment.ContentRootFileProvider.GetFileInfo(_file);
 
-				fileStream = File.Create(fileInfo.PhysicalPath ?? Path.Combine(_environment.ContentRootPath, fileInfo.Name));
+				fileStream = File.Open(fileInfo.PhysicalPath ?? Path.Combine(_environment.ContentRootPath, fileInfo.Name), FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
 				return true;
 			}
@@ -69,12 +86,36 @@
 			}
 		}
 
-		private Dictionary<string, TIOptions> GetValue()
+		private void HandleSave(FileStream fileStream, Utf8JsonWriter utf8JsonWriter, JsonDocument jsonDocument)
 		{
-			return new()
+			fileStream.SetLength(0);
+
+			utf8JsonWriter.WriteStartObject();
+
+			string section = _fileModel.ConfigurationSection;
+
+			utf8JsonWriter.WritePropertyName(section);
+
+			JsonSerializer.Serialize(utf8JsonWriter, Value, typeof(TIOptions), _serializerContext);
+
+			JsonElement rootElement = jsonDocument.RootElement;
+
+			if (rootElement.ValueKind == JsonValueKind.Object)
 			{
-				{ _fileModel.ConfigurationSection, Value }
-			};
+				foreach (JsonProperty jsonProperty in rootElement.EnumerateObject())
+				{
+					if (!jsonProperty.NameEquals(section))
+					{
+						jsonProperty.WriteTo(utf8JsonWriter);
+					}
+				}
+			}
+			else
+			{
+				_logger.LogWarning("Configuration for {File} was not a valid JSON object.", _file);
+			}
+
+			utf8JsonWriter.WriteEndObject();
 		}
 
 		private void HandleReload()
@@ -95,9 +136,24 @@
 			{
 				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
 				{
+					JsonDocument jsonDocument;
+
 					try
 					{
-						JsonSerializer.Serialize(fileStream, GetValue(), ValueType, _serializerContext);
+						jsonDocument = JsonDocument.Parse(fileStream, _jsonDocumentOptions);
+					}
+					catch
+					{
+						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
+
+						jsonDocument = JsonDocument.Parse("{}", _jsonDocumentOptions);
+					}
+
+					try
+					{
+						using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
+
+						HandleSave(fileStream, utf8JsonWriter, jsonDocument);
 
 						Value.MarkUnmodified();
 
@@ -109,6 +165,7 @@
 					}
 					finally
 					{
+						jsonDocument.Dispose();
 						fileStream.Dispose();
 					}
 				}
@@ -128,9 +185,24 @@
 			{
 				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
 				{
+					JsonDocument jsonDocument;
+
 					try
 					{
-						await JsonSerializer.SerializeAsync(fileStream, GetValue(), ValueType, _serializerContext, token);
+						jsonDocument = await JsonDocument.ParseAsync(fileStream, _jsonDocumentOptions, cancellationToken);
+					}
+					catch
+					{
+						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
+
+						jsonDocument = JsonDocument.Parse("{}", _jsonDocumentOptions);
+					}
+
+					try
+					{
+						await using Utf8JsonWriter utf8JsonWriter = new(fileStream, _jsonWriterOptions);
+
+						HandleSave(fileStream, utf8JsonWriter, jsonDocument);
 
 						Value.MarkUnmodified();
 
@@ -142,6 +214,7 @@
 					}
 					finally
 					{
+						jsonDocument.Dispose();
 						await fileStream.DisposeAsync();
 					}
 				}
