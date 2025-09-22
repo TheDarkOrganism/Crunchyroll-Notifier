@@ -4,12 +4,9 @@
 	{
 		private static readonly EmbeddedFileProvider _embeddedFileProvider = new(Assembly.GetExecutingAssembly(), nameof(WinUIApp));
 
-		public static void RestoreFile<TIModel, T>(IFileModel<TIModel> fileModel, ILogger<T> logger)
-			where TIModel : class, IModelBase
+		public static IFileInfo GetResource(string file)
 		{
-			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
-
-			string file = fileModel.File;
+			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 
 			IFileInfo fileInfo = _embeddedFileProvider.GetFileInfo(Path.GetFileName(file));
 
@@ -18,11 +15,21 @@
 				throw new FileNotFoundException("Unable to find the file as a embedded resource.", file);
 			}
 
+			return fileInfo;
+		}
+
+		public static void RestoreFile<TIModel, T>(IFileModel<TIModel> fileModel, ILogger<T> logger)
+			where TIModel : class, IModelBase
+		{
+			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
+
 			fileModel.Wait(() =>
 			{
 				try
 				{
-					using Stream stream = fileInfo.CreateReadStream();
+					string file = fileModel.File;
+
+					using Stream stream = GetResource(file).CreateReadStream();
 
 					using FileStream fileStream = File.Create(file);
 

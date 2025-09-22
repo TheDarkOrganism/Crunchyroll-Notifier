@@ -146,7 +146,9 @@
 					{
 						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
 
-						jsonDocument = JsonDocument.Parse("{}", _jsonDocumentOptions);
+						using Stream stream = ResourceHelper.GetResource(_file).CreateReadStream();
+
+						jsonDocument = JsonDocument.Parse(stream, _jsonDocumentOptions);
 					}
 
 					try
@@ -195,7 +197,9 @@
 					{
 						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
 
-						jsonDocument = JsonDocument.Parse("{}", _jsonDocumentOptions);
+						await using Stream stream = ResourceHelper.GetResource(_file).CreateReadStream();
+
+						jsonDocument = await JsonDocument.ParseAsync(stream, _jsonDocumentOptions, cancellationToken);
 					}
 
 					try
