@@ -11,6 +11,25 @@
 	[JsonSourceGenerationOptions(AllowTrailingCommas = true, Converters = [typeof(Converters.InterfaceConverter), typeof(Converters.TimeSpanConverter)], DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, UseStringEnumConverter = true)]
 	internal sealed partial class ModelSerializerContext : JsonSerializerContext
 	{
+		private static JsonDocumentOptions? _documentOptions;
+
+		public static JsonDocumentOptions DocumentOptions
+		{
+			get
+			{
+				JsonSerializerOptions options = Default.Options;
+
+				_documentOptions ??= new()
+				{
+					AllowTrailingCommas = options.AllowTrailingCommas,
+					MaxDepth = options.MaxDepth,
+					CommentHandling = options.ReadCommentHandling
+				};
+
+				return _documentOptions.Value;
+			}
+		}
+
 		private static ModelSerializerContext? _writing;
 
 		public static ModelSerializerContext Writing

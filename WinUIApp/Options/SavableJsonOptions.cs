@@ -5,14 +5,9 @@
 	{
 		private static readonly ModelSerializerContext _serializerContext = ModelSerializerContext.Writing;
 
-		private static readonly JsonSerializerOptions _jsonSerializerOptions = _serializerContext.Options;
+		private static readonly JsonDocumentOptions _jsonDocumentOptions = ModelSerializerContext.DocumentOptions;
 
-		private static readonly JsonDocumentOptions _jsonDocumentOptions = new()
-		{
-			AllowTrailingCommas = _jsonSerializerOptions.AllowTrailingCommas,
-			MaxDepth = _jsonSerializerOptions.MaxDepth,
-			CommentHandling = _jsonSerializerOptions.ReadCommentHandling
-		};
+		private static readonly JsonSerializerOptions _jsonSerializerOptions = _serializerContext.Options;
 
 		private static readonly JsonWriterOptions _jsonWriterOptions = new()
 		{
@@ -191,7 +186,7 @@
 
 					try
 					{
-						jsonDocument = await JsonDocument.ParseAsync(fileStream, _jsonDocumentOptions, cancellationToken);
+						jsonDocument = await JsonDocument.ParseAsync(fileStream, _jsonDocumentOptions, token);
 					}
 					catch
 					{
@@ -199,7 +194,7 @@
 
 						await using Stream stream = ResourceHelper.GetResource(_file).CreateReadStream();
 
-						jsonDocument = await JsonDocument.ParseAsync(stream, _jsonDocumentOptions, cancellationToken);
+						jsonDocument = await JsonDocument.ParseAsync(stream, _jsonDocumentOptions, token);
 					}
 
 					try

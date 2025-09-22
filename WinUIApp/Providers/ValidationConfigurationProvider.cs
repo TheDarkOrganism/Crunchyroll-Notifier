@@ -182,7 +182,7 @@
 					{
 						using Stream stream = fileInfo.CreateReadStream();
 
-						using JsonDocument jsonDocument = JsonDocument.Parse(stream);
+						using JsonDocument jsonDocument = JsonDocument.Parse(stream, ModelSerializerContext.DocumentOptions);
 
 						ParseValue(jsonDocument.RootElement, null);
 					}, _logger);
