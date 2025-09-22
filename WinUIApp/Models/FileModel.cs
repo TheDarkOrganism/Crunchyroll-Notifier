@@ -10,16 +10,19 @@
 
 		public string ConfigurationSection { get; }
 
-		public FileModel(string file)
+		public FileModel(string file, string section)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
+			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
 
 			File = file;
 
-			ConfigurationSection = Path.GetFileNameWithoutExtension(file);
+			ConfigurationSection = section;
 
 			_lock = new(1, 1);
 		}
+
+		public FileModel(string file) : this(file, Path.GetFileNameWithoutExtension(file)) { }
 
 		private void LogException<T>(Exception ex, ILogger<T> logger)
 		{
