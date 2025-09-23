@@ -27,7 +27,7 @@ namespace WinUIApp
 		{
 			const string lastUpdateFile = "LastUpdate.json";
 
-			FileModel<ConfigModel, IConfigModel> configFileModel = new("Config.json");
+			FileModel<ConfigModel, IConfigModel> configFileModel = new("appsettings.json", "Config");
 			FileModel<LastUpdateModel, ILastUpdateModel> lastUpdateFileModel = new(lastUpdateFile);
 
 			_host = Host.CreateDefaultBuilder()
