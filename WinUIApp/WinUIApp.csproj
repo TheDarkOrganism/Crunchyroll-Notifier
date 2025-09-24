@@ -41,6 +41,12 @@
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 
+	<ItemGroup Condition="$(Configuration.StartsWith('Debug'))">
+		<None Update="appsettings.Development.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 	<ItemGroup>
 		<None Remove="Controls\CustomTimePicker.xaml" />
 		<None Remove="Dialogs\TextInputDialog.xaml" />
