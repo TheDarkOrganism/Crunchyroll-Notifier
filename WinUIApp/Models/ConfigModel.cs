@@ -139,14 +139,28 @@ namespace WinUIApp.Models
 
 		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e, string propertyName)
 		{
-			if (sender is ObservableCollection<string> values && e.NewItems is IList newItems)
+			ArgumentException.ThrowIfNullOrWhiteSpace(propertyName, nameof(propertyName));
+
+			if (sender is ObservableCollection<string> values)
 			{
-				foreach (string value in newItems.OfType<string>())
+				int changes = e.OldItems?.Count ?? 0;
+
+				if (e.NewItems is IList newItems)
 				{
-					if (!IsValid(value, propertyName))
+					changes += newItems.Count;
+
+					foreach (string item in newItems)
 					{
-						_ = values.Remove(value);
+						if (!IsValid(item, propertyName) && values.Remove(item))
+						{
+							changes--;
+						}
 					}
+				}
+
+				if (changes > 0)
+				{
+					OnModified();
 				}
 			}
 		}
