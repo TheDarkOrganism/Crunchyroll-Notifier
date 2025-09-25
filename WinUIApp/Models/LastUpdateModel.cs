@@ -13,7 +13,7 @@
 				{
 					_lastUpdate = value;
 
-					OnModified(false);
+					OnModified();
 				}
 			}
 		}

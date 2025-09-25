@@ -8,7 +8,7 @@
 		[JsonIgnore]
 		public bool ReloadConfiguration { get; private set; }
 
-		protected void OnModified(bool reloadConfiguration)
+		protected void OnModified(bool reloadConfiguration = false)
 		{
 			Modified = true;
 			ReloadConfiguration = reloadConfiguration;
