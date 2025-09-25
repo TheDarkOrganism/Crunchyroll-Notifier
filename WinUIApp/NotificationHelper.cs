@@ -2,17 +2,8 @@
 
 namespace WinUIApp
 {
-	internal sealed class NotificationHelper
+	internal sealed class NotificationHelper(AppNotificationManager notificationManager)
 	{
-		private readonly AppNotificationManager _notificationManager;
-
-		public NotificationHelper(AppNotificationManager notificationManager)
-		{
-			_notificationManager = notificationManager;
-
-			notificationManager.Register();
-		}
-
 		private void ShowNotification(string title, string message, Action<AppNotificationBuilder> modifier)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
@@ -22,7 +13,7 @@ namespace WinUIApp
 
 			modifier(builder);
 
-			_notificationManager.Show(builder.BuildNotification());
+			notificationManager.Show(builder.BuildNotification());
 		}
 
 		internal void Notify(string title, string message)

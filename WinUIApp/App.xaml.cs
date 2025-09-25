@@ -36,7 +36,14 @@ namespace WinUIApp
 				.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty}.json", true, true)
 #endif
 				)
-				.ConfigureServices(services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddSingleton<IFileModel<IConfigModel>>(configFileModel).AddSingleton<IFileModel<ILastUpdateModel>>(lastUpdateFileModel).AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
+				.ConfigureServices(services => services.AddSingleton(_ =>
+				{
+					AppNotificationManager manager = AppNotificationManager.Default;
+
+					manager.Register();
+
+					return manager;
+				}).AddSingleton<NotificationHelper>().AddSingleton<IFileModel<IConfigModel>>(configFileModel).AddSingleton<IFileModel<ILastUpdateModel>>(lastUpdateFileModel).AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
 				.ConfigureSavableJson(configFileModel)
 				.ConfigureSavableJson(lastUpdateFileModel)
 				.AddResourceRecovery<IConfigModel>()
