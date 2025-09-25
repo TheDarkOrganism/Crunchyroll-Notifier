@@ -74,6 +74,7 @@
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="System.Globalization" />
 		<Using Include="System.Reflection" />
+		<Using Include="System.Runtime.CompilerServices" />
 		<Using Include="System.Text.Json" />
 		<Using Include="System.Text.Json.Serialization" />
 		<Using Include="System.Text.Json.Serialization.Metadata" />

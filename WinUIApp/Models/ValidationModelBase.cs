@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace WinUIApp.Models
+﻿namespace WinUIApp.Models
 {
 	internal abstract class ValidationModelBase<TModel> : ModelBase, IValidationModelBase
 		where TModel : notnull, ValidationModelBase<TModel>, new()
