@@ -31,7 +31,7 @@ namespace WinUIApp
 			FileModel<LastUpdateModel, ILastUpdateModel> lastUpdateFileModel = new(lastUpdateFile);
 
 			_host = Host.CreateDefaultBuilder()
-				.ConfigureAppConfiguration((context, builder) => builder.AddJsonFileWithValidation(configFileModel, context).AddJsonFile(lastUpdateFile)
+				.ConfigureAppConfiguration((context, builder) => builder.AddJsonFileWithValidation(configFileModel, context).AddJsonFile(lastUpdateFile, true)
 #if DEBUG
 				.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty}.json", true, true)
 #endif
@@ -39,8 +39,6 @@ namespace WinUIApp
 				.ConfigureServices(services => services.AddSingleton(AppNotificationManager.Default).AddSingleton<NotificationHelper>().AddSingleton<IFileModel<IConfigModel>>(configFileModel).AddSingleton<IFileModel<ILastUpdateModel>>(lastUpdateFileModel).AddHostedService<MainService>().AddHostedService<CrunchyrollService>().AddScoped<Settings>().AddScoped(static _ => new HttpClientHandler()).ConfigureHttpClientDefaults(static builder => builder.ConfigureHttpClient(static client => client.DefaultRequestHeaders.UserAgent.ParseAdd("chrome")).ConfigurePrimaryHttpMessageHandler(static provider => provider.GetRequiredService<HttpClientHandler>())))
 				.ConfigureSavableJson(configFileModel)
 				.ConfigureSavableJson(lastUpdateFileModel)
-				.AddResourceRecovery<IConfigModel>()
-				.AddResourceRecovery<ILastUpdateModel>()
 				.UseSerilog((context, config) => config.MinimumLevel.Verbose()
 						.Enrich.FromLogContext()
 						.WriteTo.Debug()
