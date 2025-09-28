@@ -17,33 +17,5 @@
 
 			return fileInfo;
 		}
-
-		public static void RestoreFile<TIModel, T>(IFileModel<TIModel> fileModel, ILogger<T> logger)
-			where TIModel : class, IModelBase
-		{
-			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
-
-			fileModel.Wait(() =>
-			{
-				try
-				{
-					string file = fileModel.File;
-
-					using Stream stream = GetResource(file).CreateReadStream();
-
-					using FileStream fileStream = File.Create(file);
-
-					fileStream.SetLength(0);
-
-					stream.CopyTo(fileStream);
-				}
-				catch (Exception ex)
-				{
-					Debug.WriteLine(ex);
-
-					Application.Current.Exit();
-				}
-			}, logger);
-		}
 	}
 }

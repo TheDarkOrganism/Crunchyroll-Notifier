@@ -190,8 +190,6 @@
 				catch (JsonException ex)
 				{
 					_logger.LogWarning(ex, "Failed to read json from {File}.", file);
-
-					ResourceHelper.RestoreFile(_fileModel, _logger);
 				}
 				catch (Exception ex)
 				{
