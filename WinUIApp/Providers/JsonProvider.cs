@@ -13,7 +13,7 @@
 
 		public override void Load(Stream stream)
 		{
-			if (stream.Length < 2)
+			if (stream.Length <= 2)
 			{
 				return;
 			}
