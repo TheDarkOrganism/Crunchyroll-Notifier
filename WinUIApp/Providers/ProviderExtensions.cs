@@ -9,5 +9,10 @@ namespace WinUIApp.Providers
 		{
 			return configurationBuilder.Add(new ValidationConfigurationSource<TModel, TIModel>(fileModel, context));
 		}
+
+		public static IConfigurationBuilder AddJson(this IConfigurationBuilder configurationBuilder, string file, bool optional = false, bool reloadOnChange = false)
+		{
+			return configurationBuilder.Add(new JsonSource(file, optional, reloadOnChange));
+		}
 	}
 }

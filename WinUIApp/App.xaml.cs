@@ -31,7 +31,7 @@ namespace WinUIApp
 			FileModel<LastUpdateModel, ILastUpdateModel> lastUpdateFileModel = new(lastUpdateFile);
 
 			_host = Host.CreateDefaultBuilder()
-				.ConfigureAppConfiguration((context, builder) => builder.AddJsonFileWithValidation(configFileModel, context).AddJsonFile(lastUpdateFile, true)
+				.ConfigureAppConfiguration((context, builder) => builder.AddJsonFileWithValidation(configFileModel, context).AddJson(lastUpdateFile, true)
 #if DEBUG
 				.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty}.json", true, true)
 #endif

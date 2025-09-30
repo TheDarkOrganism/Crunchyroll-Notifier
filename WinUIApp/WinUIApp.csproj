@@ -56,6 +56,7 @@
 
 	<ItemGroup>
 		<Using Include="Microsoft.Extensions.Configuration" />
+		<Using Include="Microsoft.Extensions.Configuration.Json" />
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Microsoft.Extensions.FileProviders" />
 		<Using Include="Microsoft.Extensions.Hosting" />
