@@ -51,5 +51,19 @@
 		{
 			return Options.PropertyNamingPolicy?.ConvertName(name) ?? name;
 		}
+
+		public bool TryGetJsonTypeInfo([NotNullWhen(true)] Type? type, [NotNullWhen(true)] out JsonTypeInfo? jsonTypeInfo)
+		{
+			jsonTypeInfo = null;
+
+			if (type is null)
+			{
+				return false;
+			}
+
+			jsonTypeInfo = GetTypeInfo(type);
+
+			return jsonTypeInfo is not null;
+		}
 	}
 }
