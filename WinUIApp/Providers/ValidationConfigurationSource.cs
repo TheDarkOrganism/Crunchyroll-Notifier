@@ -1,31 +1,28 @@
-﻿using Serilog;
-using Serilog.Extensions.Logging;
-
-namespace WinUIApp.Providers
+﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationSource<TModel, TIModel> : IConfigurationSource
-		where TModel : ModelBase, TIModel
-		where TIModel : class, IModelBase
+	internal sealed class ValidationConfigurationSource<TModel> : JsonConfigurationSource
+		where TModel : notnull, ModelBase
 	{
-		private readonly IFileModel<TIModel> _fileModel;
-		private readonly IFileProvider _fileProvider;
-		private readonly ILogger<ValidationConfigurationProvider<TModel, TIModel>> _logger;
+		private readonly ILogger<ValidationConfigurationProvider<TModel>> _logger;
+		private readonly string _section;
 
-		public ValidationConfigurationSource(IFileModel<TIModel> fileModel, HostBuilderContext context)
+		public ValidationConfigurationSource(string file, string section, bool optional, bool reloadOnChange)
 		{
-			ArgumentNullException.ThrowIfNull(context, nameof(context));
+			ArgumentException.ThrowIfNullOrWhiteSpace(file, nameof(file));
 
-			_fileModel = fileModel;
-			_fileProvider = context.HostingEnvironment.ContentRootFileProvider;
+			Path = file;
+			Optional = optional;
+			ReloadOnChange = reloadOnChange;
+			_section = section;
 
-			using SerilogLoggerFactory loggerFactory = new(Log.Logger);
-
-			_logger = loggerFactory.CreateLogger<ValidationConfigurationProvider<TModel, TIModel>>();
+			_logger = LoggerProvider.GetLogger<ValidationConfigurationProvider<TModel>>();
 		}
 
-		public IConfigurationProvider Build(IConfigurationBuilder builder)
+		public override IConfigurationProvider Build(IConfigurationBuilder builder)
 		{
-			return new ValidationConfigurationProvider<TModel, TIModel>(_fileModel, _fileProvider, _logger);
+			EnsureDefaults(builder);
+
+			return new ValidationConfigurationProvider<TModel>(this, _section, _logger);
 		}
 	}
 }

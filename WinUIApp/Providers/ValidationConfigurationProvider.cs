@@ -1,29 +1,34 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed class ValidationConfigurationProvider<TModel, TIModel> : ConfigurationProvider
-		where TModel : ModelBase, TIModel
-		where TIModel : class, IModelBase
+	internal sealed partial class ValidationConfigurationProvider<TModel> : JsonConfigurationProvider
+		where TModel : notnull, ModelBase
 	{
-		private static readonly Dictionary<string, ValidationAttribute[]> _attributePairs = typeof(TModel).GetValidationAttributes();
+		private static readonly ModelSerializerContext _serializerContext = ModelSerializerContext.Default;
 
-		private readonly IFileModel<TIModel> _fileModel;
-		private readonly IFileProvider _fileProvider;
-		private readonly ILogger<ValidationConfigurationProvider<TModel, TIModel>> _logger;
+		private static readonly JsonSerializerOptions _jsonSerializerOptions = _serializerContext.Options;
 
-		public ValidationConfigurationProvider(IFileModel<TIModel> fileModel, IFileProvider fileProvider, ILogger<ValidationConfigurationProvider<TModel, TIModel>> logger)
+		private static readonly JsonReaderOptions _jsonReaderOptions = new()
 		{
-			ArgumentNullException.ThrowIfNull(fileModel, nameof(fileModel));
-			ArgumentNullException.ThrowIfNull(fileProvider, nameof(fileProvider));
+			AllowTrailingCommas = _jsonSerializerOptions.AllowTrailingCommas,
+			CommentHandling = _jsonSerializerOptions.ReadCommentHandling,
+			MaxDepth = _jsonSerializerOptions.MaxDepth
+		};
+
+		private readonly string _section;
+		private readonly ILogger<ValidationConfigurationProvider<TModel>> _logger;
+
+		public ValidationConfigurationProvider(JsonConfigurationSource jsonConfigurationSource, string section, ILogger<ValidationConfigurationProvider<TModel>> logger) : base(jsonConfigurationSource)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
 			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
-			_fileModel = fileModel;
-			_fileProvider = fileProvider;
+			_section = section;
 			_logger = logger;
 		}
 
-		private void WriteValue<TValue>(string? key, TValue? value)
+		private void Set(string? key, object? value, JsonTypeInfo jsonTypeInfo)
 		{
-			if (string.IsNullOrWhiteSpace(key))
+			if (string.IsNullOrWhiteSpace(key) || (value is null && Nullable.GetUnderlyingType(jsonTypeInfo.Type) is null))
 			{
 				return;
 			}
@@ -31,51 +36,172 @@
 			Set(key, value is string str ? str : value?.ToString());
 		}
 
-		private static bool TryParse<TValue>(JsonElement jsonElement, [NotNullWhen(true)] out TValue? value)
+		private bool TryRead(ref Utf8JsonReader utf8JsonReader)
 		{
-			value = jsonElement.ValueKind switch
+			try
 			{
-				JsonValueKind.Undefined => default,
-				JsonValueKind.Object => default,
-				JsonValueKind.Array => default,
-				JsonValueKind.String => jsonElement.GetString() is TValue v ? v : default,
-				JsonValueKind.Number => jsonElement.GetDouble() is TValue v ? v : default,
-				JsonValueKind.True => jsonElement.GetBoolean() is TValue v ? v : default,
-				JsonValueKind.False => jsonElement.GetBoolean() is TValue v ? v : default,
-				JsonValueKind.Null => default,
-				_ => throw new NotImplementedException()
-			};
+				return utf8JsonReader.Read();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Failed to read the JSON file {File}.", Source.Path);
 
-			return value is not null;
+				return false;
+			}
 		}
 
-		private static bool TryParseEnum(JsonElement jsonElement, EnumDataTypeAttribute enumDataTypeAttribute, [NotNullWhen(true)] out object? enumValue)
+		private object? ParseNumber(ref Utf8JsonReader utf8JsonReader, JsonTypeInfo? jsonTypeInfo)
+		{
+			if (utf8JsonReader.TokenType != JsonTokenType.Number)
+			{
+				_logger.LogDebug("The current JSON token is not a number.");
+
+				return null;
+			}
+
+			if (jsonTypeInfo is null)
+			{
+				return utf8JsonReader.GetDouble();
+			}
+			else
+			{
+				try
+				{
+					return JsonSerializer.Deserialize(ref utf8JsonReader, jsonTypeInfo);
+				}
+				catch (JsonException ex)
+				{
+					_logger.LogWarning(ex, "Unable to desrialize the JSON token as {Type}.", jsonTypeInfo.Type.Name);
+				}
+				catch (Exception ex)
+				{
+					_logger.LogWarning(ex, "Unable to desrialize the JSON token.");
+				}
+
+				return null;
+			}
+		}
+
+		private bool TryParse<TValue>(ref Utf8JsonReader utf8JsonReader, [NotNullWhen(true)] out TValue? value)
+			where TValue : notnull
+		{
+			Type valueType = typeof(TValue);
+
+			value = (utf8JsonReader.TokenType switch
+			{
+				JsonTokenType.None => null,
+				JsonTokenType.StartObject => null,
+				JsonTokenType.EndObject => null,
+				JsonTokenType.StartArray => null,
+				JsonTokenType.EndArray => null,
+				JsonTokenType.PropertyName => utf8JsonReader.GetString(),
+				JsonTokenType.Comment => utf8JsonReader.GetString(),
+				JsonTokenType.String => utf8JsonReader.GetString(),
+				JsonTokenType.Number => ParseNumber(ref utf8JsonReader, _serializerContext.GetTypeInfo(valueType)),
+				JsonTokenType.True => true,
+				JsonTokenType.False => false,
+				JsonTokenType.Null => null,
+				_ => null,
+			}) is TValue v ? v : default;
+
+			if (value is null)
+			{
+				_logger.LogWarning("Unable to parse JSON token as {Type}.", valueType.Name);
+
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool TryParseEnum(ref Utf8JsonReader utf8JsonReader, EnumDataTypeAttribute enumDataTypeAttribute, [NotNullWhen(true)] out object? enumValue)
 		{
 			enumValue = null;
 
-			return TryParse(jsonElement, out string? stringValue) && enumDataTypeAttribute.IsValid(stringValue) && Enum.TryParse(enumDataTypeAttribute.EnumType, stringValue, true, out enumValue);
+			return TryParse(ref utf8JsonReader, out string? stringValue) && enumDataTypeAttribute.IsValid(stringValue) && Enum.TryParse(enumDataTypeAttribute.EnumType, stringValue, out enumValue);
 		}
 
-		private void ParseValue(JsonElement jsonElement, string? key)
+		private void ParseValue(ref Utf8JsonReader utf8JsonReader, JsonTypeInfo jsonTypeInfo, string? key)
 		{
-			switch (jsonElement.ValueKind)
+			if (!TryRead(ref utf8JsonReader))
 			{
-				case JsonValueKind.Undefined:
+				_logger.LogTrace("Parsing finished.");
+
+				return;
+			}
+
+			ParseToken(ref utf8JsonReader, jsonTypeInfo, key);
+
+			ParseValue(ref utf8JsonReader, jsonTypeInfo, key);
+		}
+
+		private void ParseToken(ref Utf8JsonReader utf8JsonReader, JsonTypeInfo jsonTypeInfo, string? key)
+		{
+			switch (utf8JsonReader.TokenType)
+			{
+				case JsonTokenType.None:
 					break;
-				case JsonValueKind.Object:
-					foreach (JsonProperty jsonProperty in jsonElement.EnumerateObject())
+				case JsonTokenType.StartObject:
+					break;
+				case JsonTokenType.EndObject:
+					break;
+				case JsonTokenType.StartArray:
+					if (_serializerContext.TryGetJsonTypeInfo(jsonTypeInfo.ElementType, out JsonTypeInfo? typeInfo))
 					{
-						string name = jsonProperty.Name;
+						int index = 0;
 
-						string subKey = key is null ? name : $"{key}:{name}";
-
-						JsonElement value = jsonProperty.Value;
-
-						ParseValue(value, subKey);
-
-						if (_attributePairs?.TryGetValue(name, out ValidationAttribute[]? attributes) is true)
+						do
 						{
-							foreach (ValidationAttribute attribute in attributes)
+							ParseValue(ref utf8JsonReader, typeInfo, $"{key ?? _section}:{index}");
+
+							index++;
+						} while (TryRead(ref utf8JsonReader) && utf8JsonReader.TokenType != JsonTokenType.EndArray);
+					}
+					break;
+				case JsonTokenType.EndArray:
+					break;
+				case JsonTokenType.PropertyName:
+					string? propertyName = utf8JsonReader.GetString();
+
+					if (string.IsNullOrEmpty(propertyName))
+					{
+						break;
+					}
+
+					if (string.IsNullOrEmpty(key))
+					{
+						if (propertyName == _section && !Data.ContainsKey(propertyName))
+						{
+							ParseValue(ref utf8JsonReader, jsonTypeInfo, propertyName);
+
+							_logger.LogTrace("Parsed property {PropertyName}.", propertyName);
+
+							return;
+						}
+						else
+						{
+							if (utf8JsonReader.TrySkip())
+							{
+								_logger.LogTrace("Skipped property {PropertyName}.", propertyName);
+							}
+
+							break;
+						}
+					}
+
+					string subKey = $"{key}:{propertyName}";
+
+					if (jsonTypeInfo?.Properties.FirstOrDefault(p => p.Name == propertyName) is JsonPropertyInfo jsonPropertyInfo && _serializerContext.TryGetJsonTypeInfo(jsonPropertyInfo.PropertyType, out JsonTypeInfo? jsonType) && TryRead(ref utf8JsonReader))
+					{
+						ParseToken(ref utf8JsonReader, jsonType, subKey);
+
+						if (jsonPropertyInfo.AttributeProvider?.GetCustomAttributes(typeof(ValidationAttribute), false) is object[] attributes)
+						{
+							const string logFormat = "Failed to validate {Attribute} with {Type} for {PropertyName}.";
+
+							const string rangeLogFormat = "The {Attribute} with {Value} must be between {Min} and {Max} for {PropertyName}.";
+
+							foreach (object attribute in attributes)
 							{
 								object? enumValue;
 
@@ -89,47 +215,82 @@
 											continue;
 										}
 
-										if (attributes.OfType<EnumDataTypeAttribute>().FirstOrDefault() is EnumDataTypeAttribute enumDataType && TryParseEnum(value, enumDataType, out enumValue) && allowedValuesAttribute.IsValid(enumValue))
+										string? enumName = null;
+
+										if (attributes.OfType<EnumDataTypeAttribute>().FirstOrDefault() is EnumDataTypeAttribute enumDataType)
+										{
+											enumName = enumDataType.EnumType.Name;
+
+											if (TryParseEnum(ref utf8JsonReader, enumDataType, out enumValue) && allowedValuesAttribute.IsValid(enumValue))
+											{
+												continue;
+											}
+										}
+
+										if (TryParse(ref utf8JsonReader, out object? objectValue) && allowedValuesAttribute.IsValid(objectValue))
 										{
 											continue;
 										}
 
-										if (TryParse(value, out object? objectValue) && allowedValuesAttribute.IsValid(objectValue))
-										{
-											continue;
-										}
+										_logger.LogWarning(logFormat, nameof(AllowedValuesAttribute), enumName ?? nameof(Object), propertyName);
 
-										WriteValue(subKey, values[0]);
-										
+										Set(subKey, values[0], jsonTypeInfo);
+
 										break;
 									case EnumDataTypeAttribute enumDataTypeAttribute:
-										if (TryParseEnum(value, enumDataTypeAttribute, out enumValue))
+										if (TryParseEnum(ref utf8JsonReader, enumDataTypeAttribute, out enumValue))
 										{
-											WriteValue(subKey, enumValue);
+											Set(subKey, enumValue, jsonTypeInfo);
 										}
 										else
 										{
-											Set(subKey, Enum.GetNames(enumDataTypeAttribute.EnumType)[0]);
+											Type enumType = enumDataTypeAttribute.EnumType;
+
+											_logger.LogWarning(logFormat, nameof(EnumDataTypeAttribute), enumType.Name, propertyName);
+
+											Set(subKey, Enum.GetNames(enumType)[0]);
 										}
 										break;
 									case RangeAttribute rangeAttribute:
-										if (!TryParse(value, out double number))
+										object minValue = rangeAttribute.Minimum;
+										object maxValue = rangeAttribute.Maximum;
+
+										if (!TryParse(ref utf8JsonReader, out double number))
 										{
-											WriteValue(subKey, rangeAttribute.Maximum);
+											_logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), 0, minValue, maxValue, propertyName);
+
+											Set(subKey, maxValue, jsonTypeInfo);
 
 											continue;
 										}
 
-										if (!rangeAttribute.IsValid(number) && double.TryParse(rangeAttribute.Minimum.ToString(), out double min) && double.TryParse(rangeAttribute.Maximum.ToString(), out double max))
+										if (!rangeAttribute.IsValid(number) && double.TryParse(minValue.ToString(), out double min) && double.TryParse(maxValue.ToString(), out double max))
 										{
-											WriteValue(subKey, Math.Clamp(number, min, max));
+											_logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), number, min, max, propertyName);
+
+											Set(subKey, Math.Clamp(number, min, max), jsonTypeInfo);
 										}
 										break;
 									case TimeSpanRangeAttribute timeSpanRangeAttribute:
-										if (TryParse(value, out string? stringValue) && TimeSpan.TryParse(stringValue, out TimeSpan timeSpan) && !timeSpanRangeAttribute.IsValid(timeSpan))
+										TimeSpan mininum = timeSpanRangeAttribute.Mininum;
+										TimeSpan maxinum = timeSpanRangeAttribute.Maxinum;
+
+										if (!TryParse(ref utf8JsonReader, out string? stringValue) || !TimeSpan.TryParse(stringValue, out TimeSpan timeSpan))
 										{
-											WriteValue(subKey, timeSpan.Clamp(timeSpanRangeAttribute.Mininum, timeSpanRangeAttribute.Maxinum));
+											_logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), TimeSpan.Zero, mininum, maxinum, propertyName);
+
+											Set(subKey, mininum, jsonTypeInfo);
+
+											continue;
 										}
+
+										if (!timeSpanRangeAttribute.IsValid(timeSpan))
+										{
+											_logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), timeSpan, mininum, maxinum, propertyName);
+
+											Set(subKey, timeSpan.Clamp(mininum, maxinum), jsonTypeInfo);
+										}
+
 										break;
 									default:
 										break;
@@ -137,65 +298,65 @@
 							}
 						}
 					}
-					break;
-				case JsonValueKind.Array:
-					int index = 0;
 
-					foreach (JsonElement element in jsonElement.EnumerateArray())
-					{
-						ParseValue(element, $"{key ?? "Array"}:{index}");
-
-						index++;
-					}
 					break;
-				case JsonValueKind.String:
-					WriteValue(key, jsonElement.GetString());
+				case JsonTokenType.Comment:
+					Set(key, utf8JsonReader.GetString(), jsonTypeInfo);
 					break;
-				case JsonValueKind.Number:
-					WriteValue(key, jsonElement.GetDouble());
+				case JsonTokenType.String:
+					Set(key, utf8JsonReader.GetString(), jsonTypeInfo);
 					break;
-				case JsonValueKind.True:
-					WriteValue(key, bool.TrueString);
+				case JsonTokenType.Number:
+					Set(key, ParseNumber(ref utf8JsonReader, jsonTypeInfo), jsonTypeInfo);
 					break;
-				case JsonValueKind.False:
-					WriteValue(key, bool.FalseString);
+				case JsonTokenType.True:
+					Set(key, bool.TrueString, jsonTypeInfo);
 					break;
-				case JsonValueKind.Null:
-					WriteValue(key, default(string));
+				case JsonTokenType.False:
+					Set(key, bool.FalseString, jsonTypeInfo);
+					break;
+				case JsonTokenType.Null:
+					Set(key, null, jsonTypeInfo);
 					break;
 				default:
 					break;
 			}
 		}
 
-		public override void Load()
+		public override void Load(Stream stream)
 		{
-			string file = _fileModel.File;
+			if (stream.Length <= 2)
+			{
+				return;
+			}
 
-			IFileInfo fileInfo = _fileProvider.GetFileInfo(file);
+			string? file = Source.Path;
 
-			if (fileInfo.Exists)
+			_logger.LogTrace("Parsing JSON configuration from {File}.", file);
+
+			if (_serializerContext.TryGetJsonTypeInfo(typeof(TModel), out JsonTypeInfo? jsonTypeInfo))
+			{
+				using MemoryStream memoryStream = new();
+
+				stream.CopyTo(memoryStream);
+
+				Utf8JsonReader utf8JsonReader = new(memoryStream.ToArray(), _jsonReaderOptions);
+
+				ParseValue(ref utf8JsonReader, jsonTypeInfo, null);
+			}
+			else
 			{
 				try
 				{
-					_fileModel.Wait(() =>
-					{
-						using Stream stream = fileInfo.CreateReadStream();
-
-						using JsonDocument jsonDocument = JsonDocument.Parse(stream, ModelSerializerContext.DocumentOptions);
-
-						ParseValue(jsonDocument.RootElement, null);
-					}, _logger);
+					base.Load(stream);
 				}
 				catch (JsonException ex)
 				{
-					_logger.LogWarning(ex, "Failed to read json from {File}.", file);
+					_logger.LogWarning(ex, "Failed to read JSON from {File}.", file);
 				}
 				catch (Exception ex)
 				{
-					_logger.LogCritical(ex, "Unable to read {File}.", file);
-
-					Environment.Exit(13);
+					_logger.LogError(ex, "Unable to read {File}.", file);
 				}
 			}
 		}
