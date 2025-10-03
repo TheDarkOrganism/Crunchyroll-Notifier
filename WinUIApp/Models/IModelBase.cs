@@ -4,10 +4,6 @@
 	{
 		bool Modified { get; }
 
-		bool ReloadConfiguration { get; }
-
-		void MarkReloaded();
-
 		void MarkUnmodified();
 	}
 }

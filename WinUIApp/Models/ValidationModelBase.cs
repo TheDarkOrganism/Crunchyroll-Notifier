@@ -74,7 +74,7 @@
 
 			OnPropertyChanged(propertyName);
 
-			OnModified(reloadConfiguration);
+			OnModified();
 		}
 
 		public IEnumerable GetErrors(string? propertyName)

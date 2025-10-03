@@ -113,20 +113,8 @@
 			utf8JsonWriter.WriteEndObject();
 		}
 
-		private void HandleReload()
-		{
-			if (Value.ReloadConfiguration)
-			{
-				_configurationRoot.Reload();
-
-				Value.MarkReloaded();
-			}
-		}
-
 		public void Save()
 		{
-			bool saved = false;
-
 			_fileModel.Wait(() =>
 			{
 				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
@@ -153,8 +141,6 @@
 						HandleSave(fileStream, utf8JsonWriter, jsonDocument);
 
 						Value.MarkUnmodified();
-
-						saved = true;
 					}
 					catch (Exception ex)
 					{
@@ -167,17 +153,10 @@
 					}
 				}
 			}, _logger);
-
-			if (saved)
-			{
-				HandleReload();
-			}
 		}
 
 		public async Task SaveAsync(CancellationToken cancellationToken)
 		{
-			bool saved = false;
-
 			await _fileModel.WaitAsync(async token =>
 			{
 				if (CanSave() && TryGetFileStream(out FileStream? fileStream))
@@ -204,8 +183,6 @@
 						HandleSave(fileStream, utf8JsonWriter, jsonDocument);
 
 						Value.MarkUnmodified();
-
-						saved = true;
 					}
 					catch (Exception ex)
 					{
@@ -218,11 +195,6 @@
 					}
 				}
 			}, _logger, cancellationToken);
-
-			if (saved)
-			{
-				HandleReload();
-			}
 		}
 	}
 }
