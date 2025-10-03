@@ -1,5 +1,4 @@
-﻿
-namespace WinUIApp.Providers
+﻿namespace WinUIApp.Providers
 {
 	internal static class ProviderExtensions
 	{

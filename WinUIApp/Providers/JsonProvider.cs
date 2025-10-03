@@ -1,5 +1,4 @@
-﻿
-namespace WinUIApp.Providers
+﻿namespace WinUIApp.Providers
 {
 	internal sealed partial class JsonProvider(JsonConfigurationSource jsonConfigurationSource, ILogger<JsonProvider> logger) : JsonProviderBase<JsonProvider>(jsonConfigurationSource, logger)
 	{

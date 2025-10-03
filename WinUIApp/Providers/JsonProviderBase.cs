@@ -1,5 +1,4 @@
-﻿
-namespace WinUIApp.Providers
+﻿namespace WinUIApp.Providers
 {
 	internal abstract class JsonProviderBase<T> : JsonConfigurationProvider
 		where T : JsonProviderBase<T>
