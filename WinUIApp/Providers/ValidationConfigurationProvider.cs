@@ -1,6 +1,6 @@
 ﻿namespace WinUIApp.Providers
 {
-	internal sealed partial class ValidationConfigurationProvider<TModel> : JsonConfigurationProvider
+	internal sealed partial class ValidationConfigurationProvider<TModel> : JsonProviderBase<ValidationConfigurationProvider<TModel>>
 		where TModel : notnull, ModelBase
 	{
 		private static readonly ModelSerializerContext _serializerContext = ModelSerializerContext.Default;
@@ -15,15 +15,12 @@
 		};
 
 		private readonly string _section;
-		private readonly ILogger<ValidationConfigurationProvider<TModel>> _logger;
 
-		public ValidationConfigurationProvider(JsonConfigurationSource jsonConfigurationSource, string section, ILogger<ValidationConfigurationProvider<TModel>> logger) : base(jsonConfigurationSource)
+		public ValidationConfigurationProvider(JsonConfigurationSource jsonConfigurationSource, string section, ILogger<ValidationConfigurationProvider<TModel>> logger) : base(jsonConfigurationSource, logger)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(section, nameof(section));
-			ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
 			_section = section;
-			_logger = logger;
 		}
 
 		private void Set(string? key, object? value, JsonTypeInfo jsonTypeInfo)
@@ -44,7 +41,7 @@
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Failed to read the JSON file {File}.", Source.Path);
+				Logger.LogError(ex, "Failed to read the JSON file {File}.", Source.Path);
 
 				return false;
 			}
@@ -54,7 +51,7 @@
 		{
 			if (utf8JsonReader.TokenType != JsonTokenType.Number)
 			{
-				_logger.LogDebug("The current JSON token is not a number.");
+				Logger.LogDebug("The current JSON token is not a number.");
 
 				return null;
 			}
@@ -71,11 +68,11 @@
 				}
 				catch (JsonException ex)
 				{
-					_logger.LogWarning(ex, "Unable to desrialize the JSON token as {Type}.", jsonTypeInfo.Type.Name);
+					Logger.LogWarning(ex, "Unable to desrialize the JSON token as {Type}.", jsonTypeInfo.Type.Name);
 				}
 				catch (Exception ex)
 				{
-					_logger.LogWarning(ex, "Unable to desrialize the JSON token.");
+					Logger.LogWarning(ex, "Unable to desrialize the JSON token.");
 				}
 
 				return null;
@@ -106,7 +103,7 @@
 
 			if (value is null)
 			{
-				_logger.LogWarning("Unable to parse JSON token as {Type}.", valueType.Name);
+				Logger.LogWarning("Unable to parse JSON token as {Type}.", valueType.Name);
 
 				return false;
 			}
@@ -125,7 +122,7 @@
 		{
 			if (!TryRead(ref utf8JsonReader))
 			{
-				_logger.LogTrace("Parsing finished.");
+				Logger.LogTrace("Parsing finished.");
 
 				return;
 			}
@@ -174,7 +171,7 @@
 						{
 							ParseValue(ref utf8JsonReader, jsonTypeInfo, propertyName);
 
-							_logger.LogTrace("Parsed property {PropertyName}.", propertyName);
+							Logger.LogTrace("Parsed property {PropertyName}.", propertyName);
 
 							return;
 						}
@@ -182,7 +179,7 @@
 						{
 							if (utf8JsonReader.TrySkip())
 							{
-								_logger.LogTrace("Skipped property {PropertyName}.", propertyName);
+								Logger.LogTrace("Skipped property {PropertyName}.", propertyName);
 							}
 
 							break;
@@ -232,7 +229,7 @@
 											continue;
 										}
 
-										_logger.LogWarning(logFormat, nameof(AllowedValuesAttribute), enumName ?? nameof(Object), propertyName);
+										Logger.LogWarning(logFormat, nameof(AllowedValuesAttribute), enumName ?? nameof(Object), propertyName);
 
 										Set(subKey, values[0], jsonTypeInfo);
 
@@ -246,7 +243,7 @@
 										{
 											Type enumType = enumDataTypeAttribute.EnumType;
 
-											_logger.LogWarning(logFormat, nameof(EnumDataTypeAttribute), enumType.Name, propertyName);
+											Logger.LogWarning(logFormat, nameof(EnumDataTypeAttribute), enumType.Name, propertyName);
 
 											Set(subKey, Enum.GetNames(enumType)[0]);
 										}
@@ -257,7 +254,7 @@
 
 										if (!TryParse(ref utf8JsonReader, out double number))
 										{
-											_logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), 0, minValue, maxValue, propertyName);
+											Logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), 0, minValue, maxValue, propertyName);
 
 											Set(subKey, maxValue, jsonTypeInfo);
 
@@ -266,7 +263,7 @@
 
 										if (!rangeAttribute.IsValid(number) && double.TryParse(minValue.ToString(), out double min) && double.TryParse(maxValue.ToString(), out double max))
 										{
-											_logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), number, min, max, propertyName);
+											Logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), number, min, max, propertyName);
 
 											Set(subKey, Math.Clamp(number, min, max), jsonTypeInfo);
 										}
@@ -277,7 +274,7 @@
 
 										if (!TryParse(ref utf8JsonReader, out string? stringValue) || !TimeSpan.TryParse(stringValue, out TimeSpan timeSpan))
 										{
-											_logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), TimeSpan.Zero, mininum, maxinum, propertyName);
+											Logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), TimeSpan.Zero, mininum, maxinum, propertyName);
 
 											Set(subKey, mininum, jsonTypeInfo);
 
@@ -286,7 +283,7 @@
 
 										if (!timeSpanRangeAttribute.IsValid(timeSpan))
 										{
-											_logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), timeSpan, mininum, maxinum, propertyName);
+											Logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), timeSpan, mininum, maxinum, propertyName);
 
 											Set(subKey, timeSpan.Clamp(mininum, maxinum), jsonTypeInfo);
 										}
@@ -332,7 +329,7 @@
 
 			string? file = Source.Path;
 
-			_logger.LogTrace("Parsing JSON configuration from {File}.", file);
+			Logger.LogTrace("Parsing JSON configuration from {File}.", file);
 
 			if (_serializerContext.TryGetJsonTypeInfo(typeof(TModel), out JsonTypeInfo? jsonTypeInfo))
 			{
@@ -346,18 +343,7 @@
 			}
 			else
 			{
-				try
-				{
-					base.Load(stream);
-				}
-				catch (JsonException ex)
-				{
-					_logger.LogWarning(ex, "Failed to read JSON from {File}.", file);
-				}
-				catch (Exception ex)
-				{
-					_logger.LogError(ex, "Unable to read {File}.", file);
-				}
+				base.Load(stream);
 			}
 		}
 	}
