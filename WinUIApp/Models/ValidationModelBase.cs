@@ -3,10 +3,6 @@
 	internal abstract class ValidationModelBase<TModel> : ModelBase, IValidationModelBase
 		where TModel : notnull, ValidationModelBase<TModel>
 	{
-		private static readonly Dictionary<string, ValidationAttribute[]> _validationAttributes = typeof(TModel).GetValidationAttributes();
-
-		private static readonly Dictionary<string, string> _friendlyNames = _validationAttributes.Keys.ToDictionary(static key => key, static key => key.AddSpaces());
-
 		public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -15,17 +11,6 @@
 		[JsonIgnore]
 		public bool HasErrors => _errors.Count > 0;
 
-		private void OnPropertyChanged(string propertyName)
-		{
-			PropertyChanged?.Invoke(this, new(propertyName));
-		}
-
-		private void OnErrorsChanged(string propertyName)
-		{
-			ErrorsChanged?.Invoke(this, new(propertyName));
-			OnPropertyChanged(nameof(HasErrors));
-		}
-
 		protected bool ContainsErrors([CallerMemberName, NotNull] string? propertyName = null)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(propertyName, nameof(propertyName));
@@ -33,48 +18,76 @@
 			return _errors.ContainsKey(propertyName);
 		}
 
-		protected bool IsValid<TValue>(TValue value, string propertyName)
+		private void OnPropertyChanged(string propertyName, bool modified)
+		{
+			PropertyChanged?.Invoke(this, new(propertyName));
+
+			if (modified)
+			{
+				Validate();
+
+				OnModified();
+			}
+		}
+
+		private void OnErrorsChanged(string propertyName)
+		{
+			ErrorsChanged?.Invoke(this, new(propertyName));
+			OnPropertyChanged(nameof(HasErrors), false);
+		}
+
+		protected abstract ValidateOptionsResult ValidateOptions();
+
+		private void Validate()
+		{
+			foreach (string key in _errors.Keys)
+			{
+				if (_errors.Remove(key))
+				{
+					OnErrorsChanged(key);
+				}
+			}
+
+			ValidateOptionsResult result = ValidateOptions();
+
+			if (result.Failed && result.Failures is IEnumerable<string> failures)
+			{
+				foreach (string failure in failures)
+				{
+					string[] parts = failure.Split(':', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+					if (parts.Length != 2)
+					{
+						continue;
+					}
+
+					string key = parts[0];
+
+					List<string> errors = _errors.TryGetValue(key, out IReadOnlyCollection<string>? value) ? new(value) : [];
+
+					string message = parts[1];
+
+					int index = message.IndexOf(key, StringComparison.InvariantCulture);
+
+					if (index > -1)
+					{
+						message = $"{message[..index]}{key.AddSpaces()}{message[(index + key.Length)..]}";
+					}
+
+					errors.Add(message);
+
+					_errors[key] = errors.AsReadOnly();
+
+					OnErrorsChanged(key);
+				}
+			}
+		}
+
+		protected void OnPropertyChanged([CallerMemberName, NotNull] string? propertyName = null)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(propertyName, nameof(propertyName));
 
-			return !_validationAttributes.TryGetValue(propertyName, out ValidationAttribute[]? validationAttributes) || validationAttributes.All(attribute => attribute.IsValid(value));
-		}
-
-		protected void ValidateProperty<TValue>(TValue value, [CallerArgumentExpression(nameof(value)), NotNull] string? propertyName = null)
-		{
-			if (ContainsErrors(propertyName) && _errors.Remove(propertyName))
-			{
-				OnErrorsChanged(propertyName);
-			}
-
-			if (_validationAttributes.TryGetValue(propertyName, out ValidationAttribute[]? validationAttributes))
-			{
-				List<string> errors = [];
-
-				foreach (ValidationAttribute validationAttribute in validationAttributes)
-				{
-					if (!validationAttribute.IsValid(value))
-					{
-						errors.Add(validationAttribute.FormatErrorMessage(_friendlyNames.TryGetValue(propertyName, out string? friendlyName) ? friendlyName : propertyName));
-					}
-				}
-
-				if (errors.Count > 0)
-				{
-					_errors.Add(propertyName, errors.AsReadOnly());
-
-					OnErrorsChanged(propertyName);
-				}
-			}
-		}
-
-		protected void OnPropertyChanged<TValue>(TValue value, bool reloadConfiguration = false, [CallerMemberName, NotNull] string? propertyName = null)
-		{
-			ValidateProperty(value, propertyName);
-
-			OnPropertyChanged(propertyName);
-
-			OnModified();
+			OnPropertyChanged(propertyName, true);
 		}
 
 		public IEnumerable GetErrors(string? propertyName)
@@ -82,6 +95,11 @@
 			return propertyName is null
 			? _errors.SelectMany(static pair => pair.Value).ToArray().AsReadOnly()
 			: _errors.TryGetValue(propertyName, out IReadOnlyCollection<string>? value) ? value : [];
+		}
+
+		protected ValidationModelBase()
+		{
+			Validate();
 		}
 	}
 }

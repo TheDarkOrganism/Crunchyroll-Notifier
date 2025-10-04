@@ -19,7 +19,7 @@ namespace WinUIApp.Models
 				{
 					_interval = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -37,7 +37,7 @@ namespace WinUIApp.Models
 				{
 					_maxNotifications = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -54,7 +54,7 @@ namespace WinUIApp.Models
 				{
 					_showFirstRun = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -72,7 +72,7 @@ namespace WinUIApp.Models
 				{
 					_visibility = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -90,7 +90,7 @@ namespace WinUIApp.Models
 				{
 					_feedHostType = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -106,7 +106,7 @@ namespace WinUIApp.Models
 				{
 					_useLogging = value;
 
-					OnPropertyChanged(value, true);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -125,7 +125,7 @@ namespace WinUIApp.Models
 				{
 					_logLevel = value;
 
-					OnPropertyChanged(value, true);
+					OnPropertyChanged();
 				}
 			}
 		}
@@ -136,6 +136,11 @@ namespace WinUIApp.Models
 
 		[NotEmpty]
 		public ObservableCollection<string> Names { get; } = [];
+
+		protected override ValidateOptionsResult ValidateOptions()
+		{
+			return ConfigModelValidator.Instance.Validate(null, this);
+		}
 
 		private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e, string propertyName)
 		{
@@ -149,11 +154,16 @@ namespace WinUIApp.Models
 				{
 					changes += newItems.Count;
 
-					foreach (string item in newItems)
+					ModelSerializerContext modelSerializerContext = ModelSerializerContext.Default;
+
+					if (modelSerializerContext.ConfigModel.Properties.FirstOrDefault(property => property.Name == modelSerializerContext.GetJsonName(propertyName)) is JsonPropertyInfo jsonPropertyInfo && jsonPropertyInfo.AttributeProvider?.GetCustomAttributes(typeof(ValidationAttribute), false) is ValidationAttribute[] validationAttributes)
 					{
-						if (!IsValid(item, propertyName) && values.Remove(item))
+						foreach (string item in newItems)
 						{
-							changes--;
+							if (!validationAttributes.All(attribute => attribute.IsValid(item)) && values.Remove(item))
+							{
+								changes--;
+							}
 						}
 					}
 				}
@@ -167,12 +177,6 @@ namespace WinUIApp.Models
 
 		public ConfigModel()
 		{
-			ValidateProperty(Interval);
-			ValidateProperty(MaxNotifications);
-			ValidateProperty(Visibility);
-			ValidateProperty(FeedHost);
-			ValidateProperty(LogLevel);
-
 			Dubs.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Dubs));
 			Names.CollectionChanged += (sender, e) => OnCollectionChanged(sender, e, nameof(Names));
 		}

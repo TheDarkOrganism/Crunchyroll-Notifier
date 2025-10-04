@@ -4,5 +4,10 @@
 	{
 		[NotEmpty(DisplayName = "Name")]
 		public override string Text { get => base.Text; set => base.Text = value; }
+
+		protected override ValidateOptionsResult ValidateOptions()
+		{
+			return NameTextInputModelValidator.Instance.Validate(null, this);
+		}
 	}
 }

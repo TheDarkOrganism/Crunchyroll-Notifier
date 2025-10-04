@@ -85,6 +85,7 @@
 		<Using Include="WinUIApp.Models" />
 		<Using Include="WinUIApp.Options" />
 		<Using Include="WinUIApp.Validation" />
+		<Using Include="WinUIApp.Validators" />
 	</ItemGroup>
 
 	<ItemGroup>

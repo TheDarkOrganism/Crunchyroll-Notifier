@@ -14,14 +14,9 @@
 				{
 					_text = value;
 
-					OnPropertyChanged(value);
+					OnPropertyChanged();
 				}
 			}
-		}
-
-		protected TextInputModelBase()
-		{
-			ValidateProperty(Text);
 		}
 	}
 }
