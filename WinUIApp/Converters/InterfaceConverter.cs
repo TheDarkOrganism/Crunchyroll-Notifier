@@ -25,7 +25,7 @@
 
 			Type valueType = value.GetType();
 
-			if (_context.GetTypeInfo(valueType) is not JsonTypeInfo jsonTypeInfo)
+			if (!_context.TryGetJsonTypeInfo(valueType, out JsonTypeInfo? jsonTypeInfo))
 			{
 				return;
 			}
