@@ -1,7 +1,7 @@
 ﻿namespace WinUIApp.Models
 {
 	internal abstract class ValidationModelBase<TModel> : ModelBase, IValidationModelBase
-		where TModel : notnull, ValidationModelBase<TModel>, new()
+		where TModel : notnull, ValidationModelBase<TModel>
 	{
 		private static readonly Dictionary<string, ValidationAttribute[]> _validationAttributes = typeof(TModel).GetValidationAttributes();
 

@@ -13,6 +13,7 @@
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
+		<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
 
 		<AssemblyName>Crunchyroll Notifier</AssemblyName>
 		<AssemblyVersion>1.1.1</AssemblyVersion>

@@ -1,7 +1,7 @@
 ﻿namespace WinUIApp.Models
 {
 	internal abstract class TextInputModelBase<TModel> : ValidationModelBase<TModel>, ITextInputModelBase
-		where TModel : notnull, ValidationModelBase<TModel>, new()
+		where TModel : notnull, ValidationModelBase<TModel>
 	{
 		private string _text = string.Empty;
 
