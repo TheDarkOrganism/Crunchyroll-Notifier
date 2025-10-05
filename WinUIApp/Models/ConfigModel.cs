@@ -156,11 +156,11 @@ namespace WinUIApp.Models
 
 					ModelSerializerContext modelSerializerContext = ModelSerializerContext.Default;
 
-					if (modelSerializerContext.ConfigModel.Properties.FirstOrDefault(property => property.Name == modelSerializerContext.GetJsonName(propertyName)) is JsonPropertyInfo jsonPropertyInfo && jsonPropertyInfo.AttributeProvider?.GetCustomAttributes(typeof(ValidationAttribute), false) is ValidationAttribute[] validationAttributes)
+					if (modelSerializerContext.ConfigModel.TryGetJsonPropertyInfo(modelSerializerContext.GetJsonName(propertyName), out JsonPropertyInfo? jsonPropertyInfo) && jsonPropertyInfo.TryGetAttributes(out IEnumerable<ValidationAttribute>? attributes))
 					{
 						foreach (string item in newItems)
 						{
-							if (!validationAttributes.All(attribute => attribute.IsValid(item)) && values.Remove(item))
+							if (!attributes.All(attribute => attribute.IsValid(item)) && values.Remove(item))
 							{
 								changes--;
 							}

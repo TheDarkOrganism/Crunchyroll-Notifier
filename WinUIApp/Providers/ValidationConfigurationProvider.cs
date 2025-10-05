@@ -188,17 +188,17 @@
 
 					string subKey = $"{key}:{propertyName}";
 
-					if (jsonTypeInfo?.Properties.FirstOrDefault(p => p.Name == propertyName) is JsonPropertyInfo jsonPropertyInfo && _serializerContext.TryGetJsonTypeInfo(jsonPropertyInfo.PropertyType, out JsonTypeInfo? jsonType) && TryRead(ref utf8JsonReader))
+					if (jsonTypeInfo?.TryGetJsonPropertyInfo(propertyName, out JsonPropertyInfo? jsonPropertyInfo) is true && _serializerContext.TryGetJsonTypeInfo(jsonPropertyInfo.PropertyType, out JsonTypeInfo? jsonType) && TryRead(ref utf8JsonReader))
 					{
 						ParseToken(ref utf8JsonReader, jsonType, subKey);
 
-						if (jsonPropertyInfo.AttributeProvider?.GetCustomAttributes(typeof(ValidationAttribute), false) is object[] attributes)
+						if (jsonPropertyInfo.TryGetAttributes(out IEnumerable<ValidationAttribute>? attributes))
 						{
 							const string logFormat = "Failed to validate {Attribute} with {Type} for {PropertyName}.";
 
 							const string rangeLogFormat = "The {Attribute} with {Value} must be between {Min} and {Max} for {PropertyName}.";
 
-							foreach (object attribute in attributes)
+							foreach (ValidationAttribute attribute in attributes)
 							{
 								object? enumValue;
 
