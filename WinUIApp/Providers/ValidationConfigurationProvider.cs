@@ -41,7 +41,7 @@
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, "Failed to read the JSON file {File}.", Source.Path);
+				Logger.LogFailedFileRead(ex, Source.Path);
 
 				return false;
 			}
@@ -51,7 +51,7 @@
 		{
 			if (utf8JsonReader.TokenType != JsonTokenType.Number)
 			{
-				Logger.LogDebug("The current JSON token is not a number.");
+				Logger.LogInvalidJsonTokenType(JsonTokenType.Number);
 
 				return null;
 			}
@@ -68,11 +68,11 @@
 				}
 				catch (JsonException ex)
 				{
-					Logger.LogWarning(ex, "Unable to desrialize the JSON token as {Type}.", jsonTypeInfo.Type.Name);
+					Logger.LogFailedTokenDeserialization(ex, utf8JsonReader.TokenType, jsonTypeInfo.Type);
 				}
 				catch (Exception ex)
 				{
-					Logger.LogWarning(ex, "Unable to desrialize the JSON token.");
+					Logger.LogFailedTokenDeserialization(ex, utf8JsonReader.TokenType);
 				}
 
 				return null;
@@ -103,7 +103,7 @@
 
 			if (value is null)
 			{
-				Logger.LogWarning("Unable to parse JSON token as {Type}.", valueType.Name);
+				Logger.LogFailedToParseToken(utf8JsonReader.TokenType, valueType);
 
 				return false;
 			}
@@ -122,7 +122,7 @@
 		{
 			if (!TryRead(ref utf8JsonReader))
 			{
-				Logger.LogTrace("Parsing finished.");
+				Logger.LogParsingFinished(Source.Path);
 
 				return;
 			}
@@ -171,7 +171,7 @@
 						{
 							ParseValue(ref utf8JsonReader, jsonTypeInfo, propertyName);
 
-							Logger.LogTrace("Parsed property {PropertyName}.", propertyName);
+							Logger.LogParsedProperty(propertyName);
 
 							return;
 						}
@@ -179,7 +179,7 @@
 						{
 							if (utf8JsonReader.TrySkip())
 							{
-								Logger.LogTrace("Skipped property {PropertyName}.", propertyName);
+								Logger.LogSkippedProperty(propertyName);
 							}
 
 							break;
@@ -194,12 +194,9 @@
 
 						if (jsonPropertyInfo.TryGetAttributes(out IEnumerable<ValidationAttribute>? attributes))
 						{
-							const string logFormat = "Failed to validate {Attribute} with {Type} for {PropertyName}.";
-
-							const string rangeLogFormat = "The {Attribute} with {Value} must be between {Min} and {Max} for {PropertyName}.";
-
 							foreach (ValidationAttribute attribute in attributes)
 							{
+								Type? enumType = null;
 								object? enumValue;
 
 								switch (attribute)
@@ -212,11 +209,9 @@
 											continue;
 										}
 
-										string? enumName = null;
-
 										if (attributes.OfType<EnumDataTypeAttribute>().FirstOrDefault() is EnumDataTypeAttribute enumDataType)
 										{
-											enumName = enumDataType.EnumType.Name;
+											enumType = enumDataType.EnumType;
 
 											if (TryParseEnum(ref utf8JsonReader, enumDataType, out enumValue) && allowedValuesAttribute.IsValid(enumValue))
 											{
@@ -229,7 +224,7 @@
 											continue;
 										}
 
-										Logger.LogWarning(logFormat, nameof(AllowedValuesAttribute), enumName ?? nameof(Object), propertyName);
+										Logger.LogInvalidProperty(allowedValuesAttribute, enumType ?? typeof(object), propertyName);
 
 										Set(subKey, values[0], jsonTypeInfo);
 
@@ -241,9 +236,9 @@
 										}
 										else
 										{
-											Type enumType = enumDataTypeAttribute.EnumType;
+											enumType = enumDataTypeAttribute.EnumType;
 
-											Logger.LogWarning(logFormat, nameof(EnumDataTypeAttribute), enumType.Name, propertyName);
+											Logger.LogInvalidProperty(enumDataTypeAttribute, enumType, propertyName);
 
 											Set(subKey, Enum.GetNames(enumType)[0]);
 										}
@@ -254,7 +249,7 @@
 
 										if (!TryParse(ref utf8JsonReader, out double number))
 										{
-											Logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), 0, minValue, maxValue, propertyName);
+											Logger.LogInvalidPropertyRange(rangeAttribute, 0, minValue, maxValue, propertyName);
 
 											Set(subKey, maxValue, jsonTypeInfo);
 
@@ -263,7 +258,7 @@
 
 										if (!rangeAttribute.IsValid(number) && double.TryParse(minValue.ToString(), out double min) && double.TryParse(maxValue.ToString(), out double max))
 										{
-											Logger.LogWarning(rangeLogFormat, nameof(RangeAttribute), number, min, max, propertyName);
+											Logger.LogInvalidPropertyRange(rangeAttribute, number, min, max, propertyName);
 
 											Set(subKey, Math.Clamp(number, min, max), jsonTypeInfo);
 										}
@@ -274,7 +269,7 @@
 
 										if (!TryParse(ref utf8JsonReader, out string? stringValue) || !TimeSpan.TryParse(stringValue, out TimeSpan timeSpan))
 										{
-											Logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), TimeSpan.Zero, mininum, maxinum, propertyName);
+											Logger.LogInvalidPropertyRange(timeSpanRangeAttribute, TimeSpan.Zero, mininum, maxinum, propertyName);
 
 											Set(subKey, mininum, jsonTypeInfo);
 
@@ -283,7 +278,7 @@
 
 										if (!timeSpanRangeAttribute.IsValid(timeSpan))
 										{
-											Logger.LogWarning(rangeLogFormat, nameof(TimeSpanRangeAttribute), timeSpan, mininum, maxinum, propertyName);
+											Logger.LogInvalidPropertyRange(timeSpanRangeAttribute, timeSpan, mininum, maxinum, propertyName);
 
 											Set(subKey, timeSpan.Clamp(mininum, maxinum), jsonTypeInfo);
 										}
@@ -329,7 +324,7 @@
 
 			string? file = Source.Path;
 
-			Logger.LogTrace("Parsing JSON configuration from {File}.", file);
+			Logger.LogParsingConfiguration(file);
 
 			if (_serializerContext.TryGetJsonTypeInfo(typeof(TModel), out JsonTypeInfo? jsonTypeInfo))
 			{

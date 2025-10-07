@@ -22,11 +22,11 @@
 			}
 			catch (JsonException ex)
 			{
-				Logger.LogWarning(ex, "Failed to read JSON from {File}.", file);
+				Logger.LogFailedJsonConfigurationLoad(ex, file);
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, "Unable to read {File}.", file);
+				Logger.LogFailedFileRead(ex, file);
 			}
 		}
 	}

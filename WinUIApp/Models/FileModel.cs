@@ -28,14 +28,14 @@
 		{
 			switch (ex)
 			{
-				case ObjectDisposedException:
-					logger.LogDebug("The operation was canceled because the application is shutting down.");
+				case ObjectDisposedException objectDisposedException:
+					logger.LogObjectDisposed(objectDisposedException, typeof(FileModel<TModel, TIModel>));
 					break;
-				case OperationCanceledException:
-					logger.LogDebug("The operation was canceled.");
+				case OperationCanceledException operationCanceledException:
+					logger.LogOperationCanceled(operationCanceledException);
 					break;
 				default:
-					logger.LogError(ex, "Failed to wait for the file {File}.", File);
+					logger.LogWaitFailed(ex, File);
 					throw ex;
 			}
 		}

@@ -47,14 +47,14 @@
 		{
 			if (!Value.Modified)
 			{
-				_logger.LogDebug("{File} can't be saved due to the {Model} not being modified.", _file, nameof(TIOptions));
+				_logger.LogNotModified(_file, typeof(TIOptions));
 
 				return false;
 			}
 
 			if (Value is INotifyDataErrorInfo errorInfo && errorInfo.HasErrors)
 			{
-				_logger.LogDebug("{File} can't be saved due to the {Model} having validation errors.", _file, nameof(TIOptions));
+				_logger.LogHasValidationErrors(_file, typeof(TIOptions));
 
 				return false;
 			}
@@ -74,7 +74,7 @@
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Failed to get to {FileStream} for {File}.", nameof(FileStream), _file);
+				_logger.LogFailGetFileStream(ex, _file);
 
 				fileStream = null;
 				return false;
@@ -107,7 +107,7 @@
 			}
 			else
 			{
-				_logger.LogWarning("Configuration for {File} was not a valid JSON object.", _file);
+				_logger.LogInvalidJsonConfigiurationObject(_file);
 			}
 
 			utf8JsonWriter.WriteEndObject();
@@ -125,9 +125,9 @@
 					{
 						jsonDocument = JsonDocument.Parse(fileStream, _jsonDocumentOptions);
 					}
-					catch
+					catch (Exception ex)
 					{
-						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
+						_logger.LogInvalidJsonConfigiurationDocument(ex, _file);
 
 						using Stream stream = ResourceHelper.GetResource(_file).CreateReadStream();
 
@@ -144,7 +144,7 @@
 					}
 					catch (Exception ex)
 					{
-						_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
+						_logger.LogFailedFileStreamSerialization(ex, _file);
 					}
 					finally
 					{
@@ -167,9 +167,9 @@
 					{
 						jsonDocument = await JsonDocument.ParseAsync(fileStream, _jsonDocumentOptions, token);
 					}
-					catch
+					catch (Exception ex)
 					{
-						_logger.LogWarning("Configuration for {File} was not a valid JSON document.", _file);
+						_logger.LogInvalidJsonConfigiurationDocument(ex, _file);
 
 						await using Stream stream = ResourceHelper.GetResource(_file).CreateReadStream();
 
@@ -186,7 +186,7 @@
 					}
 					catch (Exception ex)
 					{
-						_logger.LogError(ex, "Failed to serialize {FileStream} for {File}", nameof(FileStream), _file);
+						_logger.LogFailedFileStreamSerialization(ex, _file);
 					}
 					finally
 					{

@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using System.Xml;
 using System.Xml.XPath;
 
 namespace WinUIApp.Services
@@ -89,7 +88,7 @@ namespace WinUIApp.Services
 								}
 								catch (HttpRequestException ex)
 								{
-									logger.LogDebug(ex, "Unable to load the feed for {HostType}.", pair.Key);
+									logger.LogFailedFeedHostLoad(ex, pair.Key);
 
 									continue;
 								}
@@ -98,7 +97,7 @@ namespace WinUIApp.Services
 
 						if (source is null || !source.ValidateResponse(httpResponse))
 						{
-							logger.LogWarning("Unable to load the any RSS feeds.");
+							logger.LogNoRSSFeeds();
 
 							continue;
 						}
@@ -149,11 +148,11 @@ namespace WinUIApp.Services
 					}
 					catch (XmlException ex)
 					{
-						logger.LogError(ex, "The RSS feed is not valid XML.");
+						logger.LogInvalidRSS(ex);
 					}
 					catch (Exception ex)
 					{
-						logger.LogError(ex, "Unable to read the RSS feed.");
+						logger.LogInvalidFeed(ex);
 					}
 					finally
 					{
@@ -163,16 +162,15 @@ namespace WinUIApp.Services
 					}
 				} while (await periodicTimer.WaitForNextTickAsync(cancellationToken));
 			}
+			catch (OperationCanceledException ex)
+			{
+				logger.LogOperationCanceled(ex);
+
+				logger.LogMainLoopStopped();
+			}
 			catch (Exception ex)
 			{
-				if (ex is OperationCanceledException)
-				{
-					logger.LogDebug("Main loop stopped.");
-				}
-				else
-				{
-					logger.LogError(ex, "The main loop had a unknown error.");
-				}
+				logger.LogFailedMainLoop(ex);
 			}
 
 			#endregion

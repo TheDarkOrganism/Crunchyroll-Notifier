@@ -4,6 +4,10 @@ namespace WinUIApp.Services
 {
 	internal sealed class FeedSource
 	{
+		private const string _xmlContentType = "text/xml";
+
+		private const string _rssContentType = "application/xml+rss";
+
 		private DateTime _delay = DateTime.MinValue;
 
 		private int _backOff;
@@ -25,7 +29,7 @@ namespace WinUIApp.Services
 		{
 			if (_delay > DateTime.Now || _backOff > 0)
 			{
-				_logger.LogWarning("The request to {Source} must be after {Delay}.", _source, _delay);
+				_logger.LogEarlyRequest(_source, _delay);
 
 				return null;
 			}
@@ -40,9 +44,11 @@ namespace WinUIApp.Services
 				return false;
 			}
 
-			if (responseMessage.RequestMessage?.RequestUri?.AbsoluteUri != _source.AbsoluteUri)
+			Uri? responseUri = responseMessage.RequestMessage?.RequestUri;
+
+			if (responseUri?.AbsoluteUri != _source.AbsoluteUri)
 			{
-				_logger.LogDebug("The {RequestMessage}.{UriName} was not {Source}.", nameof(HttpRequestMessage), nameof(HttpRequestMessage.RequestUri), _source);
+				_logger.LogUriMismatch(responseUri, _source);
 
 				return false;
 			}
@@ -62,7 +68,7 @@ namespace WinUIApp.Services
 						_backOff++;
 					}
 
-					_logger.LogWarning("The request to {Source} was Rate-limited until {Delay}.", _source, _delay);
+					_logger.LogRateLimited(_source, _delay);
 
 					return false;
 				}
@@ -72,12 +78,12 @@ namespace WinUIApp.Services
 
 			if (string.IsNullOrWhiteSpace(contentType))
 			{
-				_logger.LogError("The Content-Type was null or empty for request to {Source}.", _source);
+				_logger.LogNullContentType(_source);
 
 				return false;
 			}
 
-			if (contentType is "text/xml" or "application/xml+rss")
+			if (contentType is _xmlContentType or _rssContentType)
 			{
 				_delay = DateTime.MinValue;
 
@@ -86,7 +92,7 @@ namespace WinUIApp.Services
 				return true;
 			}
 
-			_logger.LogWarning("The Content-Type for the {Source} was an invalid {ContentType}.", _source, contentType);
+			_logger.LogInvalidContentType(_source, contentType, _xmlContentType, _rssContentType);
 
 			return false;
 		}
