@@ -12,7 +12,7 @@
 
 				await configOptions.SaveAsync(cancellationToken);
 
-				notificationHelper.Notify("Welcome", "You can find the settings under the system tray and by clicking on the icon.");
+				notificationHelper.Notify("Welcome", "You can find the settings in the system tray by clicking the icon.");
 			}
 		}
 
