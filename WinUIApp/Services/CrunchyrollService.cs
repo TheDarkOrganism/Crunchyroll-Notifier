@@ -124,8 +124,15 @@ namespace WinUIApp.Services
 
 						string pub = configModel.Visibility is VisibilityType.Default ? "pub" : $"crunchyroll:{configModel.Visibility.ToString().ToLower(CultureInfo.InvariantCulture)}Pub";
 
-						foreach (XPathNavigator nav in navigator.Select($"//item[position() <= {configModel.MaxNotifications}]").OfType<XPathNavigator>().Reverse())
+						int notifications = 0;
+
+						foreach (XPathNavigator nav in navigator.Select($"//item").OfType<XPathNavigator>().Reverse())
 						{
+							if (notifications >= configModel.MaxNotifications)
+							{
+								break;
+							}
+
 							if (nav.SelectSingleNode(".//category", manager)?.Value == "Anime" && DateTime.TryParse(nav.SelectSingleNode($".//{pub}Date", manager)?.Value, out DateTime result) && result > copy)
 							{
 								string? dub = nav.SelectSingleNode(".//title", manager)?.Value is string title ? DubRegex().Match(title).Groups.Values.ElementAtOrDefault(1)?.Value : null;
@@ -133,6 +140,8 @@ namespace WinUIApp.Services
 								if (CheckValue(dub, configModel.Dubs) && CheckValue(nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value, configModel.Names) && Uri.TryCreate(nav.SelectSingleNode(".//link")?.Value, UriKind.Absolute, out Uri? uri))
 								{
 									notificationHelper.Notify($"{nav.SelectSingleNode(".//crunchyroll:seriesTitle", manager)?.Value}{(dub is null ? string.Empty : $" ({dub})")}", $"Episode {nav.SelectSingleNode(".//crunchyroll:episodeNumber", manager)?.ValueAsInt}", "Open", uri);
+
+									notifications++;
 								}
 
 								lastUpdateModel.LastUpdate = result;
