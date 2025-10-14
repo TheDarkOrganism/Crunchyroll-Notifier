@@ -6,7 +6,8 @@
 	xmlns:serilog="using:Serilog.Events"
 	xmlns:controls="using:WinUIApp.Controls"
 	xmlns:models="using:WinUIApp.Models"
-	xmlns:markup="using:WinUIApp.Markup"
+	xmlns:binding="using:WinUIApp.Markup.Binding"
+	xmlns:converters="using:WinUIApp.Markup.Converters"
 	xmlns:enums="using:WinUIApp.Enums"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -80,11 +81,11 @@
 						<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
 					</Style>
 
-					<markup:EnumToIndexConverter x:Key="EnumIndexConverter" />
+					<converters:EnumToIndexConverter x:Key="EnumIndexConverter" />
 
-					<markup:AddSpacesConverter x:Key="AddSpacesConverter" />
+					<converters:AddSpacesConverter x:Key="AddSpacesConverter" />
 
-					<markup:BoolConverter x:Key="BoolConverter" />
+					<converters:BoolConverter x:Key="BoolConverter" />
 
 				</ResourceDictionary>
 
@@ -133,7 +134,7 @@
 
 			<TextBlock Text="Visibility" Grid.Row="2" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
+			<ComboBox Grid.Row="2" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={binding:EnumBinding EnumType=enums:VisibilityType}, Mode=OneTime}" SelectedItem="{Binding Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding Visibility, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="enums:VisibilityType">
 						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />
@@ -147,7 +148,7 @@
 
 			<TextBlock Text="Feed Host" Grid.Row="3" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
+			<ComboBox Grid.Row="3" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={binding:EnumBinding EnumType=enums:FeedHostType}, Mode=OneTime}" SelectedItem="{Binding FeedHost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding FeedHost, Converter={StaticResource EnumIndexConverter}, Mode=OneTime}" Style="{StaticResource DropdownStyle}" Loaded="Control_Loaded">
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="enums:FeedHostType">
 						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />
@@ -189,7 +190,7 @@
 
 			<TextBlock Text="Log Level" Grid.Row="7" Style="{StaticResource LabelStyle}" />
 
-			<ComboBox Grid.Row="7" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={markup:EnumBinding EnumType=serilog:LogEventLevel, Skip=2}, Mode=OneTime}" SelectedItem="{Binding LogLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding LogLevel, Converter={StaticResource EnumIndexConverter}, ConverterParameter=2, Mode=OneTime}" Style="{StaticResource DropdownStyle}" IsEnabled="{Binding ElementName=LoggingCheckBox, Path=IsChecked, Converter={StaticResource BoolConverter}, Mode=OneWay}" Loaded="Control_Loaded">
+			<ComboBox Grid.Row="7" Template="{StaticResource ComboBoxErrorTemplate}" ItemsSource="{Binding Source={binding:EnumBinding EnumType=serilog:LogEventLevel, Skip=2}, Mode=OneTime}" SelectedItem="{Binding LogLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding LogLevel, Converter={StaticResource EnumIndexConverter}, ConverterParameter=2, Mode=OneTime}" Style="{StaticResource DropdownStyle}" IsEnabled="{Binding ElementName=LoggingCheckBox, Path=IsChecked, Converter={StaticResource BoolConverter}, Mode=OneWay}" Loaded="Control_Loaded">
 				<ComboBox.ItemTemplate>
 					<DataTemplate x:DataType="serilog:LogEventLevel">
 						<TextBlock Text="{Binding Converter={StaticResource AddSpacesConverter}}" />

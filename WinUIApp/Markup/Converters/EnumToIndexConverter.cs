@@ -1,4 +1,4 @@
-﻿namespace WinUIApp.Markup
+﻿namespace WinUIApp.Markup.Converters
 {
 	internal sealed partial class EnumToIndexConverter : IValueConverter
 	{

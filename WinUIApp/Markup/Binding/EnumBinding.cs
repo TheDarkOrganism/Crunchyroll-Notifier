@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Markup;
 
-namespace WinUIApp.Markup
+namespace WinUIApp.Markup.Binding
 {
 	internal sealed partial class EnumBinding : MarkupExtension
 	{
