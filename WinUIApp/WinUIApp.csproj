@@ -44,7 +44,7 @@
 
 	<ItemGroup Condition="$(Configuration.StartsWith('Debug'))">
 		<None Update="appsettings.Development.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
@@ -66,6 +66,7 @@
 		<Using Include="Microsoft.UI.Xaml" />
 		<Using Include="Microsoft.UI.Xaml.Controls" />
 		<Using Include="Microsoft.UI.Xaml.Data" />
+		<Using Include="Microsoft.UI.Xaml.Markup" />
 		<Using Include="Microsoft.Windows.AppNotifications" />
 		<Using Include="Serilog.Events" />
 		<Using Include="System.Collections" />
